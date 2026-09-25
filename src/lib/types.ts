@@ -6,6 +6,7 @@ export interface Person {
   lastName: string;
   gender: Gender;
   birthDate?: string;
+  isDeceased?: boolean;
   deathDate?: string;
   photoUrl?: string;
   notes?: string;

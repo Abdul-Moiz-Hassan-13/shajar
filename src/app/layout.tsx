@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Family Tree",
-  description: "A personal family tree app.",
+  title: "Shajar",
+  description: "Shajar — your family tree, rooted in one place.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

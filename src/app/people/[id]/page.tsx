@@ -16,7 +16,7 @@ export default async function EditPersonPage({ params }: PageProps) {
   if (!person) notFound();
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="mx-auto flex max-w-xl flex-col gap-6">
       <h1 className="text-2xl font-semibold">
         Edit {person.firstName} {person.lastName}
       </h1>

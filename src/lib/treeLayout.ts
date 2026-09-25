@@ -1,10 +1,10 @@
 import type { Person } from "./types";
 
-export const NODE_WIDTH = 170;
-export const NODE_HEIGHT = 88;
-const UNIT_GAP = 50;
-const SPOUSE_GAP = 16;
-const GEN_GAP = 110;
+export const NODE_WIDTH = 130;
+export const NODE_HEIGHT = 130;
+const UNIT_GAP = 40;
+const SPOUSE_GAP = 24;
+const GEN_GAP = 90;
 
 export interface TreeNode {
   person: Person;

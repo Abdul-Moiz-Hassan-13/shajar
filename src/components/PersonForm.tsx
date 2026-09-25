@@ -19,6 +19,7 @@ export function PersonForm({ person, people }: PersonFormProps) {
   const [lastName, setLastName] = useState(person?.lastName ?? "");
   const [gender, setGender] = useState(person?.gender ?? "other");
   const [birthDate, setBirthDate] = useState(person?.birthDate ?? "");
+  const [isDeceased, setIsDeceased] = useState(person?.isDeceased ?? false);
   const [deathDate, setDeathDate] = useState(person?.deathDate ?? "");
   const [photoUrl, setPhotoUrl] = useState(person?.photoUrl ?? "");
   const [notes, setNotes] = useState(person?.notes ?? "");
@@ -59,7 +60,8 @@ export function PersonForm({ person, people }: PersonFormProps) {
       lastName: lastName.trim(),
       gender,
       birthDate: birthDate || undefined,
-      deathDate: deathDate || undefined,
+      isDeceased,
+      deathDate: isDeceased ? deathDate || undefined : undefined,
       photoUrl: photoUrl || undefined,
       notes: notes || undefined,
       parentIds,
@@ -123,33 +125,60 @@ export function PersonForm({ person, people }: PersonFormProps) {
           onChange={(e) =>
             setGender(e.target.value as Person["gender"])
           }
-          className="rounded-md border border-black/15 px-3 py-2 dark:border-white/20 dark:bg-transparent"
+          className="rounded-md border border-black/15 bg-white px-3 py-2 text-black dark:border-white/20 dark:bg-neutral-900 dark:text-white"
         >
-          <option value="female">Female</option>
-          <option value="male">Male</option>
-          <option value="other">Other</option>
+          <option value="male" className="bg-white text-black dark:bg-neutral-900 dark:text-white">
+            Male
+          </option>
+          <option value="female" className="bg-white text-black dark:bg-neutral-900 dark:text-white">
+            Female
+          </option>
+          <option value="other" className="bg-white text-black dark:bg-neutral-900 dark:text-white">
+            Other
+          </option>
         </select>
       </label>
 
-      <div className="grid grid-cols-2 gap-4">
-        <label className="flex flex-col gap-1 text-sm">
-          Birth date
-          <input
-            type="date"
-            value={birthDate}
-            onChange={(e) => setBirthDate(e.target.value)}
-            className="rounded-md border border-black/15 px-3 py-2 dark:border-white/20 dark:bg-transparent"
-          />
+      <label className="flex flex-col gap-1 text-sm">
+        Birth date
+        <input
+          type="date"
+          value={birthDate}
+          onChange={(e) => setBirthDate(e.target.value)}
+          className="rounded-md border border-black/15 px-3 py-2 dark:border-white/20 dark:bg-transparent"
+        />
+      </label>
+
+      <div className="flex flex-col gap-3 rounded-md border border-black/15 p-3 dark:border-white/20">
+        <label className="flex items-center justify-between gap-2 text-sm font-medium">
+          Deceased
+          <button
+            type="button"
+            role="switch"
+            aria-checked={isDeceased}
+            onClick={() => setIsDeceased((prev) => !prev)}
+            className="relative h-6 w-11 shrink-0 rounded-full transition-colors"
+            style={{
+              backgroundColor: isDeceased ? "#10b981" : "#71717a",
+            }}
+          >
+            <span
+              className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all"
+              style={{ left: isDeceased ? "22px" : "2px" }}
+            />
+          </button>
         </label>
-        <label className="flex flex-col gap-1 text-sm">
-          Death date
-          <input
-            type="date"
-            value={deathDate}
-            onChange={(e) => setDeathDate(e.target.value)}
-            className="rounded-md border border-black/15 px-3 py-2 dark:border-white/20 dark:bg-transparent"
-          />
-        </label>
+        {isDeceased && (
+          <label className="flex flex-col gap-1 text-sm">
+            Death date (optional)
+            <input
+              type="date"
+              value={deathDate}
+              onChange={(e) => setDeathDate(e.target.value)}
+              className="rounded-md border border-black/15 px-3 py-2 dark:border-white/20 dark:bg-transparent"
+            />
+          </label>
+        )}
       </div>
 
       <label className="flex flex-col gap-1 text-sm">

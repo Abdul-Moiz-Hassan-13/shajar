@@ -61,7 +61,9 @@ export default async function PeoplePage() {
                 >
                   <td className="px-4 py-2">{fullName(p)}</td>
                   <td className="px-4 py-2">{p.birthDate ?? "—"}</td>
-                  <td className="px-4 py-2">{p.deathDate ?? "—"}</td>
+                  <td className="px-4 py-2">
+                    {p.isDeceased ? p.deathDate ?? "Yes" : "—"}
+                  </td>
                   <td className="px-4 py-2">{names(p.parentIds, byId)}</td>
                   <td className="px-4 py-2">{names(p.spouseIds, byId)}</td>
                   <td className="px-4 py-2">
