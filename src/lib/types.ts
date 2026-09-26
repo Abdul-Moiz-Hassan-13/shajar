@@ -12,8 +12,12 @@ export interface Person {
   notes?: string;
   /** 0-2 ids of this person's parents. */
   parentIds: string[];
-  /** ids of this person's spouses/partners. */
+  /** Optional birth order among siblings (lower = older); used to order the tree left-to-right. */
+  siblingOrder?: number;
+  /** ids of this person's spouses/partners (current, widowed, or divorced). */
   spouseIds: string[];
+  /** subset of spouseIds whose relationship with this person ended in divorce. */
+  divorcedSpouseIds?: string[];
 }
 
 export interface FamilyData {

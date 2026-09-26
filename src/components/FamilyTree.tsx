@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { NODE_HEIGHT, NODE_WIDTH, computeLayout } from "@/lib/treeLayout";
 import type { Person } from "@/lib/types";
+
+const HIGHLIGHT_COLOR = "#f59e0b";
 
 function lifespan(p: Person): string {
   if (!p.birthDate && !p.deathDate) return "";
@@ -20,6 +22,9 @@ const GENDER_COLOR: Record<Person["gender"], string> = {
 
 export function FamilyTree({ people }: { people: Person[] }) {
   const layout = useMemo(() => computeLayout(people), [people]);
+  const [hoveredKey, setHoveredKey] = useState<string | null>(null);
+  const [pinnedKey, setPinnedKey] = useState<string | null>(null);
+  const activeKey = hoveredKey ?? pinnedKey;
 
   if (people.length === 0) {
     return (
@@ -43,33 +48,88 @@ export function FamilyTree({ people }: { people: Person[] }) {
         className="min-w-full"
       >
         <g transform={`translate(${padding}, ${padding})`}>
+          <rect
+            x={0}
+            y={0}
+            width={layout.width}
+            height={layout.height}
+            fill="transparent"
+            onClick={() => setPinnedKey(null)}
+          />
           {layout.parentEdges.map((edge, i) => {
-            const midY = edge.parentBottomY + (edge.childTopY - edge.parentBottomY) / 2;
-            const d = `M ${edge.parentMidX} ${edge.parentBottomY} L ${edge.parentMidX} ${midY} L ${edge.childX} ${midY} L ${edge.childX} ${edge.childTopY}`;
+            const key = `parent-${i}`;
+            const active = key === activeKey;
+            const d = `M ${edge.parentMidX} ${edge.parentBottomY} L ${edge.parentMidX} ${edge.midY} L ${edge.childX} ${edge.midY} L ${edge.childX} ${edge.childTopY}`;
             return (
-              <path
-                key={i}
-                d={d}
-                fill="none"
-                stroke="currentColor"
-                strokeOpacity={0.3}
-                strokeWidth={1.5}
-              />
+              <g key={key}>
+                <path
+                  d={d}
+                  fill="none"
+                  stroke="transparent"
+                  strokeWidth={14}
+                  className="cursor-pointer"
+                  onMouseEnter={() => setHoveredKey(key)}
+                  onMouseLeave={() => setHoveredKey(null)}
+                  onClick={() =>
+                    setPinnedKey((prev) => (prev === key ? null : key))
+                  }
+                />
+                <path
+                  d={d}
+                  fill="none"
+                  stroke={active ? HIGHLIGHT_COLOR : "currentColor"}
+                  strokeOpacity={active ? 1 : 0.3}
+                  strokeWidth={active ? 3 : 1.5}
+                  pointerEvents="none"
+                />
+              </g>
             );
           })}
 
-          {layout.spouseEdges.map((edge, i) => (
-            <line
-              key={i}
-              x1={edge.x1}
-              x2={edge.x2}
-              y1={edge.y}
-              y2={edge.y}
-              stroke="currentColor"
-              strokeOpacity={0.3}
-              strokeWidth={1.5}
-            />
-          ))}
+          {layout.spouseEdges.map((edge, i) => {
+            const key = `spouse-${i}`;
+            const active = key === activeKey;
+            return (
+              <g key={key}>
+                <line
+                  x1={edge.x1}
+                  x2={edge.x2}
+                  y1={edge.y}
+                  y2={edge.y}
+                  stroke="transparent"
+                  strokeWidth={14}
+                  className="cursor-pointer"
+                  onMouseEnter={() => setHoveredKey(key)}
+                  onMouseLeave={() => setHoveredKey(null)}
+                  onClick={() =>
+                    setPinnedKey((prev) => (prev === key ? null : key))
+                  }
+                />
+                <line
+                  x1={edge.x1}
+                  x2={edge.x2}
+                  y1={edge.y}
+                  y2={edge.y}
+                  stroke={active ? HIGHLIGHT_COLOR : "currentColor"}
+                  strokeOpacity={active ? 1 : 0.3}
+                  strokeWidth={active ? 3 : 1.5}
+                  strokeDasharray={edge.status !== "married" ? "5 4" : undefined}
+                  pointerEvents="none"
+                />
+                {edge.status === "divorced" && (
+                  <line
+                    x1={(edge.x1 + edge.x2) / 2 - 5}
+                    y1={edge.y + 8}
+                    x2={(edge.x1 + edge.x2) / 2 + 5}
+                    y2={edge.y - 8}
+                    stroke={active ? HIGHLIGHT_COLOR : "currentColor"}
+                    strokeWidth={2}
+                    pointerEvents="none"
+                  />
+                )}
+              </g>
+            );
+          })}
 
           {layout.nodes.map((node) => {
             const span = lifespan(node.person);

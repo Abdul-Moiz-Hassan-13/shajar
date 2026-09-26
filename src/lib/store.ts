@@ -40,6 +40,9 @@ function removeBacklinks(data: FamilyData, id: string): void {
   for (const person of data.people) {
     person.parentIds = person.parentIds.filter((pid) => pid !== id);
     person.spouseIds = person.spouseIds.filter((sid) => sid !== id);
+    person.divorcedSpouseIds = (person.divorcedSpouseIds ?? []).filter(
+      (sid) => sid !== id,
+    );
   }
 }
 
@@ -52,6 +55,21 @@ function syncRelations(data: FamilyData, person: Person): void {
     if (shouldBeSpouse && !isSpouse) other.spouseIds.push(person.id);
     if (!shouldBeSpouse && isSpouse) {
       other.spouseIds = other.spouseIds.filter((id) => id !== person.id);
+    }
+
+    // Keep divorce status symmetric too (and only meaningful between actual
+    // spouses).
+    const divorced = person.divorcedSpouseIds ?? [];
+    const otherDivorced = other.divorcedSpouseIds ?? [];
+    const shouldBeDivorced = shouldBeSpouse && divorced.includes(other.id);
+    const isDivorced = otherDivorced.includes(person.id);
+    if (shouldBeDivorced && !isDivorced) {
+      other.divorcedSpouseIds = [...otherDivorced, person.id];
+    }
+    if (!shouldBeDivorced && isDivorced) {
+      other.divorcedSpouseIds = otherDivorced.filter(
+        (id) => id !== person.id,
+      );
     }
   }
 }
@@ -70,6 +88,8 @@ export async function createPerson(input: PersonInput): Promise<Person> {
     notes: input.notes,
     parentIds: input.parentIds ?? [],
     spouseIds: input.spouseIds ?? [],
+    divorcedSpouseIds: input.divorcedSpouseIds ?? [],
+    siblingOrder: input.siblingOrder,
   };
   data.people.push(person);
   syncRelations(data, person);
@@ -95,6 +115,8 @@ export async function updatePerson(
   existing.notes = input.notes;
   existing.parentIds = input.parentIds ?? [];
   existing.spouseIds = input.spouseIds ?? [];
+  existing.divorcedSpouseIds = input.divorcedSpouseIds ?? [];
+  existing.siblingOrder = input.siblingOrder;
 
   syncRelations(data, existing);
   await writeData(data);

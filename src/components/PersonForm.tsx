@@ -26,8 +26,14 @@ export function PersonForm({ person, people }: PersonFormProps) {
   const [parentIds, setParentIds] = useState<string[]>(
     person?.parentIds ?? [],
   );
+  const [siblingOrder, setSiblingOrder] = useState(
+    person?.siblingOrder?.toString() ?? "",
+  );
   const [spouseIds, setSpouseIds] = useState<string[]>(
     person?.spouseIds ?? [],
+  );
+  const [divorcedSpouseIds, setDivorcedSpouseIds] = useState<string[]>(
+    person?.divorcedSpouseIds ?? [],
   );
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -48,6 +54,13 @@ export function PersonForm({ person, people }: PersonFormProps) {
     setSpouseIds((prev) =>
       prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
     );
+    setDivorcedSpouseIds((prev) => prev.filter((p) => p !== id));
+  }
+
+  function toggleDivorced(id: string) {
+    setDivorcedSpouseIds((prev) =>
+      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
+    );
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -66,6 +79,8 @@ export function PersonForm({ person, people }: PersonFormProps) {
       notes: notes || undefined,
       parentIds,
       spouseIds,
+      divorcedSpouseIds,
+      siblingOrder: siblingOrder ? Number(siblingOrder) : undefined,
     };
 
     const url = person ? `/api/people/${person.id}` : "/api/people";
@@ -201,6 +216,17 @@ export function PersonForm({ person, people }: PersonFormProps) {
         />
       </label>
 
+      <label className="flex flex-col gap-1 text-sm">
+        Birth order among siblings (optional)
+        <input
+          type="number"
+          value={siblingOrder}
+          onChange={(e) => setSiblingOrder(e.target.value)}
+          placeholder="1 = oldest, 2 = next, …"
+          className="rounded-md border border-black/15 px-3 py-2 dark:border-white/20 dark:bg-transparent"
+        />
+      </label>
+
       <fieldset className="flex flex-col gap-2">
         <legend className="text-sm font-medium">
           Parents (up to 2)
@@ -236,14 +262,26 @@ export function PersonForm({ person, people }: PersonFormProps) {
             </p>
           )}
           {otherPeople.map((p) => (
-            <label key={p.id} className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={spouseIds.includes(p.id)}
-                onChange={() => toggleSpouse(p.id)}
-              />
-              {fullName(p)}
-            </label>
+            <div key={p.id} className="flex items-center justify-between gap-2">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={spouseIds.includes(p.id)}
+                  onChange={() => toggleSpouse(p.id)}
+                />
+                {fullName(p)}
+              </label>
+              {spouseIds.includes(p.id) && (
+                <label className="flex items-center gap-1.5 text-xs text-black/60 dark:text-white/60">
+                  <input
+                    type="checkbox"
+                    checked={divorcedSpouseIds.includes(p.id)}
+                    onChange={() => toggleDivorced(p.id)}
+                  />
+                  Divorced
+                </label>
+              )}
+            </div>
           ))}
         </div>
       </fieldset>
