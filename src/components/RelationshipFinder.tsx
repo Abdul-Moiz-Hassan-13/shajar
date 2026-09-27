@@ -26,6 +26,8 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
   const [idB, setIdB] = useState("");
   const [queryA, setQueryA] = useState("");
   const [queryB, setQueryB] = useState("");
+  const [openA, setOpenA] = useState(false);
+  const [openB, setOpenB] = useState(false);
   const [result, setResult] = useState<
     ReturnType<typeof findRelationship> | "none" | null
   >(null);
@@ -40,10 +42,27 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
   function selectA(p: Person) {
     setIdA(p.id);
     setQueryA(fullName(p));
+    setOpenA(false);
   }
   function selectB(p: Person) {
     setIdB(p.id);
     setQueryB(fullName(p));
+    setOpenB(false);
+  }
+
+  function toggleOpenA() {
+    if (idA) {
+      setIdA("");
+      setQueryA("");
+    }
+    setOpenA((prev) => !prev);
+  }
+  function toggleOpenB() {
+    if (idB) {
+      setIdB("");
+      setQueryB("");
+    }
+    setOpenB((prev) => !prev);
   }
 
   function handleFind() {
@@ -59,23 +78,33 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="flex flex-col gap-1 text-sm">
           Person A
-          <input
-            type="search"
-            value={queryA}
-            onChange={(e) => {
-              setQueryA(e.target.value);
-              setIdA("");
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                if (candidatesA.length > 0) selectA(candidatesA[0]);
-              }
-            }}
-            placeholder="Search…"
-            className="rounded-md border border-black/15 px-3 py-2 text-sm dark:border-white/20 dark:bg-transparent"
-          />
-          {queryA && !idA && (
+          <div className="relative">
+            <input
+              type="search"
+              value={queryA}
+              onChange={(e) => {
+                setQueryA(e.target.value);
+                setIdA("");
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (candidatesA.length > 0) selectA(candidatesA[0]);
+                }
+              }}
+              placeholder="Search…"
+              className="w-full rounded-md border border-black/15 px-3 py-2 pr-8 text-sm dark:border-white/20 dark:bg-transparent"
+            />
+            <button
+              type="button"
+              onClick={toggleOpenA}
+              aria-label="Toggle list"
+              className="absolute inset-y-0 right-0 flex w-8 items-center justify-center text-black/50 dark:text-white/50"
+            >
+              ▼
+            </button>
+          </div>
+          {(queryA || openA) && !idA && (
             <div className="max-h-48 overflow-y-auto rounded-md border border-black/15 dark:border-white/20">
               {candidatesA.length === 0 && (
                 <p className="px-3 py-2 text-sm text-black/50 dark:text-white/50">
@@ -97,23 +126,33 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
         </label>
         <label className="flex flex-col gap-1 text-sm">
           Person B
-          <input
-            type="search"
-            value={queryB}
-            onChange={(e) => {
-              setQueryB(e.target.value);
-              setIdB("");
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                if (candidatesB.length > 0) selectB(candidatesB[0]);
-              }
-            }}
-            placeholder="Search…"
-            className="rounded-md border border-black/15 px-3 py-2 text-sm dark:border-white/20 dark:bg-transparent"
-          />
-          {queryB && !idB && (
+          <div className="relative">
+            <input
+              type="search"
+              value={queryB}
+              onChange={(e) => {
+                setQueryB(e.target.value);
+                setIdB("");
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (candidatesB.length > 0) selectB(candidatesB[0]);
+                }
+              }}
+              placeholder="Search…"
+              className="w-full rounded-md border border-black/15 px-3 py-2 pr-8 text-sm dark:border-white/20 dark:bg-transparent"
+            />
+            <button
+              type="button"
+              onClick={toggleOpenB}
+              aria-label="Toggle list"
+              className="absolute inset-y-0 right-0 flex w-8 items-center justify-center text-black/50 dark:text-white/50"
+            >
+              ▼
+            </button>
+          </div>
+          {(queryB || openB) && !idB && (
             <div className="max-h-48 overflow-y-auto rounded-md border border-black/15 dark:border-white/20">
               {candidatesB.length === 0 && (
                 <p className="px-3 py-2 text-sm text-black/50 dark:text-white/50">

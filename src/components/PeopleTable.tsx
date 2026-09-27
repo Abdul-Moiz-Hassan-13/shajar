@@ -63,8 +63,7 @@ export function PeopleTable({ people }: { people: Person[] }) {
             <thead className="border-b border-black/10 bg-black/[0.02] dark:border-white/10 dark:bg-white/[0.03]">
               <tr>
                 <th className="px-4 py-2 font-medium">Name</th>
-                <th className="px-4 py-2 font-medium">Born</th>
-                <th className="px-4 py-2 font-medium">Died</th>
+                <th className="px-4 py-2 font-medium">Deceased</th>
                 <th className="px-4 py-2 font-medium">Parents</th>
                 <th className="px-4 py-2 font-medium">Spouses</th>
                 <th className="px-4 py-2 font-medium" />
@@ -77,10 +76,7 @@ export function PeopleTable({ people }: { people: Person[] }) {
                   className="border-b border-black/5 last:border-0 dark:border-white/5"
                 >
                   <td className="px-4 py-2">{fullName(p)}</td>
-                  <td className="px-4 py-2">{p.birthDate ?? "—"}</td>
-                  <td className="px-4 py-2">
-                    {p.isDeceased ? p.deathDate ?? "Yes" : "—"}
-                  </td>
+                  <td className="px-4 py-2">{p.isDeceased ? "Yes" : "—"}</td>
                   <td className="px-4 py-2">{names(p.parentIds, byId)}</td>
                   <td className="px-4 py-2">{names(p.spouseIds, byId)}</td>
                   <td className="px-4 py-2">

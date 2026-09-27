@@ -18,9 +18,7 @@ export function PersonForm({ person, people }: PersonFormProps) {
   const [firstName, setFirstName] = useState(person?.firstName ?? "");
   const [lastName, setLastName] = useState(person?.lastName ?? "");
   const [gender, setGender] = useState(person?.gender ?? "other");
-  const [birthDate, setBirthDate] = useState(person?.birthDate ?? "");
   const [isDeceased, setIsDeceased] = useState(person?.isDeceased ?? false);
-  const [deathDate, setDeathDate] = useState(person?.deathDate ?? "");
   const [photoUrl, setPhotoUrl] = useState(person?.photoUrl ?? "");
   const [notes, setNotes] = useState(person?.notes ?? "");
   const [parentIds, setParentIds] = useState<string[]>(
@@ -86,9 +84,7 @@ export function PersonForm({ person, people }: PersonFormProps) {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       gender,
-      birthDate: birthDate || undefined,
       isDeceased,
-      deathDate: isDeceased ? deathDate || undefined : undefined,
       photoUrl: photoUrl || undefined,
       notes: notes || undefined,
       parentIds,
@@ -167,47 +163,24 @@ export function PersonForm({ person, people }: PersonFormProps) {
         </select>
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
-        Birth date
-        <input
-          type="date"
-          value={birthDate}
-          onChange={(e) => setBirthDate(e.target.value)}
-          className="rounded-md border border-black/15 px-3 py-2 dark:border-white/20 dark:bg-transparent"
-        />
+      <label className="flex items-center justify-between gap-2 rounded-md border border-black/15 p-3 text-sm font-medium dark:border-white/20">
+        Deceased
+        <button
+          type="button"
+          role="switch"
+          aria-checked={isDeceased}
+          onClick={() => setIsDeceased((prev) => !prev)}
+          className="relative h-6 w-11 shrink-0 rounded-full transition-colors"
+          style={{
+            backgroundColor: isDeceased ? "#10b981" : "#71717a",
+          }}
+        >
+          <span
+            className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all"
+            style={{ left: isDeceased ? "22px" : "2px" }}
+          />
+        </button>
       </label>
-
-      <div className="flex flex-col gap-3 rounded-md border border-black/15 p-3 dark:border-white/20">
-        <label className="flex items-center justify-between gap-2 text-sm font-medium">
-          Deceased
-          <button
-            type="button"
-            role="switch"
-            aria-checked={isDeceased}
-            onClick={() => setIsDeceased((prev) => !prev)}
-            className="relative h-6 w-11 shrink-0 rounded-full transition-colors"
-            style={{
-              backgroundColor: isDeceased ? "#10b981" : "#71717a",
-            }}
-          >
-            <span
-              className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all"
-              style={{ left: isDeceased ? "22px" : "2px" }}
-            />
-          </button>
-        </label>
-        {isDeceased && (
-          <label className="flex flex-col gap-1 text-sm">
-            Death date (optional)
-            <input
-              type="date"
-              value={deathDate}
-              onChange={(e) => setDeathDate(e.target.value)}
-              className="rounded-md border border-black/15 px-3 py-2 dark:border-white/20 dark:bg-transparent"
-            />
-          </label>
-        )}
-      </div>
 
       <label className="flex flex-col gap-1 text-sm">
         Photo URL

@@ -5,9 +5,7 @@ export interface Person {
   firstName: string;
   lastName: string;
   gender: Gender;
-  birthDate?: string;
   isDeceased?: boolean;
-  deathDate?: string;
   photoUrl?: string;
   notes?: string;
   /** 0-2 ids of this person's parents. */

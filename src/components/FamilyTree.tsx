@@ -8,13 +8,6 @@ import type { Person, PersonInput } from "@/lib/types";
 
 const HIGHLIGHT_COLOR = "#f59e0b";
 
-function lifespan(p: Person): string {
-  if (!p.birthDate && !p.deathDate) return "";
-  return `${p.birthDate?.slice(0, 4) ?? "?"} – ${
-    p.deathDate?.slice(0, 4) ?? ""
-  }`;
-}
-
 const GENDER_COLOR: Record<Person["gender"], string> = {
   female: "#e6a4c4",
   male: "#8fb8de",
@@ -74,9 +67,7 @@ export function FamilyTree({
       firstName,
       lastName,
       gender: person.gender,
-      birthDate: person.birthDate,
       isDeceased: person.isDeceased,
-      deathDate: person.deathDate,
       photoUrl: person.photoUrl,
       notes: person.notes,
       parentIds: person.parentIds,
@@ -203,16 +194,9 @@ export function FamilyTree({
           })}
 
           {layout.nodes.map((node) => {
-            const span = lifespan(node.person);
             const hasLastName = Boolean(node.person.lastName);
-            const firstNameY = hasLastName
-              ? span
-                ? -10
-                : -9
-              : span
-                ? -6
-                : 0;
-            const lastNameY = span ? 8 : 9;
+            const firstNameY = hasLastName ? -9 : 0;
+            const lastNameY = 9;
 
             const isEditing = editingId === node.person.id;
 
@@ -269,17 +253,6 @@ export function FamilyTree({
                           fontWeight={600}
                         >
                           {node.person.lastName}
-                        </text>
-                      )}
-                      {span && (
-                        <text
-                          x={NODE_WIDTH / 2}
-                          y={NODE_HEIGHT / 2 + 26}
-                          textAnchor="middle"
-                          className="fill-black/60 dark:fill-white/60"
-                          fontSize={10}
-                        >
-                          {span}
                         </text>
                       )}
                     </>
