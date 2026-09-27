@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo, useRef, useState } from "react";
 import { NODE_HEIGHT, NODE_WIDTH, computeLayout } from "@/lib/treeLayout";
-import type { Person } from "@/lib/types";
+import type { Person, PersonInput } from "@/lib/types";
 
 const HIGHLIGHT_COLOR = "#f59e0b";
 
@@ -20,11 +21,77 @@ const GENDER_COLOR: Record<Person["gender"], string> = {
   other: "#c9c2e8",
 };
 
-export function FamilyTree({ people }: { people: Person[] }) {
+export function FamilyTree({
+  people,
+  center = false,
+}: {
+  people: Person[];
+  /** Center the diagram in its container instead of pinning it to the left
+   * — nice for a small scoped subset (e.g. a relationship graph) where the
+   * content is narrower than the container; leave off for the main tree,
+   * where content is usually wider than the viewport and should scroll from
+   * the root ancestors on the left. */
+  center?: boolean;
+}) {
+  const router = useRouter();
   const layout = useMemo(() => computeLayout(people), [people]);
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
   const [pinnedKey, setPinnedKey] = useState<string | null>(null);
   const activeKey = hoveredKey ?? pinnedKey;
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [nameDraft, setNameDraft] = useState("");
+  const clickTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function handleNodeClick(id: string) {
+    if (clickTimeout.current) clearTimeout(clickTimeout.current);
+    clickTimeout.current = setTimeout(() => {
+      router.push(`/people/${id}`);
+    }, 250);
+  }
+
+  function startEditing(person: Person) {
+    if (clickTimeout.current) {
+      clearTimeout(clickTimeout.current);
+      clickTimeout.current = null;
+    }
+    setEditingId(person.id);
+    setNameDraft(`${person.firstName} ${person.lastName}`.trim());
+  }
+
+  async function saveEditing(person: Person) {
+    const trimmed = nameDraft.trim();
+    setEditingId(null);
+    if (!trimmed) return;
+
+    const parts = trimmed.split(/\s+/);
+    const lastName = parts.length > 1 ? parts.pop()! : "";
+    const firstName = parts.join(" ");
+    if (firstName === person.firstName && lastName === person.lastName) {
+      return;
+    }
+
+    const input: PersonInput = {
+      firstName,
+      lastName,
+      gender: person.gender,
+      birthDate: person.birthDate,
+      isDeceased: person.isDeceased,
+      deathDate: person.deathDate,
+      photoUrl: person.photoUrl,
+      notes: person.notes,
+      parentIds: person.parentIds,
+      spouseIds: person.spouseIds,
+      divorcedSpouseIds: person.divorcedSpouseIds,
+      siblingOrder: person.siblingOrder,
+    };
+
+    const res = await fetch(`/api/people/${person.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+    if (res.ok) router.refresh();
+  }
 
   if (people.length === 0) {
     return (
@@ -41,11 +108,15 @@ export function FamilyTree({ people }: { people: Person[] }) {
   const padding = 20;
 
   return (
-    <div className="overflow-auto rounded-md border border-black/10 dark:border-white/10">
+    <div
+      className={`overflow-auto rounded-md border border-black/10 dark:border-white/10 ${
+        center ? "flex justify-center" : ""
+      }`}
+    >
       <svg
         width={layout.width + padding * 2}
         height={layout.height + padding * 2}
-        className="min-w-full"
+        className={center ? "shrink-0" : "min-w-full"}
       >
         <g transform={`translate(${padding}, ${padding})`}>
           <rect
@@ -133,15 +204,37 @@ export function FamilyTree({ people }: { people: Person[] }) {
 
           {layout.nodes.map((node) => {
             const span = lifespan(node.person);
-            const firstNameY = span ? -10 : -9;
+            const hasLastName = Boolean(node.person.lastName);
+            const firstNameY = hasLastName
+              ? span
+                ? -10
+                : -9
+              : span
+                ? -6
+                : 0;
             const lastNameY = span ? 8 : 9;
+
+            const isEditing = editingId === node.person.id;
 
             return (
               <g
                 key={node.person.id}
                 transform={`translate(${node.x - NODE_WIDTH / 2}, ${node.y})`}
               >
-                <Link href={`/people/${node.person.id}`}>
+                <g
+                  className="cursor-pointer"
+                  onClick={() => handleNodeClick(node.person.id)}
+                  onDoubleClick={() => startEditing(node.person)}
+                >
+                  {/* Opaque backing so connector lines passing behind (e.g. a
+                      long multi-generation trunk) never show through the
+                      circle's own translucent fill. */}
+                  <circle
+                    cx={NODE_WIDTH / 2}
+                    cy={NODE_HEIGHT / 2}
+                    r={NODE_WIDTH / 2}
+                    className="fill-white dark:fill-black"
+                  />
                   <circle
                     cx={NODE_WIDTH / 2}
                     cy={NODE_HEIGHT / 2}
@@ -154,38 +247,66 @@ export function FamilyTree({ people }: { people: Person[] }) {
                       node.person.isDeceased ? "5 4" : undefined
                     }
                   />
-                  <text
-                    x={NODE_WIDTH / 2}
-                    y={NODE_HEIGHT / 2 + firstNameY}
-                    textAnchor="middle"
-                    className="fill-black dark:fill-white"
-                    fontSize={13}
-                    fontWeight={600}
-                  >
-                    {node.person.firstName}
-                  </text>
-                  <text
-                    x={NODE_WIDTH / 2}
-                    y={NODE_HEIGHT / 2 + lastNameY}
-                    textAnchor="middle"
-                    className="fill-black dark:fill-white"
-                    fontSize={13}
-                    fontWeight={600}
-                  >
-                    {node.person.lastName}
-                  </text>
-                  {span && (
-                    <text
-                      x={NODE_WIDTH / 2}
-                      y={NODE_HEIGHT / 2 + 26}
-                      textAnchor="middle"
-                      className="fill-black/60 dark:fill-white/60"
-                      fontSize={10}
-                    >
-                      {span}
-                    </text>
+                  {!isEditing && (
+                    <>
+                      <text
+                        x={NODE_WIDTH / 2}
+                        y={NODE_HEIGHT / 2 + firstNameY}
+                        textAnchor="middle"
+                        className="fill-black dark:fill-white"
+                        fontSize={13}
+                        fontWeight={600}
+                      >
+                        {node.person.firstName}
+                      </text>
+                      {hasLastName && (
+                        <text
+                          x={NODE_WIDTH / 2}
+                          y={NODE_HEIGHT / 2 + lastNameY}
+                          textAnchor="middle"
+                          className="fill-black dark:fill-white"
+                          fontSize={13}
+                          fontWeight={600}
+                        >
+                          {node.person.lastName}
+                        </text>
+                      )}
+                      {span && (
+                        <text
+                          x={NODE_WIDTH / 2}
+                          y={NODE_HEIGHT / 2 + 26}
+                          textAnchor="middle"
+                          className="fill-black/60 dark:fill-white/60"
+                          fontSize={10}
+                        >
+                          {span}
+                        </text>
+                      )}
+                    </>
                   )}
-                </Link>
+                </g>
+                {isEditing && (
+                  <foreignObject
+                    x={10}
+                    y={NODE_HEIGHT / 2 - 14}
+                    width={NODE_WIDTH - 20}
+                    height={28}
+                  >
+                    <input
+                      autoFocus
+                      value={nameDraft}
+                      onChange={(e) => setNameDraft(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      onDoubleClick={(e) => e.stopPropagation()}
+                      onBlur={() => saveEditing(node.person)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") e.currentTarget.blur();
+                        if (e.key === "Escape") setEditingId(null);
+                      }}
+                      className="w-full rounded border border-black/30 bg-white px-1 py-0.5 text-center text-[13px] font-semibold text-black outline-none dark:border-white/40 dark:bg-neutral-900 dark:text-white"
+                    />
+                  </foreignObject>
+                )}
                 {node.person.isDeceased && (
                   <g transform={`translate(${NODE_WIDTH - 20}, 20)`}>
                     <circle

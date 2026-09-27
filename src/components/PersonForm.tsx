@@ -38,9 +38,23 @@ export function PersonForm({ person, people }: PersonFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  const [parentQuery, setParentQuery] = useState("");
+  const [spouseQuery, setSpouseQuery] = useState("");
+
   const otherPeople = people
     .filter((p) => p.id !== person?.id)
     .sort((a, b) => fullName(a).localeCompare(fullName(b)));
+
+  const parentCandidates = otherPeople.filter(
+    (p) =>
+      parentIds.includes(p.id) ||
+      fullName(p).toLowerCase().includes(parentQuery.trim().toLowerCase()),
+  );
+  const spouseCandidates = otherPeople.filter(
+    (p) =>
+      spouseIds.includes(p.id) ||
+      fullName(p).toLowerCase().includes(spouseQuery.trim().toLowerCase()),
+  );
 
   function toggleParent(id: string) {
     setParentIds((prev) => {
@@ -123,9 +137,8 @@ export function PersonForm({ person, people }: PersonFormProps) {
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
-          Last name
+          Last name (optional)
           <input
-            required
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             className="rounded-md border border-black/15 px-3 py-2 dark:border-white/20 dark:bg-transparent"
@@ -231,13 +244,27 @@ export function PersonForm({ person, people }: PersonFormProps) {
         <legend className="text-sm font-medium">
           Parents (up to 2)
         </legend>
+        {otherPeople.length > 0 && (
+          <input
+            type="search"
+            value={parentQuery}
+            onChange={(e) => setParentQuery(e.target.value)}
+            placeholder="Search…"
+            className="rounded-md border border-black/15 px-3 py-1.5 text-sm dark:border-white/20 dark:bg-transparent"
+          />
+        )}
         <div className="flex flex-col gap-1 max-h-40 overflow-y-auto rounded-md border border-black/15 p-2 dark:border-white/20">
           {otherPeople.length === 0 && (
             <p className="text-sm text-black/50 dark:text-white/50">
               No other people yet.
             </p>
           )}
-          {otherPeople.map((p) => (
+          {otherPeople.length > 0 && parentCandidates.length === 0 && (
+            <p className="text-sm text-black/50 dark:text-white/50">
+              No matches.
+            </p>
+          )}
+          {parentCandidates.map((p) => (
             <label key={p.id} className="flex items-center gap-2 text-sm">
               <input
                 type="checkbox"
@@ -255,13 +282,27 @@ export function PersonForm({ person, people }: PersonFormProps) {
 
       <fieldset className="flex flex-col gap-2">
         <legend className="text-sm font-medium">Spouses / partners</legend>
+        {otherPeople.length > 0 && (
+          <input
+            type="search"
+            value={spouseQuery}
+            onChange={(e) => setSpouseQuery(e.target.value)}
+            placeholder="Search…"
+            className="rounded-md border border-black/15 px-3 py-1.5 text-sm dark:border-white/20 dark:bg-transparent"
+          />
+        )}
         <div className="flex flex-col gap-1 max-h-40 overflow-y-auto rounded-md border border-black/15 p-2 dark:border-white/20">
           {otherPeople.length === 0 && (
             <p className="text-sm text-black/50 dark:text-white/50">
               No other people yet.
             </p>
           )}
-          {otherPeople.map((p) => (
+          {otherPeople.length > 0 && spouseCandidates.length === 0 && (
+            <p className="text-sm text-black/50 dark:text-white/50">
+              No matches.
+            </p>
+          )}
+          {spouseCandidates.map((p) => (
             <div key={p.id} className="flex items-center justify-between gap-2">
               <label className="flex items-center gap-2 text-sm">
                 <input

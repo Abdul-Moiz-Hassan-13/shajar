@@ -273,18 +273,33 @@ export function computeLayout(people: Person[]): TreeLayout {
   // spans overlap in x — that's a normal, readable crossing, not a merge.
   const parentEdges: ParentEdge[] = [];
   for (const p of people) {
-    const parentXs = p.parentIds
+    const validParentIds = p.parentIds.filter((pid) => byId.has(pid));
+    const parentXs = validParentIds
       .map((pid) => positions.get(pid))
       .filter((x): x is number => x !== undefined);
     if (parentXs.length === 0) continue;
     const childTopY = genCache.get(p.id)! * (NODE_HEIGHT + GEN_GAP);
-    const parentBottomY = childTopY - GEN_GAP;
+    // Use the parents' own (actual) generation to find their bottom edge,
+    // rather than assuming the child is exactly one generation below — a
+    // spouse pulled forward to match a much-younger partner can otherwise
+    // sit many generations below their real parents, which would make this
+    // line start from nowhere instead of from the parents themselves.
+    const parentGen = Math.max(
+      ...validParentIds.map((pid) => genCache.get(pid)!),
+    );
+    const parentBottomY = parentGen * (NODE_HEIGHT + GEN_GAP) + NODE_HEIGHT;
+    // Route the horizontal jog through the gap right after the parents'
+    // own row — that band is always circle-free — rather than splitting
+    // the full distance 50/50, which for a multi-generation gap (e.g. a
+    // spouse pulled forward several generations) would land the jog inside
+    // some unrelated row's circles in between.
+    const midY = Math.min(parentBottomY + GEN_GAP / 2, childTopY);
     parentEdges.push({
       childX: positions.get(p.id)!,
       childTopY,
       parentMidX: parentXs.reduce((a, b) => a + b, 0) / parentXs.length,
       parentBottomY,
-      midY: parentBottomY + (childTopY - parentBottomY) / 2,
+      midY,
     });
   }
 

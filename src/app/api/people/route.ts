@@ -10,9 +10,9 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as PersonInput;
 
-  if (!body.firstName || !body.lastName || !body.gender) {
+  if (!body.firstName || !body.gender) {
     return NextResponse.json(
-      { error: "firstName, lastName, and gender are required" },
+      { error: "firstName and gender are required" },
       { status: 400 },
     );
   }
