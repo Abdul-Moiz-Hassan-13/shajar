@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { PersonFormHeading } from "@/components/headers/PersonFormHeading";
 import { PersonForm } from "@/components/PersonForm";
 import { getAllPeople, getPerson } from "@/lib/store";
 
@@ -17,9 +18,7 @@ export default async function EditPersonPage({ params }: PageProps) {
 
   return (
     <div className="mx-auto flex max-w-xl flex-col gap-6">
-      <h1 className="text-2xl font-semibold">
-        Edit {person.firstName} {person.lastName}
-      </h1>
+      <PersonFormHeading person={person} />
       <PersonForm person={person} people={people} />
     </div>
   );

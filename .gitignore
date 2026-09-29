@@ -43,3 +43,4 @@ next-env.d.ts
 # personal family data (kept local only)
 /data/family.json
 /data/family.backup-*.json
+/scripts/add-urdu-names.js

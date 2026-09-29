@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useLanguage } from "@/components/LanguageProvider";
+import { displayFullName } from "@/lib/personName";
 import type { Person, PersonInput } from "@/lib/types";
 
 interface PersonFormProps {
@@ -15,8 +17,11 @@ function fullName(p: Person): string {
 
 export function PersonForm({ person, people }: PersonFormProps) {
   const router = useRouter();
+  const { t, locale } = useLanguage();
   const [firstName, setFirstName] = useState(person?.firstName ?? "");
   const [lastName, setLastName] = useState(person?.lastName ?? "");
+  const [firstNameUr, setFirstNameUr] = useState(person?.firstNameUr ?? "");
+  const [lastNameUr, setLastNameUr] = useState(person?.lastNameUr ?? "");
   const [gender, setGender] = useState(person?.gender ?? "other");
   const [isDeceased, setIsDeceased] = useState(person?.isDeceased ?? false);
   const [photoUrl, setPhotoUrl] = useState(person?.photoUrl ?? "");
@@ -83,6 +88,8 @@ export function PersonForm({ person, people }: PersonFormProps) {
     const input: PersonInput = {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
+      firstNameUr: firstNameUr.trim() || undefined,
+      lastNameUr: lastNameUr.trim() || undefined,
       gender,
       isDeceased,
       photoUrl: photoUrl || undefined,
@@ -106,12 +113,12 @@ export function PersonForm({ person, people }: PersonFormProps) {
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      setError(body.error ?? "Something went wrong.");
+      setError(body.error ?? t.form.somethingWrong);
       return;
     }
 
-    router.push("/people");
     router.refresh();
+    router.back();
   }
 
   return (
@@ -124,7 +131,7 @@ export function PersonForm({ person, people }: PersonFormProps) {
 
       <div className="grid grid-cols-2 gap-4">
         <label className="flex flex-col gap-1 text-sm">
-          First name
+          {t.form.firstName}
           <input
             required
             value={firstName}
@@ -133,17 +140,35 @@ export function PersonForm({ person, people }: PersonFormProps) {
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
-          Last name (optional)
+          {t.form.lastName}
           <input
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             className="rounded-md border border-black/15 px-3 py-2 dark:border-white/20 dark:bg-transparent"
           />
         </label>
+        <label className="flex flex-col gap-1 text-sm">
+          {t.form.firstNameUr}
+          <input
+            dir="rtl"
+            value={firstNameUr}
+            onChange={(e) => setFirstNameUr(e.target.value)}
+            className="rounded-md border border-black/15 px-3 py-2 dark:border-white/20 dark:bg-transparent"
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-sm">
+          {t.form.lastNameUr}
+          <input
+            dir="rtl"
+            value={lastNameUr}
+            onChange={(e) => setLastNameUr(e.target.value)}
+            className="rounded-md border border-black/15 px-3 py-2 dark:border-white/20 dark:bg-transparent"
+          />
+        </label>
       </div>
 
       <label className="flex flex-col gap-1 text-sm">
-        Gender
+        {t.form.gender}
         <select
           value={gender}
           onChange={(e) =>
@@ -152,19 +177,19 @@ export function PersonForm({ person, people }: PersonFormProps) {
           className="rounded-md border border-black/15 bg-white px-3 py-2 text-black dark:border-white/20 dark:bg-neutral-900 dark:text-white"
         >
           <option value="male" className="bg-white text-black dark:bg-neutral-900 dark:text-white">
-            Male
+            {t.form.male}
           </option>
           <option value="female" className="bg-white text-black dark:bg-neutral-900 dark:text-white">
-            Female
+            {t.form.female}
           </option>
           <option value="other" className="bg-white text-black dark:bg-neutral-900 dark:text-white">
-            Other
+            {t.form.other}
           </option>
         </select>
       </label>
 
       <label className="flex items-center justify-between gap-2 rounded-md border border-black/15 p-3 text-sm font-medium dark:border-white/20">
-        Deceased
+        {t.form.deceased}
         <button
           type="button"
           role="switch"
@@ -183,7 +208,7 @@ export function PersonForm({ person, people }: PersonFormProps) {
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
-        Photo URL
+        {t.form.photoUrl}
         <input
           value={photoUrl}
           onChange={(e) => setPhotoUrl(e.target.value)}
@@ -193,7 +218,7 @@ export function PersonForm({ person, people }: PersonFormProps) {
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
-        Notes
+        {t.form.notes}
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
@@ -203,38 +228,38 @@ export function PersonForm({ person, people }: PersonFormProps) {
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
-        Birth order among siblings (optional)
+        {t.form.siblingOrder}
         <input
           type="number"
           value={siblingOrder}
           onChange={(e) => setSiblingOrder(e.target.value)}
-          placeholder="1 = oldest, 2 = next, …"
+          placeholder={t.form.siblingOrderPlaceholder}
           className="rounded-md border border-black/15 px-3 py-2 dark:border-white/20 dark:bg-transparent"
         />
       </label>
 
       <fieldset className="flex flex-col gap-2">
         <legend className="text-sm font-medium">
-          Parents (up to 2)
+          {t.form.parents}
         </legend>
         {otherPeople.length > 0 && (
           <input
             type="search"
             value={parentQuery}
             onChange={(e) => setParentQuery(e.target.value)}
-            placeholder="Search…"
+            placeholder={t.form.searchPlaceholder}
             className="rounded-md border border-black/15 px-3 py-1.5 text-sm dark:border-white/20 dark:bg-transparent"
           />
         )}
         <div className="flex flex-col gap-1 max-h-40 overflow-y-auto rounded-md border border-black/15 p-2 dark:border-white/20">
           {otherPeople.length === 0 && (
             <p className="text-sm text-black/50 dark:text-white/50">
-              No other people yet.
+              {t.form.noOtherPeople}
             </p>
           )}
           {otherPeople.length > 0 && parentCandidates.length === 0 && (
             <p className="text-sm text-black/50 dark:text-white/50">
-              No matches.
+              {t.form.noMatches}
             </p>
           )}
           {parentCandidates.map((p) => (
@@ -247,32 +272,32 @@ export function PersonForm({ person, people }: PersonFormProps) {
                 }
                 onChange={() => toggleParent(p.id)}
               />
-              {fullName(p)}
+              {displayFullName(p, locale)}
             </label>
           ))}
         </div>
       </fieldset>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm font-medium">Spouses / partners</legend>
+        <legend className="text-sm font-medium">{t.form.spouses}</legend>
         {otherPeople.length > 0 && (
           <input
             type="search"
             value={spouseQuery}
             onChange={(e) => setSpouseQuery(e.target.value)}
-            placeholder="Search…"
+            placeholder={t.form.searchPlaceholder}
             className="rounded-md border border-black/15 px-3 py-1.5 text-sm dark:border-white/20 dark:bg-transparent"
           />
         )}
         <div className="flex flex-col gap-1 max-h-40 overflow-y-auto rounded-md border border-black/15 p-2 dark:border-white/20">
           {otherPeople.length === 0 && (
             <p className="text-sm text-black/50 dark:text-white/50">
-              No other people yet.
+              {t.form.noOtherPeople}
             </p>
           )}
           {otherPeople.length > 0 && spouseCandidates.length === 0 && (
             <p className="text-sm text-black/50 dark:text-white/50">
-              No matches.
+              {t.form.noMatches}
             </p>
           )}
           {spouseCandidates.map((p) => (
@@ -283,7 +308,7 @@ export function PersonForm({ person, people }: PersonFormProps) {
                   checked={spouseIds.includes(p.id)}
                   onChange={() => toggleSpouse(p.id)}
                 />
-                {fullName(p)}
+                {displayFullName(p, locale)}
               </label>
               {spouseIds.includes(p.id) && (
                 <label className="flex items-center gap-1.5 text-xs text-black/60 dark:text-white/60">
@@ -292,7 +317,7 @@ export function PersonForm({ person, people }: PersonFormProps) {
                     checked={divorcedSpouseIds.includes(p.id)}
                     onChange={() => toggleDivorced(p.id)}
                   />
-                  Divorced
+                  {t.form.divorced}
                 </label>
               )}
             </div>
@@ -306,14 +331,14 @@ export function PersonForm({ person, people }: PersonFormProps) {
           disabled={saving}
           className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
         >
-          {saving ? "Saving…" : "Save"}
+          {saving ? t.form.saving : t.form.save}
         </button>
         <button
           type="button"
-          onClick={() => router.push("/people")}
+          onClick={() => router.back()}
           className="rounded-md border border-black/15 px-4 py-2 text-sm font-medium dark:border-white/20"
         >
-          Cancel
+          {t.form.cancel}
         </button>
       </div>
     </form>

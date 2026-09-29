@@ -80,6 +80,8 @@ export async function createPerson(input: PersonInput): Promise<Person> {
     id: randomUUID(),
     firstName: input.firstName,
     lastName: input.lastName,
+    firstNameUr: input.firstNameUr,
+    lastNameUr: input.lastNameUr,
     gender: input.gender,
     isDeceased: input.isDeceased,
     photoUrl: input.photoUrl,
@@ -105,6 +107,8 @@ export async function updatePerson(
 
   existing.firstName = input.firstName;
   existing.lastName = input.lastName;
+  existing.firstNameUr = input.firstNameUr;
+  existing.lastNameUr = input.lastNameUr;
   existing.gender = input.gender;
   existing.isDeceased = input.isDeceased;
   existing.photoUrl = input.photoUrl;

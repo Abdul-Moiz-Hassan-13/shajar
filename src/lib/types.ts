@@ -4,6 +4,10 @@ export interface Person {
   id: string;
   firstName: string;
   lastName: string;
+  /** Urdu-script transliteration, shown when the app is in Urdu mode. */
+  firstNameUr?: string;
+  /** Urdu-script transliteration, shown when the app is in Urdu mode. */
+  lastNameUr?: string;
   gender: Gender;
   isDeceased?: boolean;
   photoUrl?: string;

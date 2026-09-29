@@ -25,6 +25,38 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+html[dir="rtl"] body {
+  font-family: var(--font-noto-nastaliq-urdu), "Noto Nastaliq Urdu", serif;
+}
+
+/* Nastaliq's tall loops/ligatures get clipped by the fixed line-heights that
+   Tailwind's text-size utilities pair with their own font-size — a plain
+   body-level line-height doesn't reach elements that set their own, so this
+   overrides everything uniformly instead of chasing each utility. */
+html[dir="rtl"] * {
+  line-height: 2 !important;
+}
+
+html[dir="rtl"] svg text {
+  font-family: var(--font-noto-nastaliq-urdu), "Noto Nastaliq Urdu", serif;
+}
+
+html[dir="rtl"] .brand-logo {
+  padding-block: 0.4rem;
+  overflow: visible;
+}
+
+html[dir="rtl"] input,
+html[dir="rtl"] textarea,
+html[dir="rtl"] select,
+html[dir="rtl"] button {
+  padding-block: 0.5rem !important;
+}
+
+html[dir="rtl"] .text-left {
+  text-align: right !important;
+}
+
 button,
 a,
 select,

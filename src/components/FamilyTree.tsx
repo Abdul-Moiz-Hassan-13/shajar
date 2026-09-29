@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useRef, useState } from "react";
-import { NODE_HEIGHT, NODE_WIDTH, computeLayout } from "@/lib/treeLayout";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useLanguage } from "@/components/LanguageProvider";
+import { displayFirstName, displayLastName } from "@/lib/personName";
+import { NODE_HEIGHT, NODE_WIDTH, computeLayout, type TreeLayout } from "@/lib/treeLayout";
 import type { Person, PersonInput } from "@/lib/types";
 
 const HIGHLIGHT_COLOR = "#f59e0b";
@@ -13,6 +15,96 @@ const GENDER_COLOR: Record<Person["gender"], string> = {
   male: "#8fb8de",
   other: "#c9c2e8",
 };
+
+const ZOOM_MIN = 0.25;
+const ZOOM_MAX = 2;
+const ZOOM_STEP = 0.15;
+
+function clampZoom(z: number): number {
+  return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
+}
+
+/** Scrolls so the root with the most descendants — the actual family
+ * patriarch/matriarch — sits centered at the top, rather than wherever the
+ * user last scrolled/zoomed to. Several disconnected fragments can each
+ * have their own gen-0 root (e.g. an in-law's "TBC" placeholder with no
+ * recorded parents of their own), so this picks the biggest one rather than
+ * averaging every root's position, which can land in the gap between
+ * unrelated branches. */
+function centerOnMainRoot(
+  container: HTMLDivElement,
+  layout: TreeLayout,
+  people: Person[],
+) {
+  const roots = layout.nodes.filter((n) => n.gen === 0);
+  if (roots.length === 0) return;
+
+  const childrenByParentId = new Map<string, string[]>();
+  for (const p of people) {
+    for (const parentId of p.parentIds) {
+      childrenByParentId.set(parentId, [
+        ...(childrenByParentId.get(parentId) ?? []),
+        p.id,
+      ]);
+    }
+  }
+  function countDescendants(rootId: string): number {
+    const seen = new Set<string>([rootId]);
+    const stack = [rootId];
+    while (stack.length > 0) {
+      const current = stack.pop()!;
+      for (const childId of childrenByParentId.get(current) ?? []) {
+        if (seen.has(childId)) continue;
+        seen.add(childId);
+        stack.push(childId);
+      }
+    }
+    return seen.size - 1;
+  }
+
+  const mainRoot = roots.reduce((best, n) =>
+    countDescendants(n.person.id) > countDescendants(best.person.id)
+      ? n
+      : best,
+  );
+
+  const padding = 20;
+  container.scrollLeft = Math.max(
+    0,
+    mainRoot.x + padding - container.clientWidth / 2,
+  );
+  container.scrollTop = 0;
+}
+
+function touchDistance(touches: TouchList): number {
+  const [a, b] = [touches[0], touches[1]];
+  return Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+}
+
+function touchMidpoint(touches: TouchList): { x: number; y: number } {
+  const [a, b] = [touches[0], touches[1]];
+  return { x: (a.clientX + b.clientX) / 2, y: (a.clientY + b.clientY) / 2 };
+}
+
+/** Adjusts scroll so the content point that was under (clientX, clientY) at
+ * `zoomBefore` stays under the same screen position at `zoomAfter` — without
+ * this, resizing the diagram out from under the fingers as it scales reads
+ * as a jarring "shake" instead of a smooth pinch. */
+function keepPointStable(
+  container: HTMLDivElement,
+  clientX: number,
+  clientY: number,
+  zoomBefore: number,
+  zoomAfter: number,
+) {
+  const rect = container.getBoundingClientRect();
+  const offsetX = clientX - rect.left;
+  const offsetY = clientY - rect.top;
+  const contentX = (container.scrollLeft + offsetX) / zoomBefore;
+  const contentY = (container.scrollTop + offsetY) / zoomBefore;
+  container.scrollLeft = contentX * zoomAfter - offsetX;
+  container.scrollTop = contentY * zoomAfter - offsetY;
+}
 
 export function FamilyTree({
   people,
@@ -27,6 +119,7 @@ export function FamilyTree({
   center?: boolean;
 }) {
   const router = useRouter();
+  const { t, locale } = useLanguage();
   const layout = useMemo(() => computeLayout(people), [people]);
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
   const [pinnedKey, setPinnedKey] = useState<string | null>(null);
@@ -34,6 +127,143 @@ export function FamilyTree({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [nameDraft, setNameDraft] = useState("");
   const clickTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const zoomRef = useRef(zoom);
+  useEffect(() => {
+    zoomRef.current = zoom;
+  }, [zoom]);
+  // Set by a gesture just before calling setZoom; consumed by the
+  // useLayoutEffect below once the resize has actually landed in the DOM,
+  // so the point under the fingers/cursor stays visually still.
+  const pendingFocalPoint = useRef<{
+    clientX: number;
+    clientY: number;
+    zoomBefore: number;
+  } | null>(null);
+  // Set by the "Reset zoom" button; consumed alongside pendingFocalPoint
+  // once the resize lands, so resetting zoom also returns to the same
+  // centered view as the initial load rather than wherever was last scrolled.
+  const recenterOnReset = useRef(false);
+
+  useLayoutEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    if (recenterOnReset.current) {
+      recenterOnReset.current = false;
+      if (!center) centerOnMainRoot(container, layout, people);
+      return;
+    }
+
+    const pending = pendingFocalPoint.current;
+    if (!pending) return;
+    pendingFocalPoint.current = null;
+    keepPointStable(
+      container,
+      pending.clientX,
+      pending.clientY,
+      pending.zoomBefore,
+      zoom,
+    );
+  }, [zoom, layout, people, center]);
+
+  useEffect(() => {
+    if (center) return;
+    const container = scrollRef.current;
+    if (!container) return;
+    centerOnMainRoot(container, layout, people);
+  }, [layout, center, people]);
+
+  // Pinch-to-zoom (touch) and trackpad pinch / ctrl+scroll (wheel). Attached
+  // as native, non-passive listeners (rather than React's on* props) so
+  // preventDefault() actually stops the browser's own page-zoom gesture —
+  // and macOS/Windows both report a trackpad pinch as a wheel event with
+  // ctrlKey set, regardless of whether Ctrl is actually held.
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    let pinchStartDistance = 0;
+    let zoomAtPinchStart = 1;
+
+    // touchmove fires far more often than a phone can actually paint —
+    // applying every single event as its own state update/reflow is what
+    // made pinching feel janky. Coalescing to one update per animation
+    // frame keeps it in step with what the screen can show.
+    let rafId: number | null = null;
+    let latestGesture: { newZoom: number; clientX: number; clientY: number } | null = null;
+
+    function scheduleZoomUpdate() {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        const gesture = latestGesture;
+        latestGesture = null;
+        if (!gesture) return;
+        setZoom((zoomBefore) => {
+          pendingFocalPoint.current = {
+            clientX: gesture.clientX,
+            clientY: gesture.clientY,
+            zoomBefore,
+          };
+          return gesture.newZoom;
+        });
+      });
+    }
+
+    function onTouchStart(e: TouchEvent) {
+      if (e.touches.length !== 2) return;
+      pinchStartDistance = touchDistance(e.touches);
+      setZoom((z) => {
+        zoomAtPinchStart = z;
+        return z;
+      });
+    }
+
+    function onTouchMove(e: TouchEvent) {
+      if (e.touches.length !== 2 || pinchStartDistance === 0) return;
+      e.preventDefault();
+      const scale = touchDistance(e.touches) / pinchStartDistance;
+      const mid = touchMidpoint(e.touches);
+      latestGesture = {
+        newZoom: clampZoom(zoomAtPinchStart * scale),
+        clientX: mid.x,
+        clientY: mid.y,
+      };
+      scheduleZoomUpdate();
+    }
+
+    function onTouchEnd(e: TouchEvent) {
+      if (e.touches.length < 2) pinchStartDistance = 0;
+    }
+
+    function onWheel(e: WheelEvent) {
+      if (!e.ctrlKey) return;
+      e.preventDefault();
+      const base = latestGesture?.newZoom ?? zoomRef.current;
+      latestGesture = {
+        newZoom: clampZoom(base * Math.exp(-e.deltaY * 0.01)),
+        clientX: e.clientX,
+        clientY: e.clientY,
+      };
+      scheduleZoomUpdate();
+    }
+
+    container.addEventListener("touchstart", onTouchStart, { passive: true });
+    container.addEventListener("touchmove", onTouchMove, { passive: false });
+    container.addEventListener("touchend", onTouchEnd, { passive: true });
+    container.addEventListener("touchcancel", onTouchEnd, { passive: true });
+    container.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      container.removeEventListener("touchstart", onTouchStart);
+      container.removeEventListener("touchmove", onTouchMove);
+      container.removeEventListener("touchend", onTouchEnd);
+      container.removeEventListener("touchcancel", onTouchEnd);
+      container.removeEventListener("wheel", onWheel);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
+  }, []);
 
   function handleNodeClick(id: string) {
     if (clickTimeout.current) clearTimeout(clickTimeout.current);
@@ -87,11 +317,11 @@ export function FamilyTree({
   if (people.length === 0) {
     return (
       <p className="text-black/60 dark:text-white/60">
-        Nothing to show yet.{" "}
+        {t.tree.nothingToShow}{" "}
         <Link href="/people/new" className="underline">
-          Add someone
+          {t.tree.addSomeone}
         </Link>{" "}
-        to get started.
+        {t.tree.toGetStarted}
       </p>
     );
   }
@@ -99,15 +329,68 @@ export function FamilyTree({
   const padding = 20;
 
   return (
-    <div
-      className={`overflow-auto rounded-md border border-black/10 dark:border-white/10 ${
-        center ? "flex justify-center" : ""
-      }`}
-    >
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setZoom((z) => clampZoom(+(z - ZOOM_STEP).toFixed(2)))}
+          disabled={zoom <= ZOOM_MIN}
+          aria-label={t.tree.zoomOut}
+          className="rounded-md border border-black/15 px-2 py-1 text-sm disabled:opacity-40 dark:border-white/20"
+        >
+          −
+        </button>
+        <span className="w-12 text-center text-xs text-black/50 dark:text-white/50">
+          {Math.round(zoom * 100)}%
+        </span>
+        <button
+          type="button"
+          onClick={() => setZoom((z) => clampZoom(+(z + ZOOM_STEP).toFixed(2)))}
+          disabled={zoom >= ZOOM_MAX}
+          aria-label={t.tree.zoomIn}
+          className="rounded-md border border-black/15 px-2 py-1 text-sm disabled:opacity-40 dark:border-white/20"
+        >
+          +
+        </button>
+        {zoom !== 1 && (
+          <button
+            type="button"
+            onClick={() => {
+              recenterOnReset.current = true;
+              setZoom(1);
+            }}
+            className="rounded-md border border-black/15 px-2 py-1 text-xs dark:border-white/20"
+          >
+            {t.tree.resetZoom}
+          </button>
+        )}
+      </div>
+      <div
+        ref={scrollRef}
+        dir="ltr"
+        style={{ touchAction: "pan-x pan-y" }}
+        className={`overflow-auto rounded-md border border-black/10 dark:border-white/10 ${
+          center ? "flex justify-center" : ""
+        }`}
+      >
+      {/* The scaling itself happens via a CSS transform on the SVG (cheap,
+          GPU-composited) rather than changing its width/height attributes
+          (which would force the browser to re-lay-out every shape inside it
+          on every touchmove — the cause of pinch-zoom feeling janky on
+          phones). This wrapper's own box is what the scaled size actually
+          is, so the scrollable area still matches. */}
+      <div
+        style={{
+          width: (layout.width + padding * 2) * zoom,
+          height: (layout.height + padding * 2) * zoom,
+        }}
+        className={center ? "shrink-0" : ""}
+      >
       <svg
+        viewBox={`0 0 ${layout.width + padding * 2} ${layout.height + padding * 2}`}
         width={layout.width + padding * 2}
         height={layout.height + padding * 2}
-        className={center ? "shrink-0" : "min-w-full"}
+        style={{ transform: `scale(${zoom})`, transformOrigin: "0 0" }}
       >
         <g transform={`translate(${padding}, ${padding})`}>
           <rect
@@ -194,7 +477,9 @@ export function FamilyTree({
           })}
 
           {layout.nodes.map((node) => {
-            const hasLastName = Boolean(node.person.lastName);
+            const shownFirstName = displayFirstName(node.person, locale);
+            const shownLastName = displayLastName(node.person, locale);
+            const hasLastName = Boolean(shownLastName);
             const firstNameY = hasLastName ? -9 : 0;
             const lastNameY = 9;
 
@@ -241,7 +526,7 @@ export function FamilyTree({
                         fontSize={13}
                         fontWeight={600}
                       >
-                        {node.person.firstName}
+                        {shownFirstName}
                       </text>
                       {hasLastName && (
                         <text
@@ -252,7 +537,7 @@ export function FamilyTree({
                           fontSize={13}
                           fontWeight={600}
                         >
-                          {node.person.lastName}
+                          {shownLastName}
                         </text>
                       )}
                     </>
@@ -301,6 +586,8 @@ export function FamilyTree({
           })}
         </g>
       </svg>
+      </div>
+      </div>
     </div>
   );
 }
