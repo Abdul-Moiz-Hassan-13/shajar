@@ -38,15 +38,15 @@ function fullName(p: Person): string {
   return `${p.firstName} ${p.lastName}`.trim();
 }
 
-// How far below the sticky nav bar a found node lands — enough that the
+// How far below the sticky nav bar a found node lands - enough that the
 // nav never overlaps it, without pushing it all the way to mid-screen.
 const SEARCH_RESULT_TOP_OFFSET = 300;
 
 /** Scrolls so the given node lands near the top of the viewport (just under
- * the sticky nav) — horizontally centered within the diagram's own scroll
+ * the sticky nav) - horizontally centered within the diagram's own scroll
  * container (which does clip and scroll, since it can be narrower than its
  * content), and vertically via the browser window itself. The container has
- * no fixed height — it just grows tall enough to fit the whole diagram — so
+ * no fixed height - it just grows tall enough to fit the whole diagram - so
  * vertical "scrolling" is actually the page's, not the container's;
  * adjusting only container.scrollTop would be a no-op for anything below
  * the very top of the tree. */
@@ -68,8 +68,8 @@ function centerOnNode(
   window.scrollTo({ top: Math.max(0, targetScrollY), behavior: "smooth" });
 }
 
-/** Scrolls so the root with the most descendants — the actual family
- * patriarch/matriarch — sits centered at the top, rather than wherever the
+/** Scrolls so the root with the most descendants - the actual family
+ * patriarch/matriarch - sits centered at the top, rather than wherever the
  * user last scrolled/zoomed to. Several disconnected fragments can each
  * have their own gen-0 root (e.g. an in-law's "TBC" placeholder with no
  * recorded parents of their own), so this picks the biggest one rather than
@@ -126,7 +126,7 @@ const EXPORT_SCALE = 3;
  * high-DPI PNG and triggers a download. The clone is detached from the
  * page, so anything that only carries color/font via a Tailwind class
  * (rather than an inline attribute) would otherwise fall back to SVG's
- * bare initial values (e.g. fill defaults to black) — computed styles are
+ * bare initial values (e.g. fill defaults to black) - computed styles are
  * read off the still-attached original elements first and baked into the
  * clone as explicit attributes to avoid that. */
 async function exportSvgAsPng(
@@ -195,7 +195,7 @@ function touchMidpoint(touches: TouchList): { x: number; y: number } {
 }
 
 /** Adjusts scroll so the content point that was under (clientX, clientY) at
- * `zoomBefore` stays under the same screen position at `zoomAfter` — without
+ * `zoomBefore` stays under the same screen position at `zoomAfter` - without
  * this, resizing the diagram out from under the fingers as it scales reads
  * as a jarring "shake" instead of a smooth pinch. */
 function keepPointStable(
@@ -220,7 +220,7 @@ export function FamilyTree({
 }: {
   people: Person[];
   /** Center the diagram in its container instead of pinning it to the left
-   * — nice for a small scoped subset (e.g. a relationship graph) where the
+   * - nice for a small scoped subset (e.g. a relationship graph) where the
    * content is narrower than the container; leave off for the main tree,
    * where content is usually wider than the viewport and should scroll from
    * the root ancestors on the left. */
@@ -292,7 +292,7 @@ export function FamilyTree({
 
   // Pinch-to-zoom (touch) and trackpad pinch / ctrl+scroll (wheel). Attached
   // as native, non-passive listeners (rather than React's on* props) so
-  // preventDefault() actually stops the browser's own page-zoom gesture —
+  // preventDefault() actually stops the browser's own page-zoom gesture -
   // and macOS/Windows both report a trackpad pinch as a wheel event with
   // ctrlKey set, regardless of whether Ctrl is actually held.
   useEffect(() => {
@@ -302,7 +302,7 @@ export function FamilyTree({
     let pinchStartDistance = 0;
     let zoomAtPinchStart = 1;
 
-    // touchmove fires far more often than a phone can actually paint —
+    // touchmove fires far more often than a phone can actually paint -
     // applying every single event as its own state update/reflow is what
     // made pinching feel janky. Coalescing to one update per animation
     // frame keeps it in step with what the screen can show.
@@ -416,7 +416,7 @@ export function FamilyTree({
 
   const handleNodeClick = useCallback(
     (id: string) => {
-      // Read-only visitors have nowhere to navigate to — /people/[id] is the
+      // Read-only visitors have nowhere to navigate to - /people/[id] is the
       // edit form, and it's gated behind login.
       if (!isAdmin) return;
       if (clickTimeout.current) clearTimeout(clickTimeout.current);
@@ -457,7 +457,6 @@ export function FamilyTree({
       lastName,
       gender: person.gender,
       isDeceased: person.isDeceased,
-      photoUrl: person.photoUrl,
       notes: person.notes,
       parentIds: person.parentIds,
       spouseIds: person.spouseIds,
@@ -473,11 +472,11 @@ export function FamilyTree({
     if (res.ok) router.refresh();
   }, [nameDraft, router]);
 
-  // The node/edge markup below never depends on `zoom` — only the outer
+  // The node/edge markup below never depends on `zoom` - only the outer
   // <svg>'s own scale transform does. Memoizing it (excluding zoom from the
   // deps) lets React bail out of reconciling this whole subtree on every
   // pinch/wheel frame, instead of re-diffing every node and edge each time
-  // zoom state changes — the difference between smooth and janky pinching
+  // zoom state changes - the difference between smooth and janky pinching
   // once the tree has more than a couple dozen people.
   const treeContent = useMemo(
     () => (
@@ -820,7 +819,7 @@ export function FamilyTree({
       {/* The scaling itself happens via a CSS transform on the SVG (cheap,
           GPU-composited) rather than changing its width/height attributes
           (which would force the browser to re-lay-out every shape inside it
-          on every touchmove — the cause of pinch-zoom feeling janky on
+          on every touchmove - the cause of pinch-zoom feeling janky on
           phones). This wrapper's own box is what the scaled size actually
           is, so the scrollable area still matches. */}
       <div

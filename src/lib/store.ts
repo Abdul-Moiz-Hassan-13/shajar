@@ -84,7 +84,6 @@ export async function createPerson(input: PersonInput): Promise<Person> {
     lastNameUr: input.lastNameUr,
     gender: input.gender,
     isDeceased: input.isDeceased,
-    photoUrl: input.photoUrl,
     notes: input.notes,
     parentIds: input.parentIds ?? [],
     spouseIds: input.spouseIds ?? [],
@@ -111,7 +110,6 @@ export async function updatePerson(
   existing.lastNameUr = input.lastNameUr;
   existing.gender = input.gender;
   existing.isDeceased = input.isDeceased;
-  existing.photoUrl = input.photoUrl;
   existing.notes = input.notes;
   existing.parentIds = input.parentIds ?? [];
   existing.spouseIds = input.spouseIds ?? [];

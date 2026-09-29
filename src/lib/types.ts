@@ -10,7 +10,6 @@ export interface Person {
   lastNameUr?: string;
   gender: Gender;
   isDeceased?: boolean;
-  photoUrl?: string;
   notes?: string;
   /** 0-2 ids of this person's parents. */
   parentIds: string[];

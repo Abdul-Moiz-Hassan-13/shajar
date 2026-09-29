@@ -130,7 +130,6 @@ export interface TranslationDict {
     female: string;
     other: string;
     deceased: string;
-    photoUrl: string;
     notes: string;
     siblingOrder: string;
     siblingOrderPlaceholder: string;
@@ -222,7 +221,7 @@ const en: TranslationDict = {
     colName: "Name",
     colDeceased: "Deceased",
     colParents: "Parents",
-    colSpouses: "Spouses",
+    colSpouses: "Spouse",
     yes: "Yes",
     edit: "Edit",
   },
@@ -272,7 +271,6 @@ const en: TranslationDict = {
     female: "Female",
     other: "Other",
     deceased: "Deceased",
-    photoUrl: "Photo URL",
     notes: "Notes",
     siblingOrder: "Birth order among siblings (optional)",
     siblingOrderPlaceholder: "1 = oldest, 2 = next, …",
@@ -280,7 +278,7 @@ const en: TranslationDict = {
     searchPlaceholder: "Search…",
     noOtherPeople: "No other people yet.",
     noMatches: "No matches.",
-    spouses: "Spouses / partners",
+    spouses: "Spouse / partner",
     divorced: "Divorced",
     save: "Save",
     saving: "Saving…",
@@ -396,7 +394,7 @@ const ur: TranslationDict = {
     isRelationOf: (nameB, nameA, label, genderB) => {
       // "کزن" (cousin) doesn't inflect for gender. On its own ("first
       // cousin") it takes the plain "کا پہلا کزن". Only when something
-      // trails it — "cousin's son/daughter" — does the construction switch
+      // trails it - "cousin's son/daughter" - does the construction switch
       // to the oblique "کے پہلے کزن کا بیٹا".
       if (/کزن$/.test(label.trim())) {
         return `${nameB}، ${nameA} کا ${label} ہے`;
@@ -432,7 +430,6 @@ const ur: TranslationDict = {
     female: "عورت",
     other: "دیگر",
     deceased: "متوفی",
-    photoUrl: "تصویر کا لنک",
     notes: "نوٹس",
     siblingOrder: "بہن بھائیوں میں پیدائشی ترتیب (اختیاری)",
     siblingOrderPlaceholder: "1 = سب سے بڑا، 2 = اس کے بعد، …",

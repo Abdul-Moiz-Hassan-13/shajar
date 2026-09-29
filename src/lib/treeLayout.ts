@@ -113,8 +113,8 @@ export function computeLayout(people: Person[]): TreeLayout {
       if (branches.length === 1) {
         const branch = branches[0];
         const other = branch[0];
-        // Simple monogamous pair — neither has ever had another spouse on
-        // record — gets the husband-left, wife-right convention, regardless
+        // Simple monogamous pair - neither has ever had another spouse on
+        // record - gets the husband-left, wife-right convention, regardless
         // of which one triggered this expansion. Anyone who's had more than
         // one spouse (either side of this pair) keeps the existing
         // first-branch-left chain ordering untouched.
@@ -270,7 +270,7 @@ export function computeLayout(people: Person[]): TreeLayout {
   // Every couple's bus line sits at the same height within a generation gap
   // (the vertical midpoint), so all sibling groups read as level with one
   // another. Two unrelated bus lines may occasionally cross when their
-  // spans overlap in x — that's a normal, readable crossing, not a merge.
+  // spans overlap in x - that's a normal, readable crossing, not a merge.
   const parentEdges: ParentEdge[] = [];
   for (const p of people) {
     const validParentIds = p.parentIds.filter((pid) => byId.has(pid));
@@ -280,7 +280,7 @@ export function computeLayout(people: Person[]): TreeLayout {
     if (parentXs.length === 0) continue;
     const childTopY = genCache.get(p.id)! * (NODE_HEIGHT + GEN_GAP);
     // Use the parents' own (actual) generation to find their bottom edge,
-    // rather than assuming the child is exactly one generation below — a
+    // rather than assuming the child is exactly one generation below - a
     // spouse pulled forward to match a much-younger partner can otherwise
     // sit many generations below their real parents, which would make this
     // line start from nowhere instead of from the parents themselves.
@@ -289,7 +289,7 @@ export function computeLayout(people: Person[]): TreeLayout {
     );
     const parentBottomY = parentGen * (NODE_HEIGHT + GEN_GAP) + NODE_HEIGHT;
     // Route the horizontal jog through the gap right after the parents'
-    // own row — that band is always circle-free — rather than splitting
+    // own row - that band is always circle-free - rather than splitting
     // the full distance 50/50, which for a multi-generation gap (e.g. a
     // spouse pulled forward several generations) would land the jog inside
     // some unrelated row's circles in between.

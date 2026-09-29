@@ -24,7 +24,6 @@ export function PersonForm({ person, people }: PersonFormProps) {
   const [lastNameUr, setLastNameUr] = useState(person?.lastNameUr ?? "");
   const [gender, setGender] = useState(person?.gender ?? "other");
   const [isDeceased, setIsDeceased] = useState(person?.isDeceased ?? false);
-  const [photoUrl, setPhotoUrl] = useState(person?.photoUrl ?? "");
   const [notes, setNotes] = useState(person?.notes ?? "");
   const [parentIds, setParentIds] = useState<string[]>(
     person?.parentIds ?? [],
@@ -92,7 +91,6 @@ export function PersonForm({ person, people }: PersonFormProps) {
       lastNameUr: lastNameUr.trim() || undefined,
       gender,
       isDeceased,
-      photoUrl: photoUrl || undefined,
       notes: notes || undefined,
       parentIds,
       spouseIds,
@@ -205,16 +203,6 @@ export function PersonForm({ person, people }: PersonFormProps) {
             style={{ left: isDeceased ? "22px" : "2px" }}
           />
         </button>
-      </label>
-
-      <label className="flex flex-col gap-1 text-sm">
-        {t.form.photoUrl}
-        <input
-          value={photoUrl}
-          onChange={(e) => setPhotoUrl(e.target.value)}
-          placeholder="https://…"
-          className="rounded-md border border-black/15 px-3 py-2 dark:border-white/20 dark:bg-transparent"
-        />
       </label>
 
       <label className="flex flex-col gap-1 text-sm">

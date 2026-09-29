@@ -7,7 +7,7 @@ const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30; // 30 days
 function secret(): string {
   const value = process.env.AUTH_SECRET;
   if (!value) {
-    throw new Error("AUTH_SECRET is not set — add it to your .env.local");
+    throw new Error("AUTH_SECRET is not set - add it to your .env.local");
   }
   return value;
 }
@@ -17,7 +17,7 @@ function sign(payload: string): string {
 }
 
 /** A session token is just an expiry timestamp plus an HMAC over it, so
- * verifying a session never needs a database — only the same secret that
+ * verifying a session never needs a database - only the same secret that
  * signed it. */
 export function createSessionToken(): string {
   const expires = Date.now() + SESSION_MAX_AGE_SECONDS * 1000;
@@ -43,7 +43,7 @@ export function checkCredentials(email: string, password: string): boolean {
   return email.trim().toLowerCase() === adminEmail.toLowerCase() && password === adminPassword;
 }
 
-/** Server Components / Route Handlers only — reads the session cookie via
+/** Server Components / Route Handlers only - reads the session cookie via
  * next/headers, so it can't be called from client components. */
 export async function isAuthenticated(): Promise<boolean> {
   const cookieStore = await cookies();

@@ -27,7 +27,7 @@ const notoNastaliqUrdu = Noto_Nastaliq_Urdu({
 
 export const metadata: Metadata = {
   title: "Shajar",
-  description: "Shajar — your family tree, rooted in one place.",
+  description: "Shajar - your family tree, rooted in one place.",
 };
 
 // The tree page implements its own pinch-to-zoom on the diagram; the
@@ -46,7 +46,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const initialLocale: Locale =
     cookieStore.get("shajar-locale")?.value === "ur" ? "ur" : "en";
   // No stored preference yet? Default to dark rather than silently
-  // following the OS/browser's prefers-color-scheme — that's what made the
+  // following the OS/browser's prefers-color-scheme - that's what made the
   // site render in light mode on a laptop with a light system theme.
   const initialTheme: Theme =
     cookieStore.get("shajar-theme")?.value === "light" ? "light" : "dark";

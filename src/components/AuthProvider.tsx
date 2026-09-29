@@ -15,7 +15,7 @@ export function AuthProvider({
   initialIsAdmin,
 }: {
   children: ReactNode;
-  /** Read server-side from the (httpOnly) session cookie — it can't be read
+  /** Read server-side from the (httpOnly) session cookie - it can't be read
    * from client code, so the logged-in state has to arrive as a prop like
    * the locale/theme cookies do. */
   initialIsAdmin: boolean;
@@ -26,7 +26,7 @@ export function AuthProvider({
     await fetch("/api/auth/logout", { method: "POST" });
     // A full reload (rather than router.refresh()) guarantees the root
     // layout re-runs its server-side cookie check and this provider is
-    // re-seeded with the new value — a soft navigation wouldn't remount it.
+    // re-seeded with the new value - a soft navigation wouldn't remount it.
     window.location.href = "/";
   }
 

@@ -19,7 +19,7 @@ export function LanguageProvider({
 }: {
   children: ReactNode;
   /** Read server-side from the `shajar-locale` cookie so the HTML already
-   * reflects the stored preference on the very first response — no flash,
+   * reflects the stored preference on the very first response - no flash,
    * no hydration mismatch, no client-only correction needed. */
   initialLocale: Locale;
 }) {

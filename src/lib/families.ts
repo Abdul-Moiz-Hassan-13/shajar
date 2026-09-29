@@ -3,7 +3,7 @@ import type { Person } from "./types";
 export type FamilyStatus = "married" | "widowed" | "divorced" | null;
 
 export interface Family {
-  /** Stable, unique per couple (or per solo parent) — a person who remarries
+  /** Stable, unique per couple (or per solo parent) - a person who remarries
    * produces a separate Family for each marriage, never a merged one. */
   id: string;
   parents: Person[];
@@ -24,7 +24,7 @@ function coupleStatus(a: Person, b: Person): FamilyStatus {
 }
 
 /** Groups people into family units of exactly two parents (or one, when
- * only one is on record) plus their *direct* children only — no
+ * only one is on record) plus their *direct* children only - no
  * grandchildren, no children's own spouses. Each marriage is its own unit:
  * someone who married twice appears in two separate Family entries, one per
  * spouse, each listing only the children from that specific pairing. */
@@ -52,7 +52,7 @@ export function computeFamilies(people: Person[]): Family[] {
   }
 
   // Assign every person as a child to whichever family matches their own
-  // recorded parentIds exactly — two parents means the couple family (even
+  // recorded parentIds exactly - two parents means the couple family (even
   // if that couple wasn't otherwise linked as spouses on record), one parent
   // means a standalone solo-parent family.
   for (const p of people) {

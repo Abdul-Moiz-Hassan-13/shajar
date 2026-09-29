@@ -47,7 +47,7 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
   const [openA, setOpenA] = useState(false);
   const [openB, setOpenB] = useState(false);
   // Whether the user has asked for a relationship at all (vs. just having
-  // picked people). The result itself is *derived*, not stored — so it can
+  // picked people). The result itself is *derived*, not stored - so it can
   // never go stale relative to the current selection or language, unlike a
   // separately-tracked value that needs manual re-syncing on every change.
   const [searched, setSearched] = useState(
@@ -73,7 +73,7 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
   }
 
   // Once a person is actually selected, always display their name in the
-  // *current* language — derived from idA/idB + locale, not the query text
+  // *current* language - derived from idA/idB + locale, not the query text
   // captured at selection time, so a later language switch can't leave a
   // stale name behind.
   const personA = idA ? byId.get(idA) : undefined;
@@ -81,7 +81,7 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
   const displayedQueryA = personA ? displayFullName(personA, locale) : queryA;
   const displayedQueryB = personB ? displayFullName(personB, locale) : queryB;
 
-  // Exclude whichever person is already picked in the other field — the
+  // Exclude whichever person is already picked in the other field - the
   // same person can't be related to themselves.
   const candidatesA = sorted.filter((p) => p.id !== idB && matches(p, queryA));
   const candidatesB = sorted.filter((p) => p.id !== idA && matches(p, queryB));

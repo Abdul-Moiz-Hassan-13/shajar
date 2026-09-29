@@ -13,7 +13,7 @@ export interface RelationshipStep {
 export interface RelationshipResult {
   path: RelationshipStep[];
   label: string;
-  /** The real, uncollapsed sequence of people connecting them — useful for
+  /** The real, uncollapsed sequence of people connecting them - useful for
    * rendering an actual generational tree diagram of the relationship. */
   rawPeople: Person[];
 }
@@ -93,7 +93,7 @@ function classify(
     const removed = Math.abs(u - d);
     if (removed === 0) return terms.cousin(degree, removed, "same", g);
 
-    // "Removed" cousins are confusing jargon — phrase them plainly instead:
+    // "Removed" cousins are confusing jargon - phrase them plainly instead:
     // whichever person is more generations from the shared ancestor is
     // effectively looking at the *other* person's parent's cousin (or, from
     // the other direction, their cousin's child).
@@ -153,7 +153,7 @@ export function findRelationship(
 
   // For DISPLAY only, collapse an "up" immediately followed by "down" (i.e.
   // passing through a shared parent to reach one of their other children)
-  // into a single "sibling" hop, hiding that parent — e.g. an uncle relation
+  // into a single "sibling" hop, hiding that parent - e.g. an uncle relation
   // reads as "your dad → (sibling) → your uncle" rather than spelling out
   // the grandparent in between. Left alone for a direct sibling pair (path
   // length 2), where the shared parent is itself the interesting answer to

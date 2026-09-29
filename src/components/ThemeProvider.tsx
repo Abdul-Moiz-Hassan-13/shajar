@@ -19,10 +19,10 @@ export function ThemeProvider({
 }: {
   children: ReactNode;
   /** Read server-side from the `shajar-theme` cookie so the HTML already
-   * reflects the stored preference on the very first response — no flash,
+   * reflects the stored preference on the very first response - no flash,
    * no hydration mismatch. Without an explicit choice, the app no longer
    * silently follows the OS/browser's `prefers-color-scheme` (that's what
-   * made it look different on another laptop) — it defaults to dark until
+   * made it look different on another laptop) - it defaults to dark until
    * the user picks otherwise. */
   initialTheme: Theme;
 }) {
