@@ -82,6 +82,30 @@ html.dark input[type="search"]::-webkit-search-cancel-button {
   background-color: #3b82f6;
 }
 
+/* The language/theme toggle pills only need a vertical nudge under Urdu —
+   that's the RTL line-height/font-metric combination that pushes their
+   emoji/text visually low. Scoping it to [dir="rtl"] keeps the English
+   pills (already centered) untouched. */
+html[dir="rtl"] .navbar-pill {
+  padding-top: 0.125rem !important;
+  padding-bottom: 0.625rem !important;
+}
+
+/* Chrome/Edge paint autofilled fields with their own opaque background
+   (recognized email/password, saved addresses, etc.) that a plain
+   `background-color` can't override — this is the standard workaround: an
+   inset box-shadow the size of the field paints over it, and
+   `-webkit-text-fill-color` keeps the typed text itself readable. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--background) inset;
+  box-shadow: 0 0 0 1000px var(--background) inset;
+  -webkit-text-fill-color: var(--foreground);
+  caret-color: var(--foreground);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
 button,
 a,
 select,

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Fragment, useMemo, useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
 import { useLanguage } from "@/components/LanguageProvider";
 import type { Family } from "@/lib/families";
 import type { Person } from "@/lib/types";
@@ -21,6 +22,7 @@ function familyMatches(family: Family, query: string): boolean {
 
 export function FamiliesList({ families }: { families: Family[] }) {
   const { t, locale } = useLanguage();
+  const { isAdmin } = useAuth();
   const [query, setQuery] = useState("");
 
   const filtered = useMemo(
@@ -61,12 +63,18 @@ export function FamiliesList({ families }: { families: Family[] }) {
                     {i > 0 && (
                       <span className="text-black/40 dark:text-white/40">+</span>
                     )}
-                    <Link
-                      href={`/people/${p.id}`}
-                      className="font-semibold hover:underline"
-                    >
-                      {displayFullName(p, locale)}
-                    </Link>
+                    {isAdmin ? (
+                      <Link
+                        href={`/people/${p.id}`}
+                        className="font-semibold hover:underline"
+                      >
+                        {displayFullName(p, locale)}
+                      </Link>
+                    ) : (
+                      <span className="font-semibold">
+                        {displayFullName(p, locale)}
+                      </span>
+                    )}
                     {p.isDeceased && <span>🕊️</span>}
                   </Fragment>
                 ))}
@@ -92,16 +100,26 @@ export function FamiliesList({ families }: { families: Family[] }) {
                   </p>
                 ) : (
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {family.children.map((c) => (
-                      <Link
-                        key={c.id}
-                        href={`/people/${c.id}`}
-                        className="rounded-full border border-black/15 px-3 py-1 text-sm hover:border-emerald-500/40 hover:text-emerald-500 dark:border-white/20"
-                      >
-                        {displayFullName(c, locale)}
-                        {c.isDeceased && " 🕊️"}
-                      </Link>
-                    ))}
+                    {family.children.map((c) =>
+                      isAdmin ? (
+                        <Link
+                          key={c.id}
+                          href={`/people/${c.id}`}
+                          className="rounded-full border border-black/15 px-3 py-1 text-sm hover:border-emerald-500/40 hover:text-emerald-500 dark:border-white/20"
+                        >
+                          {displayFullName(c, locale)}
+                          {c.isDeceased && " 🕊️"}
+                        </Link>
+                      ) : (
+                        <span
+                          key={c.id}
+                          className="rounded-full border border-black/15 px-3 py-1 text-sm dark:border-white/20"
+                        >
+                          {displayFullName(c, locale)}
+                          {c.isDeceased && " 🕊️"}
+                        </span>
+                      ),
+                    )}
                   </div>
                 )}
               </div>

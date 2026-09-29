@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useAuth } from "@/components/AuthProvider";
 import { useLanguage } from "@/components/LanguageProvider";
 import { localizeNumber } from "@/lib/i18n/numerals";
 import { displayFullName } from "@/lib/personName";
@@ -20,6 +21,7 @@ export function HomeContent({
   roots: Person[];
 }) {
   const { t, locale } = useLanguage();
+  const { isAdmin } = useAuth();
 
   if (peopleCount === 0) {
     return (
@@ -36,12 +38,14 @@ export function HomeContent({
               {t.home.emptyTagline}
             </p>
           </div>
-          <Link
-            href="/people/new"
-            className="rounded-full bg-black px-6 py-3 text-sm font-medium text-white shadow-lg shadow-black/10 transition hover:scale-105 dark:bg-white dark:text-black"
-          >
-            {t.home.plantSeed}
-          </Link>
+          {isAdmin && (
+            <Link
+              href="/people/new"
+              className="rounded-full bg-black px-6 py-3 text-sm font-medium text-white shadow-lg shadow-black/10 transition hover:scale-105 dark:bg-white dark:text-black"
+            >
+              {t.home.plantSeed}
+            </Link>
+          )}
         </div>
       </div>
     );
@@ -97,18 +101,20 @@ export function HomeContent({
             {t.home.exploreTreeDesc}
           </span>
         </Link>
-        <Link
-          href="/people/new"
-          className="group flex flex-col gap-2 rounded-xl border border-black/10 bg-gradient-to-br from-teal-400/5 to-transparent p-6 transition hover:border-teal-400/40 dark:border-white/10"
-        >
-          <span className="text-2xl">➕</span>
-          <span className="font-semibold group-hover:text-teal-400">
-            {t.home.addSomeoneNew}
-          </span>
-          <span className="text-sm text-black/60 dark:text-white/60">
-            {t.home.addSomeoneNewDesc}
-          </span>
-        </Link>
+        {isAdmin && (
+          <Link
+            href="/people/new"
+            className="group flex flex-col gap-2 rounded-xl border border-black/10 bg-gradient-to-br from-teal-400/5 to-transparent p-6 transition hover:border-teal-400/40 dark:border-white/10"
+          >
+            <span className="text-2xl">➕</span>
+            <span className="font-semibold group-hover:text-teal-400">
+              {t.home.addSomeoneNew}
+            </span>
+            <span className="text-sm text-black/60 dark:text-white/60">
+              {t.home.addSomeoneNewDesc}
+            </span>
+          </Link>
+        )}
       </div>
 
       {roots.length > 0 && (
@@ -117,15 +123,24 @@ export function HomeContent({
             {t.home.oldestBranches}
           </h2>
           <div className="flex flex-wrap gap-2">
-            {roots.map((p) => (
-              <Link
-                key={p.id}
-                href={`/people/${p.id}`}
-                className="rounded-full border border-black/10 px-4 py-1.5 text-sm hover:border-emerald-500/40 hover:text-emerald-500 dark:border-white/10"
-              >
-                {displayFullName(p, locale)}
-              </Link>
-            ))}
+            {roots.map((p) =>
+              isAdmin ? (
+                <Link
+                  key={p.id}
+                  href={`/people/${p.id}`}
+                  className="rounded-full border border-black/10 px-4 py-1.5 text-sm hover:border-emerald-500/40 hover:text-emerald-500 dark:border-white/10"
+                >
+                  {displayFullName(p, locale)}
+                </Link>
+              ) : (
+                <span
+                  key={p.id}
+                  className="rounded-full border border-black/10 px-4 py-1.5 text-sm dark:border-white/10"
+                >
+                  {displayFullName(p, locale)}
+                </span>
+              ),
+            )}
           </div>
         </div>
       )}

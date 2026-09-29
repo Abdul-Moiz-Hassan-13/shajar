@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 import { Geist, Geist_Mono, Noto_Nastaliq_Urdu } from "next/font/google";
+import { AuthProvider } from "@/components/AuthProvider";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import { NavBar } from "@/components/NavBar";
 import { ThemeProvider, type Theme } from "@/components/ThemeProvider";
+import { isAuthenticated } from "@/lib/auth";
 import type { Locale } from "@/lib/i18n/translations";
 import "./globals.css";
 
@@ -48,6 +50,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   // site render in light mode on a laptop with a light system theme.
   const initialTheme: Theme =
     cookieStore.get("shajar-theme")?.value === "light" ? "light" : "dark";
+  const initialIsAdmin = await isAuthenticated();
 
   return (
     <html
@@ -58,10 +61,12 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         <ThemeProvider initialTheme={initialTheme}>
           <LanguageProvider initialLocale={initialLocale}>
-            <NavBar />
-            <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">
-              {children}
-            </main>
+            <AuthProvider initialIsAdmin={initialIsAdmin}>
+              <NavBar />
+              <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">
+                {children}
+              </main>
+            </AuthProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>

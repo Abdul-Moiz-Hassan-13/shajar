@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
 import { DeletePersonButton } from "@/components/DeletePersonButton";
 import { useLanguage } from "@/components/LanguageProvider";
 import { displayFullName } from "@/lib/personName";
@@ -36,6 +37,7 @@ function currentSpouseNames(
 
 export function PeopleTable({ people }: { people: Person[] }) {
   const { t, locale } = useLanguage();
+  const { isAdmin } = useAuth();
   const [query, setQuery] = useState("");
 
   const byId = useMemo(() => new Map(people.map((p) => [p.id, p])), [people]);
@@ -54,10 +56,15 @@ export function PeopleTable({ people }: { people: Person[] }) {
   if (people.length === 0) {
     return (
       <p className="text-black/60 dark:text-white/60">
-        {t.people.noOneYet}{" "}
-        <Link href="/people/new" className="underline">
-          {t.people.addFirstPerson}
-        </Link>
+        {t.people.noOneYet}
+        {isAdmin && (
+          <>
+            {" "}
+            <Link href="/people/new" className="underline">
+              {t.people.addFirstPerson}
+            </Link>
+          </>
+        )}
         .
       </p>
     );
@@ -82,11 +89,19 @@ export function PeopleTable({ people }: { people: Person[] }) {
           <table className="w-full min-w-[640px] table-fixed text-left text-sm">
             <thead className="border-b border-black/10 bg-black/[0.02] dark:border-white/10 dark:bg-white/[0.03]">
               <tr>
-                <th className="w-[22%] px-4 py-2 font-medium">{t.people.colName}</th>
-                <th className="w-[10%] px-4 py-2 font-medium">{t.people.colDeceased}</th>
-                <th className="w-[27%] px-4 py-2 font-medium">{t.people.colParents}</th>
-                <th className="w-[27%] px-4 py-2 font-medium">{t.people.colSpouses}</th>
-                <th className="w-[14%] px-4 py-2 font-medium" />
+                <th className={`${isAdmin ? "w-[22%]" : "w-[25%]"} px-4 py-2 font-medium`}>
+                  {t.people.colName}
+                </th>
+                <th className={`${isAdmin ? "w-[10%]" : "w-[12%]"} px-4 py-2 font-medium`}>
+                  {t.people.colDeceased}
+                </th>
+                <th className={`${isAdmin ? "w-[27%]" : "w-[31.5%]"} px-4 py-2 font-medium`}>
+                  {t.people.colParents}
+                </th>
+                <th className={`${isAdmin ? "w-[27%]" : "w-[31.5%]"} px-4 py-2 font-medium`}>
+                  {t.people.colSpouses}
+                </th>
+                {isAdmin && <th className="w-[14%] px-4 py-2 font-medium" />}
               </tr>
             </thead>
             <tbody>
@@ -99,17 +114,19 @@ export function PeopleTable({ people }: { people: Person[] }) {
                   <td className="break-words px-4 py-2">{p.isDeceased ? t.people.yes : "—"}</td>
                   <td className="break-words px-4 py-2">{names(p.parentIds, byId, locale)}</td>
                   <td className="break-words px-4 py-2">{currentSpouseNames(p, byId, locale)}</td>
-                  <td className="px-4 py-2">
-                    <div className="flex items-center gap-3">
-                      <Link
-                        href={`/people/${p.id}`}
-                        className="text-sm hover:underline"
-                      >
-                        {t.people.edit}
-                      </Link>
-                      <DeletePersonButton id={p.id} name={displayFullName(p, locale)} />
-                    </div>
-                  </td>
+                  {isAdmin && (
+                    <td className="px-4 py-2">
+                      <div className="flex items-center gap-3">
+                        <Link
+                          href={`/people/${p.id}`}
+                          className="text-sm hover:underline"
+                        >
+                          {t.people.edit}
+                        </Link>
+                        <DeletePersonButton id={p.id} name={displayFullName(p, locale)} />
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

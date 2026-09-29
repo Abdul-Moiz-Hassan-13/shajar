@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isAuthenticated } from "@/lib/auth";
 import { createPerson, getAllPeople } from "@/lib/store";
 import type { PersonInput } from "@/lib/types";
 
@@ -8,6 +9,10 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const body = (await request.json()) as PersonInput;
 
   if (!body.firstName || !body.gender) {

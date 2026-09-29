@@ -35,6 +35,18 @@ export interface TranslationDict {
     toDark: string;
     toLight: string;
   };
+  auth: {
+    login: string;
+    logout: string;
+    email: string;
+    password: string;
+    signIn: string;
+    signingIn: string;
+    invalidCredentials: string;
+    genericError: string;
+    showPassword: string;
+    hidePassword: string;
+  };
   home: {
     emptyTagline: string;
     plantSeed: string;
@@ -164,6 +176,18 @@ const en: TranslationDict = {
   themeToggle: {
     toDark: "Switch to dark mode",
     toLight: "Switch to light mode",
+  },
+  auth: {
+    login: "Login",
+    logout: "Logout",
+    email: "Email",
+    password: "Password",
+    signIn: "Sign in",
+    signingIn: "Signing in…",
+    invalidCredentials: "Invalid email or password.",
+    genericError: "Something went wrong. Try again.",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
   },
   home: {
     emptyTagline:
@@ -295,6 +319,18 @@ const ur: TranslationDict = {
   themeToggle: {
     toDark: "ڈارک موڈ میں جائیں",
     toLight: "لائٹ موڈ میں جائیں",
+  },
+  auth: {
+    login: "لاگ ان",
+    logout: "لاگ آؤٹ",
+    email: "ای میل",
+    password: "پاس ورڈ",
+    signIn: "سائن ان کریں",
+    signingIn: "سائن ان ہو رہا ہے…",
+    invalidCredentials: "غلط ای میل یا پاس ورڈ۔",
+    genericError: "کچھ غلط ہو گیا۔ دوبارہ کوشش کریں۔",
+    showPassword: "پاس ورڈ دکھائیں",
+    hidePassword: "پاس ورڈ چھپائیں",
   },
   home: {
     emptyTagline:

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
 import { useLanguage } from "@/components/LanguageProvider";
 import { useTheme } from "@/components/ThemeProvider";
 
@@ -10,6 +11,7 @@ export function NavBar() {
   const pathname = usePathname();
   const { t, toggleLocale } = useLanguage();
   const { theme, toggleTheme } = useTheme();
+  const { isAdmin, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const LINKS = [
@@ -52,7 +54,7 @@ export function NavBar() {
           <button
             type="button"
             onClick={toggleLocale}
-            className="inline-flex shrink-0 items-center justify-center rounded-full border border-black/15 px-3 pt-1! pb-2! text-sm font-medium leading-5! hover:border-emerald-500/40 hover:text-emerald-500 dark:border-white/20"
+            className="navbar-pill inline-flex shrink-0 items-center justify-center rounded-full border border-black/15 px-3 py-1.5 text-sm font-medium leading-5! hover:border-emerald-500/40 hover:text-emerald-500 dark:border-white/20"
           >
             {t.languageToggle.label}
           </button>
@@ -60,10 +62,19 @@ export function NavBar() {
             type="button"
             onClick={toggleTheme}
             aria-label={theme === "dark" ? t.themeToggle.toLight : t.themeToggle.toDark}
-            className="inline-flex shrink-0 items-center justify-center rounded-full border border-black/15 px-3 pt-1! pb-2! text-sm leading-5! hover:border-emerald-500/40 hover:text-emerald-500 dark:border-white/20"
+            className="navbar-pill inline-flex shrink-0 items-center justify-center rounded-full border border-black/15 px-3 py-1.5 text-sm leading-5! hover:border-emerald-500/40 hover:text-emerald-500 dark:border-white/20"
           >
             {theme === "dark" ? "☀️" : "🌙"}
           </button>
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={logout}
+              className="navbar-pill hidden shrink-0 items-center justify-center rounded-full border border-black/15 px-3 py-1.5 text-sm leading-5! hover:border-emerald-500/40 hover:text-emerald-500 sm:inline-flex dark:border-white/20"
+            >
+              {t.auth.logout}
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setMenuOpen((prev) => !prev)}
@@ -94,6 +105,17 @@ export function NavBar() {
               </Link>
             </li>
           ))}
+          {isAdmin && (
+            <li>
+              <button
+                type="button"
+                onClick={logout}
+                className="block w-full rounded-md px-3 py-2 text-left text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+              >
+                {t.auth.logout}
+              </button>
+            </li>
+          )}
         </ul>
       )}
     </header>

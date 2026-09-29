@@ -1,6 +1,7 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { PersonFormHeading } from "@/components/headers/PersonFormHeading";
 import { PersonForm } from "@/components/PersonForm";
+import { isAuthenticated } from "@/lib/auth";
 import { getAllPeople, getPerson } from "@/lib/store";
 
 interface PageProps {
@@ -8,6 +9,7 @@ interface PageProps {
 }
 
 export default async function EditPersonPage({ params }: PageProps) {
+  if (!(await isAuthenticated())) redirect("/login");
   const { id } = await params;
   const [person, people] = await Promise.all([
     getPerson(id),

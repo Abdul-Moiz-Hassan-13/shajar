@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isAuthenticated } from "@/lib/auth";
 import { deletePerson, getPerson, updatePerson } from "@/lib/store";
 import type { PersonInput } from "@/lib/types";
 
@@ -16,6 +17,10 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 }
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { id } = await params;
   const body = (await request.json()) as PersonInput;
 
@@ -34,6 +39,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 }
 
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { id } = await params;
   const ok = await deletePerson(id);
   if (!ok) {
