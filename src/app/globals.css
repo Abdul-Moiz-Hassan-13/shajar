@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Explicit toggle (see ThemeProvider) instead of only following the OS
+   theme — a `dark` class on <html> now drives every `dark:` utility. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -12,11 +16,9 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
 body {
@@ -55,6 +57,29 @@ html[dir="rtl"] button {
 
 html[dir="rtl"] .text-left {
   text-align: right !important;
+}
+
+/* The native "×" clear button every <input type="search"> gets is a plain
+   gray glyph by default with no `color` to override — swap it for a
+   same-shaped mask so it can be tinted, consistently across every search
+   box in the app (People, Families, Tree, Relations). */
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 14px;
+  width: 14px;
+  cursor: pointer;
+  background-color: #1e3a8a;
+  -webkit-mask-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M4 4l8 8M12 4l-8 8' stroke='black' stroke-width='2' stroke-linecap='round'/></svg>");
+  mask-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M4 4l8 8M12 4l-8 8' stroke='black' stroke-width='2' stroke-linecap='round'/></svg>");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+html.dark input[type="search"]::-webkit-search-cancel-button {
+  background-color: #3b82f6;
 }
 
 button,

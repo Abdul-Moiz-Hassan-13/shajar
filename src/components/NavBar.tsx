@@ -4,10 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
+import { useTheme } from "@/components/ThemeProvider";
 
 export function NavBar() {
   const pathname = usePathname();
   const { t, toggleLocale } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const LINKS = [
@@ -15,6 +17,7 @@ export function NavBar() {
     { href: "/people", label: t.nav.people },
     { href: "/tree", label: t.nav.tree },
     { href: "/relations", label: t.nav.relations },
+    { href: "/families", label: t.nav.families },
   ];
 
   function isActive(href: string) {
@@ -49,9 +52,17 @@ export function NavBar() {
           <button
             type="button"
             onClick={toggleLocale}
-            className="shrink-0 rounded-full border border-black/15 px-3 py-1.5 text-sm font-medium hover:border-emerald-500/40 hover:text-emerald-500 dark:border-white/20"
+            className="inline-flex shrink-0 items-center justify-center rounded-full border border-black/15 px-3 pt-1! pb-2! text-sm font-medium leading-5! hover:border-emerald-500/40 hover:text-emerald-500 dark:border-white/20"
           >
             {t.languageToggle.label}
+          </button>
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? t.themeToggle.toLight : t.themeToggle.toDark}
+            className="inline-flex shrink-0 items-center justify-center rounded-full border border-black/15 px-3 pt-1! pb-2! text-sm leading-5! hover:border-emerald-500/40 hover:text-emerald-500 dark:border-white/20"
+          >
+            {theme === "dark" ? "☀️" : "🌙"}
           </button>
           <button
             type="button"

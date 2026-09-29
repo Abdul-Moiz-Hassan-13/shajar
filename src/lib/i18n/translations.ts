@@ -25,10 +25,15 @@ export interface TranslationDict {
     people: string;
     tree: string;
     relations: string;
+    families: string;
     menu: string;
   };
   languageToggle: {
     label: string;
+  };
+  themeToggle: {
+    toDark: string;
+    toLight: string;
   };
   home: {
     emptyTagline: string;
@@ -71,6 +76,8 @@ export interface TranslationDict {
     zoomIn: string;
     zoomOut: string;
     resetZoom: string;
+    exportImage: string;
+    exporting: string;
   };
   relations: {
     title: string;
@@ -131,6 +138,14 @@ export interface TranslationDict {
     deleting: string;
     delete: string;
   };
+  families: {
+    title: string;
+    subtitle: string;
+    noFamilies: string;
+    childrenLabel: string;
+    noChildren: string;
+    unknownParent: string;
+  };
 }
 
 const en: TranslationDict = {
@@ -140,10 +155,15 @@ const en: TranslationDict = {
     people: "People",
     tree: "Tree",
     relations: "Relations",
+    families: "Families",
     menu: "Menu",
   },
   languageToggle: {
     label: "اردو",
+  },
+  themeToggle: {
+    toDark: "Switch to dark mode",
+    toLight: "Switch to light mode",
   },
   home: {
     emptyTagline:
@@ -190,6 +210,8 @@ const en: TranslationDict = {
     zoomIn: "Zoom in",
     zoomOut: "Zoom out",
     resetZoom: "Reset zoom",
+    exportImage: "Export image",
+    exporting: "Exporting…",
   },
   relations: {
     title: "How are they related?",
@@ -246,6 +268,15 @@ const en: TranslationDict = {
     deleting: "Deleting…",
     delete: "Delete",
   },
+  families: {
+    title: "Families",
+    subtitle:
+      "Every couple and their direct children.",
+    noFamilies: "No families yet.",
+    childrenLabel: "Children",
+    noChildren: "No children on record.",
+    unknownParent: "Unknown parent",
+  },
 };
 
 const ur: TranslationDict = {
@@ -255,10 +286,15 @@ const ur: TranslationDict = {
     people: "لوگ",
     tree: "شجرہ",
     relations: "رشتے",
+    families: "خاندان",
     menu: "مینو",
   },
   languageToggle: {
     label: "English",
+  },
+  themeToggle: {
+    toDark: "ڈارک موڈ میں جائیں",
+    toLight: "لائٹ موڈ میں جائیں",
   },
   home: {
     emptyTagline:
@@ -305,6 +341,8 @@ const ur: TranslationDict = {
     zoomIn: "زوم ان",
     zoomOut: "زوم آؤٹ",
     resetZoom: "زوم ری سیٹ کریں",
+    exportImage: "تصویر ایکسپورٹ کریں",
+    exporting: "ایکسپورٹ ہو رہا ہے…",
   },
   relations: {
     title: "ان کا آپس میں کیا رشتہ ہے؟",
@@ -377,6 +415,14 @@ const ur: TranslationDict = {
     confirm: (name) => `${name} کو حذف کریں؟ یہ واپس نہیں ہو سکتا۔`,
     deleting: "حذف ہو رہا ہے…",
     delete: "حذف کریں",
+  },
+  families: {
+    title: "خاندان",
+    subtitle: "ہر جوڑا اور ان کی اولاد۔",
+    noFamilies: "ابھی تک کوئی خاندان موجود نہیں۔",
+    childrenLabel: "اولاد",
+    noChildren: "کوئی اولاد درج نہیں۔",
+    unknownParent: "نامعلوم والدین",
   },
 };
 

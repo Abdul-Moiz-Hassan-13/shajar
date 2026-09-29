@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
-import { displayFirstName, displayLastName } from "@/lib/personName";
+import { useTheme } from "@/components/ThemeProvider";
+import { displayFirstName, displayFullName, displayLastName } from "@/lib/personName";
 import { NODE_HEIGHT, NODE_WIDTH, computeLayout, type TreeLayout } from "@/lib/treeLayout";
 import type { Person, PersonInput } from "@/lib/types";
 
@@ -19,9 +20,44 @@ const GENDER_COLOR: Record<Person["gender"], string> = {
 const ZOOM_MIN = 0.25;
 const ZOOM_MAX = 2;
 const ZOOM_STEP = 0.15;
+const PADDING = 20;
 
 function clampZoom(z: number): number {
   return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
+}
+
+function fullName(p: Person): string {
+  return `${p.firstName} ${p.lastName}`.trim();
+}
+
+// How far below the sticky nav bar a found node lands — enough that the
+// nav never overlaps it, without pushing it all the way to mid-screen.
+const SEARCH_RESULT_TOP_OFFSET = 200;
+
+/** Scrolls so the given node lands near the top of the viewport (just under
+ * the sticky nav) — horizontally centered within the diagram's own scroll
+ * container (which does clip and scroll, since it can be narrower than its
+ * content), and vertically via the browser window itself. The container has
+ * no fixed height — it just grows tall enough to fit the whole diagram — so
+ * vertical "scrolling" is actually the page's, not the container's;
+ * adjusting only container.scrollTop would be a no-op for anything below
+ * the very top of the tree. */
+function centerOnNode(
+  container: HTMLDivElement,
+  node: { x: number; y: number },
+  zoom: number,
+) {
+  container.scrollLeft = Math.max(
+    0,
+    (node.x + PADDING) * zoom - container.clientWidth / 2,
+  );
+
+  const rect = container.getBoundingClientRect();
+  const nodeViewportY =
+    rect.top + (node.y + NODE_HEIGHT / 2 + PADDING) * zoom - container.scrollTop;
+  const targetScrollY =
+    window.scrollY + nodeViewportY - SEARCH_RESULT_TOP_OFFSET;
+  window.scrollTo({ top: Math.max(0, targetScrollY), behavior: "smooth" });
 }
 
 /** Scrolls so the root with the most descendants — the actual family
@@ -76,6 +112,70 @@ function centerOnMainRoot(
   container.scrollTop = 0;
 }
 
+const EXPORT_SCALE = 3;
+
+/** Serializes the live tree SVG at full (unzoomed) resolution into a
+ * high-DPI PNG and triggers a download. The clone is detached from the
+ * page, so anything that only carries color/font via a Tailwind class
+ * (rather than an inline attribute) would otherwise fall back to SVG's
+ * bare initial values (e.g. fill defaults to black) — computed styles are
+ * read off the still-attached original elements first and baked into the
+ * clone as explicit attributes to avoid that. */
+async function exportSvgAsPng(
+  svgEl: SVGSVGElement,
+  width: number,
+  height: number,
+  backgroundColor: string,
+  fileName: string,
+) {
+  const clone = svgEl.cloneNode(true) as SVGSVGElement;
+  const originals = svgEl.querySelectorAll("*");
+  const clones = clone.querySelectorAll("*");
+  originals.forEach((original, i) => {
+    const target = clones[i];
+    const cs = getComputedStyle(original);
+    if (cs.fill && cs.fill !== "none") target.setAttribute("fill", cs.fill);
+    if (cs.stroke && cs.stroke !== "none")
+      target.setAttribute("stroke", cs.stroke);
+    if (cs.fontFamily) target.setAttribute("font-family", cs.fontFamily);
+  });
+  clone.removeAttribute("style");
+  clone.setAttribute("width", String(width));
+  clone.setAttribute("height", String(height));
+
+  const svgString = new XMLSerializer().serializeToString(clone);
+  const svgUrl =
+    "data:image/svg+xml;base64," +
+    btoa(unescape(encodeURIComponent(svgString)));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width * EXPORT_SCALE;
+  canvas.height = height * EXPORT_SCALE;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.fillStyle = backgroundColor;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const image = new Image();
+  await new Promise<void>((resolve, reject) => {
+    image.onload = () => resolve();
+    image.onerror = () => reject(new Error("Failed to render tree image"));
+    image.src = svgUrl;
+  });
+  ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+  const blob: Blob | null = await new Promise((resolve) =>
+    canvas.toBlob(resolve, "image/png"),
+  );
+  if (!blob) return;
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function touchDistance(touches: TouchList): number {
   const [a, b] = [touches[0], touches[1]];
   return Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
@@ -120,10 +220,16 @@ export function FamilyTree({
 }) {
   const router = useRouter();
   const { t, locale } = useLanguage();
+  const { theme } = useTheme();
   const layout = useMemo(() => computeLayout(people), [people]);
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
   const [pinnedKey, setPinnedKey] = useState<string | null>(null);
   const activeKey = hoveredKey ?? pinnedKey;
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [nameDraft, setNameDraft] = useState("");
   const clickTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -265,6 +371,40 @@ export function FamilyTree({
     };
   }, []);
 
+  const searchCandidates = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return [];
+    return people
+      .filter((p) => fullName(p).toLowerCase().includes(q))
+      .slice(0, 8);
+  }, [people, searchQuery]);
+
+  function selectSearchResult(personId: string) {
+    setSearchQuery("");
+    setSearchOpen(false);
+    setHighlightedId(personId);
+    const node = layout.nodes.find((n) => n.person.id === personId);
+    const container = scrollRef.current;
+    if (node && container) centerOnNode(container, node, zoomRef.current);
+  }
+
+  async function handleExport() {
+    const svgEl = svgRef.current;
+    if (!svgEl || isExporting) return;
+    setIsExporting(true);
+    try {
+      await exportSvgAsPng(
+        svgEl,
+        layout.width + PADDING * 2,
+        layout.height + PADDING * 2,
+        theme === "dark" ? "#0a0a0a" : "#ffffff",
+        "family-tree.png",
+      );
+    } finally {
+      setIsExporting(false);
+    }
+  }
+
   function handleNodeClick(id: string) {
     if (clickTimeout.current) clearTimeout(clickTimeout.current);
     clickTimeout.current = setTimeout(() => {
@@ -330,6 +470,46 @@ export function FamilyTree({
 
   return (
     <div className="flex flex-col gap-2">
+      {!center && (
+        <div className="relative max-w-xs">
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setSearchOpen(true);
+            }}
+            onFocus={() => setSearchOpen(true)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && searchCandidates.length > 0) {
+                e.preventDefault();
+                selectSearchResult(searchCandidates[0].id);
+              }
+            }}
+            placeholder={t.people.searchPlaceholder}
+            className="w-full rounded-md border border-black/15 px-3 py-2 text-sm dark:border-white/20 dark:bg-transparent"
+          />
+          {searchOpen && searchQuery && (
+            <div className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-black/15 bg-white dark:border-white/20 dark:bg-neutral-900">
+              {searchCandidates.length === 0 && (
+                <p className="px-3 py-2 text-sm text-black/50 dark:text-white/50">
+                  {t.relations.noMatches}
+                </p>
+              )}
+              {searchCandidates.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => selectSearchResult(p.id)}
+                  className="block w-full px-3 py-1.5 text-left text-sm hover:bg-black/5 dark:hover:bg-white/10"
+                >
+                  {displayFullName(p, locale)}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
       <div className="flex items-center gap-2">
         <button
           type="button"
@@ -364,6 +544,14 @@ export function FamilyTree({
             {t.tree.resetZoom}
           </button>
         )}
+        <button
+          type="button"
+          onClick={handleExport}
+          disabled={isExporting}
+          className="rounded-md border border-black/15 px-2 py-1 text-xs disabled:opacity-40 dark:border-white/20"
+        >
+          {isExporting ? t.tree.exporting : t.tree.exportImage}
+        </button>
       </div>
       <div
         ref={scrollRef}
@@ -387,6 +575,7 @@ export function FamilyTree({
         className={center ? "shrink-0" : ""}
       >
       <svg
+        ref={svgRef}
         viewBox={`0 0 ${layout.width + padding * 2} ${layout.height + padding * 2}`}
         width={layout.width + padding * 2}
         height={layout.height + padding * 2}
@@ -399,7 +588,10 @@ export function FamilyTree({
             width={layout.width}
             height={layout.height}
             fill="transparent"
-            onClick={() => setPinnedKey(null)}
+            onClick={() => {
+              setPinnedKey(null);
+              setHighlightedId(null);
+            }}
           />
           {layout.parentEdges.map((edge, i) => {
             const key = `parent-${i}`;
@@ -485,6 +677,8 @@ export function FamilyTree({
 
             const isEditing = editingId === node.person.id;
 
+            const isHighlighted = highlightedId === node.person.id;
+
             return (
               <g
                 key={node.person.id}
@@ -495,6 +689,16 @@ export function FamilyTree({
                   onClick={() => handleNodeClick(node.person.id)}
                   onDoubleClick={() => startEditing(node.person)}
                 >
+                  {isHighlighted && (
+                    <circle
+                      cx={NODE_WIDTH / 2}
+                      cy={NODE_HEIGHT / 2}
+                      r={NODE_WIDTH / 2 + 6}
+                      fill="none"
+                      stroke={HIGHLIGHT_COLOR}
+                      strokeWidth={3}
+                    />
+                  )}
                   {/* Opaque backing so connector lines passing behind (e.g. a
                       long multi-generation trunk) never show through the
                       circle's own translucent fill. */}

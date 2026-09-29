@@ -70,7 +70,7 @@ export function PeopleTable({ people }: { people: Person[] }) {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={t.people.searchPlaceholder}
-        className="w-full sm:max-w-xs rounded-md border border-black/15 px-3 py-2 text-sm dark:border-white/20 dark:bg-transparent"
+        className="w-full rounded-md border border-black/15 px-3 py-2 text-sm dark:border-white/20 dark:bg-transparent"
       />
 
       {filtered.length === 0 ? (

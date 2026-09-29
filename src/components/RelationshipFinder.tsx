@@ -132,6 +132,7 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
               onChange={(e) => {
                 setQueryA(e.target.value);
                 setIdA("");
+                setOpenA(true);
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -180,6 +181,7 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
               onChange={(e) => {
                 setQueryB(e.target.value);
                 setIdB("");
+                setOpenB(true);
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
