@@ -159,6 +159,8 @@ export interface TranslationDict {
     showGraph: string;
     graphTitle: string;
     closeGraph: string;
+    previousGraph: string;
+    nextGraph: string;
   };
 }
 
@@ -304,6 +306,8 @@ const en: TranslationDict = {
     showGraph: "Show family graph",
     graphTitle: "Family graph",
     closeGraph: "Close",
+    previousGraph: "Previous family graph",
+    nextGraph: "Next family graph",
   },
 };
 
@@ -465,6 +469,8 @@ const ur: TranslationDict = {
     showGraph: "خاندان کا خاکہ دیکھیں",
     graphTitle: "خاندان کا خاکہ",
     closeGraph: "بند کریں",
+    previousGraph: "پچھلے خاندان کا خاکہ",
+    nextGraph: "اگلے خاندان کا خاکہ",
   },
 };
 

@@ -36,6 +36,15 @@ export function FamiliesList({ families }: { families: Family[] }) {
     () => families.filter((f) => familyMatches(f, query)),
     [families, query],
   );
+  const openFamilyIndex = openFamily
+    ? filtered.findIndex((family) => family.id === openFamily.id)
+    : -1;
+  const graphFitReady = heightFit?.familyId === openFamily?.id;
+
+  function moveGraph(direction: -1 | 1) {
+    const nextFamily = filtered[openFamilyIndex + direction];
+    if (nextFamily) setOpenFamily(nextFamily);
+  }
 
   const graphPeople = useMemo(() => {
     if (!openFamily) return [];
@@ -68,12 +77,22 @@ export function FamiliesList({ families }: { families: Family[] }) {
       )
     : 0.95;
 
+  const hasOpenFamily = openFamily !== null;
+  useLayoutEffect(() => {
+    if (!hasOpenFamily) return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    dialog.showModal();
+    return () => {
+      if (dialog.open) dialog.close();
+    };
+  }, [hasOpenFamily]);
+
   useLayoutEffect(() => {
     if (!openFamily || !graphLayout) return;
     const dialog = dialogRef.current;
     const graphContainer = graphContainerRef.current;
     if (!dialog || !graphContainer) return;
-    dialog.showModal();
     const measure = () => {
       setGraphWidth(graphContainer.clientWidth);
       const canvas = graphContainer.querySelector("svg")?.parentElement;
@@ -100,7 +119,6 @@ export function FamiliesList({ families }: { families: Family[] }) {
     return () => {
       observer.disconnect();
       window.removeEventListener("resize", measure);
-      dialog.close();
     };
   }, [openFamily, graphLayout]);
 
@@ -214,7 +232,21 @@ export function FamiliesList({ families }: { families: Family[] }) {
           ref={dialogRef}
           aria-labelledby="family-graph-title"
           onClose={() => setOpenFamily(null)}
-          className="fixed inset-0 m-auto max-h-[96vh] w-[calc(100%-2rem)] max-w-5xl overflow-y-auto rounded-xl border border-black/15 bg-white p-4 text-neutral-900 shadow-2xl backdrop:bg-black/70 dark:border-white/20 dark:bg-neutral-950 dark:text-white sm:p-6"
+          onKeyDown={(event) => {
+            if (event.altKey || event.ctrlKey || event.metaKey) return;
+            if (
+              event.target instanceof Element &&
+              event.target.closest('input, textarea, select, [contenteditable="true"]')
+            ) return;
+            if (event.key === "ArrowLeft" && openFamilyIndex > 0) {
+              event.preventDefault();
+              moveGraph(-1);
+            } else if (event.key === "ArrowRight" && openFamilyIndex < filtered.length - 1) {
+              event.preventDefault();
+              moveGraph(1);
+            }
+          }}
+          className={`fixed inset-0 m-auto max-h-[96vh] w-[calc(100%-2rem)] max-w-5xl rounded-xl border border-black/15 bg-white p-4 text-neutral-900 shadow-2xl backdrop:bg-black/70 dark:border-white/20 dark:bg-neutral-950 dark:text-white sm:p-6 ${graphFitReady ? "overflow-y-auto" : "overflow-y-hidden"}`}
         >
           <div className="mb-4 flex items-start justify-between gap-4">
             <div>
@@ -234,7 +266,32 @@ export function FamiliesList({ families }: { families: Family[] }) {
               {t.families.closeGraph}
             </button>
           </div>
-          <div ref={graphContainerRef} className="min-w-0 w-full">
+          <div dir="ltr" className="mb-3 flex items-center justify-between gap-3">
+            <button
+              type="button"
+              aria-label={t.families.previousGraph}
+              title={t.families.previousGraph}
+              disabled={openFamilyIndex <= 0}
+              onClick={() => moveGraph(-1)}
+              className="flex h-9 w-9 items-center justify-center rounded-md border border-black/15 text-lg disabled:opacity-40 dark:border-white/20"
+            >
+              ←
+            </button>
+            <span className="min-w-16 text-center text-sm text-black/60 dark:text-white/60">
+              {openFamilyIndex + 1} / {filtered.length}
+            </span>
+            <button
+              type="button"
+              aria-label={t.families.nextGraph}
+              title={t.families.nextGraph}
+              disabled={openFamilyIndex < 0 || openFamilyIndex >= filtered.length - 1}
+              onClick={() => moveGraph(1)}
+              className="flex h-9 w-9 items-center justify-center rounded-md border border-black/15 text-lg disabled:opacity-40 dark:border-white/20"
+            >
+              →
+            </button>
+          </div>
+          <div ref={graphContainerRef} className={`min-w-0 w-full ${graphFitReady ? "" : "invisible"}`}>
             {graphWidth > 0 && (
               <FamilyTree
                 key={`${openFamily.id}:${graphBaseZoom}`}
