@@ -61,6 +61,11 @@ html[dir="rtl"] .tree-zoom-button {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+html[dir="rtl"] .family-child-pill {
+  padding-top: 0;
+  padding-bottom: 0.5rem;
+}
+
 html[dir="rtl"] .text-left {
   text-align: right !important;
 }

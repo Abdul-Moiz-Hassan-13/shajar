@@ -30,8 +30,8 @@ const ZOOM_MAX = 2;
 const ZOOM_STEP = 0.15;
 const PADDING = 20;
 
-function clampZoom(z: number): number {
-  return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
+function clampZoom(z: number, baseZoom: number): number {
+  return Math.min(ZOOM_MAX * baseZoom, Math.max(ZOOM_MIN * baseZoom, z));
 }
 
 function fullName(p: Person): string {
@@ -217,6 +217,7 @@ function keepPointStable(
 export function FamilyTree({
   people,
   center = false,
+  baseZoom = 1,
 }: {
   people: Person[];
   /** Center the diagram in its container instead of pinning it to the left
@@ -225,12 +226,25 @@ export function FamilyTree({
    * where content is usually wider than the viewport and should scroll from
    * the root ancestors on the left. */
   center?: boolean;
+  /** Visual scale represented by 100% in the zoom controls. */
+  baseZoom?: number;
 }) {
   const router = useRouter();
   const { t, locale } = useLanguage();
   const { theme } = useTheme();
   const { isAdmin } = useAuth();
   const layout = useMemo(() => computeLayout(people), [people]);
+  const centerOffset = useMemo(() => {
+    if (!center || layout.nodes.length === 0) return { x: 0, y: 0 };
+    const left = Math.min(...layout.nodes.map((n) => n.x - NODE_WIDTH / 2));
+    const right = Math.max(...layout.nodes.map((n) => n.x + NODE_WIDTH / 2));
+    const top = Math.min(...layout.nodes.map((n) => n.y));
+    const bottom = Math.max(...layout.nodes.map((n) => n.y + NODE_HEIGHT));
+    return {
+      x: (layout.width + PADDING * 2 - left - right) / 2 - PADDING,
+      y: (layout.height + PADDING * 2 - top - bottom) / 2 - PADDING,
+    };
+  }, [center, layout]);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
@@ -243,11 +257,20 @@ export function FamilyTree({
   const [nameDraft, setNameDraft] = useState("");
   const clickTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(baseZoom);
   const zoomRef = useRef(zoom);
   useEffect(() => {
     zoomRef.current = zoom;
   }, [zoom]);
+  // Nastaliq glyphs (Urdu mode) are far costlier to rasterize than Latin
+  // ones, and some browsers repaint text on every scale step rather than
+  // just resizing an already-painted layer — cheap in English, visibly
+  // janky in Urdu. Hiding the (purely decorative during a gesture) name
+  // labels for the ~200ms a pinch/wheel-zoom is actively in progress keeps
+  // the moving parts down to plain circles/lines, which compose cheaply
+  // regardless of script; labels reappear once the gesture settles.
+  const [isGesturing, setIsGesturing] = useState(false);
+  const gestureEndTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Set by a gesture just before calling setZoom; consumed by the
   // useLayoutEffect below once the resize has actually landed in the DOM,
   // so the point under the fingers/cursor stays visually still.
@@ -255,6 +278,7 @@ export function FamilyTree({
     clientX: number;
     clientY: number;
     zoomBefore: number;
+    svgLeft?: number;
   } | null>(null);
   // Set by the "Reset zoom" button; consumed alongside pendingFocalPoint
   // once the resize lands, so resetting zoom also returns to the same
@@ -274,6 +298,12 @@ export function FamilyTree({
     const pending = pendingFocalPoint.current;
     if (!pending) return;
     pendingFocalPoint.current = null;
+    if (center && pending.svgLeft !== undefined && svgRef.current) {
+      const contentX = (pending.clientX - pending.svgLeft) / pending.zoomBefore;
+      const desiredLeft = pending.clientX - contentX * zoom;
+      container.scrollLeft += svgRef.current.getBoundingClientRect().left - desiredLeft;
+      return;
+    }
     keepPointStable(
       container,
       pending.clientX,
@@ -309,6 +339,19 @@ export function FamilyTree({
     let rafId: number | null = null;
     let latestGesture: { newZoom: number; clientX: number; clientY: number } | null = null;
 
+    function markGesturing() {
+      if (locale !== "ur") return;
+      if (gestureEndTimer.current) {
+        clearTimeout(gestureEndTimer.current);
+      } else {
+        setIsGesturing(true);
+      }
+      gestureEndTimer.current = setTimeout(() => {
+        gestureEndTimer.current = null;
+        setIsGesturing(false);
+      }, 200);
+    }
+
     function scheduleZoomUpdate() {
       if (rafId !== null) return;
       rafId = requestAnimationFrame(() => {
@@ -321,6 +364,7 @@ export function FamilyTree({
             clientX: gesture.clientX,
             clientY: gesture.clientY,
             zoomBefore,
+            svgLeft: center ? svgRef.current?.getBoundingClientRect().left : undefined,
           };
           return gesture.newZoom;
         });
@@ -342,10 +386,11 @@ export function FamilyTree({
       const scale = touchDistance(e.touches) / pinchStartDistance;
       const mid = touchMidpoint(e.touches);
       latestGesture = {
-        newZoom: clampZoom(zoomAtPinchStart * scale),
+        newZoom: clampZoom(zoomAtPinchStart * scale, baseZoom),
         clientX: mid.x,
         clientY: mid.y,
       };
+      markGesturing();
       scheduleZoomUpdate();
     }
 
@@ -358,10 +403,11 @@ export function FamilyTree({
       e.preventDefault();
       const base = latestGesture?.newZoom ?? zoomRef.current;
       latestGesture = {
-        newZoom: clampZoom(base * Math.exp(-e.deltaY * 0.01)),
+        newZoom: clampZoom(base * Math.exp(-e.deltaY * 0.01), baseZoom),
         clientX: e.clientX,
         clientY: e.clientY,
       };
+      markGesturing();
       scheduleZoomUpdate();
     }
 
@@ -377,8 +423,26 @@ export function FamilyTree({
       container.removeEventListener("touchcancel", onTouchEnd);
       container.removeEventListener("wheel", onWheel);
       if (rafId !== null) cancelAnimationFrame(rafId);
+      if (gestureEndTimer.current) clearTimeout(gestureEndTimer.current);
     };
-  }, []);
+  }, [locale, baseZoom, center]);
+
+  function zoomBy(step: number) {
+    const container = scrollRef.current;
+    const rect = container?.getBoundingClientRect();
+    setZoom((current) => {
+      const next = clampZoom(+(current + step * baseZoom).toFixed(4), baseZoom);
+      if (center && rect && next !== current) {
+        pendingFocalPoint.current = {
+          clientX: rect.left + rect.width / 2,
+          clientY: rect.top + rect.height / 2,
+          zoomBefore: current,
+          svgLeft: svgRef.current?.getBoundingClientRect().left,
+        };
+      }
+      return next;
+    });
+  }
 
   const searchCandidates = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -480,7 +544,7 @@ export function FamilyTree({
   // once the tree has more than a couple dozen people.
   const treeContent = useMemo(
     () => (
-      <g transform={`translate(${PADDING}, ${PADDING})`}>
+      <g transform={`translate(${PADDING + centerOffset.x}, ${PADDING + centerOffset.y})`}>
         <rect
           x={0}
           y={0}
@@ -619,7 +683,7 @@ export function FamilyTree({
                     node.person.isDeceased ? "5 4" : undefined
                   }
                 />
-                {!isEditing && (
+                {!isEditing && !isGesturing && (
                   <>
                     <text
                       x={NODE_WIDTH / 2}
@@ -691,12 +755,14 @@ export function FamilyTree({
     ),
     [
       layout,
+      centerOffset,
       activeKey,
       editingId,
       nameDraft,
       highlightedId,
       locale,
       isAdmin,
+      isGesturing,
       handleNodeClick,
       startEditing,
       saveEditing,
@@ -761,25 +827,25 @@ export function FamilyTree({
         </div>
       )}
       <div
-        className={`flex w-full items-center justify-between gap-2 overflow-x-auto ${center ? "" : toolbarMaxWidth}`}
+        className={`flex w-full items-center justify-between gap-2 ${center ? "flex-wrap" : `overflow-x-auto ${toolbarMaxWidth}`}`}
       >
         <div className="flex shrink-0 items-center gap-2">
           <button
             type="button"
-            onClick={() => setZoom((z) => clampZoom(+(z - ZOOM_STEP).toFixed(2)))}
-            disabled={zoom <= ZOOM_MIN}
+            onClick={() => zoomBy(-ZOOM_STEP)}
+            disabled={zoom <= ZOOM_MIN * baseZoom}
             aria-label={t.tree.zoomOut}
             className="tree-zoom-button flex h-12 w-12 items-center justify-center rounded-md border border-black/15 text-sm disabled:opacity-40 dark:border-white/20"
           >
             −
           </button>
           <span className="w-12 shrink-0 text-center text-xs text-black/50 dark:text-white/50">
-            {Math.round(zoom * 100)}%
+            {Math.round((zoom / baseZoom) * 100)}%
           </span>
           <button
             type="button"
-            onClick={() => setZoom((z) => clampZoom(+(z + ZOOM_STEP).toFixed(2)))}
-            disabled={zoom >= ZOOM_MAX}
+            onClick={() => zoomBy(ZOOM_STEP)}
+            disabled={zoom >= ZOOM_MAX * baseZoom}
             aria-label={t.tree.zoomIn}
             className="tree-zoom-button flex h-12 w-12 items-center justify-center rounded-md border border-black/15 text-sm disabled:opacity-40 dark:border-white/20"
           >
@@ -787,12 +853,12 @@ export function FamilyTree({
           </button>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          {zoom !== 1 && (
+          {zoom !== baseZoom && (
             <button
               type="button"
               onClick={() => {
                 recenterOnReset.current = true;
-                setZoom(1);
+                setZoom(baseZoom);
               }}
               className="flex h-12 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-black/15 px-3 text-xs dark:border-white/20"
             >
@@ -813,8 +879,8 @@ export function FamilyTree({
         ref={scrollRef}
         dir="ltr"
         style={{ touchAction: "pan-x pan-y" }}
-        className={`overflow-auto rounded-md border border-black/10 dark:border-white/10 ${
-          center ? "flex justify-center" : ""
+        className={`rounded-md border border-black/10 dark:border-white/10 ${
+          center ? "overflow-x-auto overflow-y-hidden" : "overflow-auto"
         }`}
       >
       {/* The scaling itself happens via a CSS transform on the SVG (cheap,
@@ -828,14 +894,23 @@ export function FamilyTree({
           width: (layout.width + padding * 2) * zoom,
           height: (layout.height + padding * 2) * zoom,
         }}
-        className={center ? "shrink-0" : ""}
+        className={center ? "mx-auto" : ""}
       >
       <svg
         ref={svgRef}
         viewBox={`0 0 ${layout.width + padding * 2} ${layout.height + padding * 2}`}
         width={layout.width + padding * 2}
         height={layout.height + padding * 2}
-        style={{ transform: `scale(${zoom})`, transformOrigin: "0 0" }}
+        style={{
+          transform: `scale(${zoom})`,
+          transformOrigin: "0 0",
+          // Nastaliq glyphs (Urdu mode) are far more expensive to rasterize
+          // than Latin ones — without a standing composited layer, the
+          // browser can re-rasterize the whole diagram's text on every
+          // zoom frame instead of just resizing an existing bitmap, which
+          // is what made pinching feel fine in English but janky in Urdu.
+          willChange: "transform",
+        }}
       >
         {treeContent}
       </svg>

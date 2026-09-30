@@ -156,6 +156,9 @@ export interface TranslationDict {
     childrenLabel: string;
     noChildren: string;
     unknownParent: string;
+    showGraph: string;
+    graphTitle: string;
+    closeGraph: string;
   };
 }
 
@@ -298,6 +301,9 @@ const en: TranslationDict = {
     childrenLabel: "Children",
     noChildren: "No children on record.",
     unknownParent: "Unknown parent",
+    showGraph: "Show family graph",
+    graphTitle: "Family graph",
+    closeGraph: "Close",
   },
 };
 
@@ -456,6 +462,9 @@ const ur: TranslationDict = {
     childrenLabel: "اولاد",
     noChildren: "کوئی اولاد درج نہیں۔",
     unknownParent: "نامعلوم والدین",
+    showGraph: "خاندان کا خاکہ دیکھیں",
+    graphTitle: "خاندان کا خاکہ",
+    closeGraph: "بند کریں",
   },
 };
 
