@@ -716,11 +716,12 @@ export function FamilyTree({
   }
 
   const padding = 20;
+  const toolbarMaxWidth = locale === "ur" ? "max-w-[27rem]" : "max-w-sm";
 
   return (
     <div className="flex flex-col gap-2">
       {!center && (
-        <div className="relative max-w-xs">
+        <div className={`relative w-full ${toolbarMaxWidth}`}>
           <input
             type="search"
             value={searchQuery}
@@ -736,7 +737,7 @@ export function FamilyTree({
               }
             }}
             placeholder={t.people.searchPlaceholder}
-            className="w-full rounded-md border border-black/15 px-3 py-2 text-sm dark:border-white/20 dark:bg-transparent"
+            className="h-12 w-full rounded-md border border-black/15 px-3 text-sm dark:border-white/20 dark:bg-transparent"
           />
           {searchOpen && searchQuery && (
             <div className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-black/15 bg-white dark:border-white/20 dark:bg-neutral-900">
@@ -760,19 +761,19 @@ export function FamilyTree({
         </div>
       )}
       <div
-        className={`flex items-center justify-between gap-2 ${center ? "" : "max-w-xs"}`}
+        className={`flex w-full items-center justify-between gap-2 overflow-x-auto ${center ? "" : toolbarMaxWidth}`}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <button
             type="button"
             onClick={() => setZoom((z) => clampZoom(+(z - ZOOM_STEP).toFixed(2)))}
             disabled={zoom <= ZOOM_MIN}
             aria-label={t.tree.zoomOut}
-            className="rounded-md border border-black/15 px-2 py-1 text-sm disabled:opacity-40 dark:border-white/20"
+            className="tree-zoom-button flex h-12 w-12 items-center justify-center rounded-md border border-black/15 text-sm disabled:opacity-40 dark:border-white/20"
           >
             −
           </button>
-          <span className="w-12 text-center text-xs text-black/50 dark:text-white/50">
+          <span className="w-12 shrink-0 text-center text-xs text-black/50 dark:text-white/50">
             {Math.round(zoom * 100)}%
           </span>
           <button
@@ -780,12 +781,12 @@ export function FamilyTree({
             onClick={() => setZoom((z) => clampZoom(+(z + ZOOM_STEP).toFixed(2)))}
             disabled={zoom >= ZOOM_MAX}
             aria-label={t.tree.zoomIn}
-            className="rounded-md border border-black/15 px-2 py-1 text-sm disabled:opacity-40 dark:border-white/20"
+            className="tree-zoom-button flex h-12 w-12 items-center justify-center rounded-md border border-black/15 text-sm disabled:opacity-40 dark:border-white/20"
           >
             +
           </button>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           {zoom !== 1 && (
             <button
               type="button"
@@ -793,7 +794,7 @@ export function FamilyTree({
                 recenterOnReset.current = true;
                 setZoom(1);
               }}
-              className="rounded-md border border-black/15 px-2 py-1 text-xs dark:border-white/20"
+              className="flex h-12 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-black/15 px-3 text-xs dark:border-white/20"
             >
               {t.tree.resetZoom}
             </button>
@@ -802,7 +803,7 @@ export function FamilyTree({
             type="button"
             onClick={handleExport}
             disabled={isExporting}
-            className="rounded-md border border-black/15 px-2 py-1 text-xs disabled:opacity-40 dark:border-white/20"
+            className="flex h-12 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-black/15 px-3 text-xs disabled:opacity-40 dark:border-white/20"
           >
             {isExporting ? t.tree.exporting : t.tree.exportImage}
           </button>
