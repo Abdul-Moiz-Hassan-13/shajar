@@ -121,6 +121,20 @@ export async function updatePerson(
   return existing;
 }
 
+export async function renamePerson(
+  id: string,
+  names: Pick<Person, "firstName" | "lastName">,
+): Promise<Person | undefined> {
+  const data = await readData();
+  const existing = data.people.find((p) => p.id === id);
+  if (!existing) return undefined;
+
+  existing.firstName = names.firstName;
+  existing.lastName = names.lastName;
+  await writeData(data);
+  return existing;
+}
+
 export async function deletePerson(id: string): Promise<boolean> {
   const data = await readData();
   const before = data.people.length;

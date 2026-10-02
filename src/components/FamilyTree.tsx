@@ -13,17 +13,12 @@ import {
 import { useAuth } from "@/components/AuthProvider";
 import { useLanguage } from "@/components/LanguageProvider";
 import { useTheme } from "@/components/ThemeProvider";
+import { GENDER_COLOR } from "@/lib/personColors";
 import { displayFirstName, displayFullName, displayLastName } from "@/lib/personName";
 import { NODE_HEIGHT, NODE_WIDTH, computeLayout, type TreeLayout } from "@/lib/treeLayout";
-import type { Person, PersonInput } from "@/lib/types";
+import type { Person } from "@/lib/types";
 
 const HIGHLIGHT_COLOR = "#f59e0b";
-
-const GENDER_COLOR: Record<Person["gender"], string> = {
-  female: "#e6a4c4",
-  male: "#8fb8de",
-  other: "#c9c2e8",
-};
 
 const ZOOM_MIN = 0.25;
 const ZOOM_MAX = 2;
@@ -516,22 +511,10 @@ export function FamilyTree({
       return;
     }
 
-    const input: PersonInput = {
-      firstName,
-      lastName,
-      gender: person.gender,
-      isDeceased: person.isDeceased,
-      notes: person.notes,
-      parentIds: person.parentIds,
-      spouseIds: person.spouseIds,
-      divorcedSpouseIds: person.divorcedSpouseIds,
-      siblingOrder: person.siblingOrder,
-    };
-
     const res = await fetch(`/api/people/${person.id}`, {
-      method: "PUT",
+      method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(input),
+      body: JSON.stringify({ firstName, lastName }),
     });
     if (res.ok) router.refresh();
   }, [nameDraft, router]);

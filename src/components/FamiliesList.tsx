@@ -7,6 +7,7 @@ import { FamilyTree } from "@/components/FamilyTree";
 import { useLanguage } from "@/components/LanguageProvider";
 import type { Family } from "@/lib/families";
 import type { Person } from "@/lib/types";
+import { GENDER_COLOR, genderTagStyle } from "@/lib/personColors";
 import { displayFullName } from "@/lib/personName";
 import { computeLayout } from "@/lib/treeLayout";
 
@@ -20,6 +21,26 @@ function familyMatches(family: Family, query: string): boolean {
   return [...family.parents, ...family.children].some((p) =>
     fullName(p).toLowerCase().includes(q),
   );
+}
+
+function parentsLeftToRight(parents: Person[]): Person[] {
+  const rank = (person: Person) =>
+    person.gender === "male" ? 0 : person.gender === "female" ? 1 : 2;
+  return parents
+    .map((person, index) => ({ person, index }))
+    .sort((a, b) => rank(a.person) - rank(b.person) || a.index - b.index)
+    .map(({ person }) => person);
+}
+
+function childrenInTreeOrder(children: Person[]): Person[] {
+  return children
+    .map((person, index) => ({ person, index }))
+    .sort((a, b) => {
+      const orderA = a.person.siblingOrder ?? Number.MAX_SAFE_INTEGER;
+      const orderB = b.person.siblingOrder ?? Number.MAX_SAFE_INTEGER;
+      return orderA - orderB || a.index - b.index;
+    })
+    .map(({ person }) => person);
 }
 
 export function FamiliesList({ families }: { families: Family[] }) {
@@ -50,13 +71,13 @@ export function FamiliesList({ families }: { families: Family[] }) {
     if (!openFamily) return [];
     const parentIds = new Set(openFamily.parents.map((p) => p.id));
     return [
-      ...openFamily.parents.map((p) => ({
+      ...parentsLeftToRight(openFamily.parents).map((p) => ({
         ...p,
         parentIds: [],
         spouseIds: p.spouseIds.filter((id) => parentIds.has(id)),
         divorcedSpouseIds: p.divorcedSpouseIds?.filter((id) => parentIds.has(id)),
       })),
-      ...openFamily.children.map((c) => ({
+      ...childrenInTreeOrder(openFamily.children).map((c) => ({
         ...c,
         parentIds: c.parentIds.filter((id) => parentIds.has(id)),
         spouseIds: [],
@@ -144,86 +165,132 @@ export function FamiliesList({ families }: { families: Family[] }) {
         </p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
-          {filtered.map((family) => (
-            <div
-              key={family.id}
-              className="flex flex-col gap-3 rounded-md border border-black/10 p-4 dark:border-white/10"
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                {family.parents.map((p, i) => (
-                  <Fragment key={p.id}>
-                    {i > 0 && (
-                      <span className="text-black/40 dark:text-white/40">+</span>
-                    )}
-                    {isAdmin ? (
-                      <Link
-                        href={`/people/${p.id}`}
-                        className="font-semibold hover:underline"
-                      >
-                        {displayFullName(p, locale)}
-                      </Link>
-                    ) : (
-                      <span className="font-semibold">
-                        {displayFullName(p, locale)}
-                      </span>
-                    )}
-                    {p.isDeceased && <span>🕊️</span>}
-                  </Fragment>
-                ))}
-                {family.parents.length === 1 && (
-                  <span className="text-xs text-black/40 dark:text-white/40">
-                    ({t.families.unknownParent})
-                  </span>
-                )}
-                {family.status === "divorced" && (
-                  <span className="rounded-full bg-black/5 px-2 py-0.5 text-xs dark:bg-white/10">
-                    {t.form.divorced}
-                  </span>
-                )}
-              </div>
-
-              <div>
-                <span className="text-xs uppercase tracking-wide text-black/50 dark:text-white/50">
-                  {t.families.childrenLabel}
-                </span>
-                {family.children.length === 0 ? (
-                  <p className="mt-1 text-sm text-black/50 dark:text-white/50">
-                    {t.families.noChildren}
-                  </p>
-                ) : (
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {family.children.map((c) =>
-                      isAdmin ? (
-                        <Link
-                          key={c.id}
-                          href={`/people/${c.id}`}
-                          className="family-child-pill rounded-full border border-black/15 px-3 py-1 text-sm hover:border-emerald-500/40 hover:text-emerald-500 dark:border-white/20"
+          {filtered.map((family, familyIndex) => {
+            const displayedParents = parentsLeftToRight(family.parents);
+            const displayedChildren = childrenInTreeOrder(family.children);
+            const primaryColor = GENDER_COLOR[displayedParents[0]?.gender ?? "other"];
+            const secondaryColor =
+              GENDER_COLOR[
+                displayedParents[1]?.gender ??
+                  displayedParents[0]?.gender ??
+                  "other"
+              ];
+            return (
+              <div
+                key={family.id}
+                style={{
+                  "--family-primary": primaryColor,
+                  "--family-secondary": secondaryColor,
+                  animationDelay: `${Math.min(familyIndex, 12) * 45}ms`,
+                } as React.CSSProperties}
+                className="family-card group relative flex flex-col gap-4 overflow-hidden rounded-2xl border p-5 shadow-sm"
+              >
+                <div
+                  dir="ltr"
+                  className="relative flex flex-wrap items-center gap-2.5"
+                >
+                  {displayedParents.map((p, i) => (
+                    <Fragment key={p.id}>
+                      {i > 0 && (
+                        <span
+                          className="family-parent-plus flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold"
+                          aria-hidden="true"
                         >
-                          {displayFullName(c, locale)}
-                          {c.isDeceased && " 🕊️"}
+                          +
+                        </span>
+                      )}
+                      {isAdmin ? (
+                        <Link
+                          href={`/people/${p.id}`}
+                          style={genderTagStyle(p.gender)}
+                          dir={locale === "ur" ? "rtl" : "ltr"}
+                          className="family-parent-pill rounded-full border px-3 py-1 font-semibold transition hover:brightness-110"
+                        >
+                          {displayFullName(p, locale)}
+                          {p.isDeceased && " 🕊️"}
                         </Link>
                       ) : (
                         <span
-                          key={c.id}
-                          className="family-child-pill rounded-full border border-black/15 px-3 py-1 text-sm dark:border-white/20"
+                          style={genderTagStyle(p.gender)}
+                          dir={locale === "ur" ? "rtl" : "ltr"}
+                          className="family-parent-pill rounded-full border px-3 py-1 font-semibold"
                         >
-                          {displayFullName(c, locale)}
-                          {c.isDeceased && " 🕊️"}
+                          {displayFullName(p, locale)}
+                          {p.isDeceased && " 🕊️"}
                         </span>
-                      ),
-                    )}
+                      )}
+                    </Fragment>
+                  ))}
+                  {displayedParents.length === 1 && (
+                    <span
+                      dir={locale === "ur" ? "rtl" : "ltr"}
+                      className="text-xs text-black/40 dark:text-white/40"
+                    >
+                      ({t.families.unknownParent})
+                    </span>
+                  )}
+                  {family.status === "divorced" && (
+                    <span
+                      dir={locale === "ur" ? "rtl" : "ltr"}
+                      className="rounded-full bg-black/5 px-2 py-0.5 text-xs dark:bg-white/10"
+                    >
+                      {t.form.divorced}
+                    </span>
+                  )}
+                </div>
+
+                <div className="relative flex-1">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs uppercase tracking-wide text-black/50 dark:text-white/50">
+                      {t.families.childrenLabel}
+                    </span>
+                    <span className="family-child-count flex h-6 min-w-6 items-center justify-center rounded-full px-2 text-xs font-semibold">
+                      {displayedChildren.length}
+                    </span>
                   </div>
-                )}
+                  {displayedChildren.length === 0 ? (
+                    <p className="family-empty-children mt-2 rounded-xl border border-dashed px-3 py-3 text-sm text-black/50 dark:text-white/50">
+                      {t.families.noChildren}
+                    </p>
+                  ) : (
+                    <div dir="ltr" className="mt-2 flex flex-wrap gap-2">
+                      {displayedChildren.map((c) =>
+                        isAdmin ? (
+                          <Link
+                            key={c.id}
+                            href={`/people/${c.id}`}
+                            style={genderTagStyle(c.gender)}
+                            dir={locale === "ur" ? "rtl" : "ltr"}
+                            className="family-child-pill rounded-full border px-3 py-1 text-sm transition hover:-translate-y-0.5 hover:brightness-110 hover:shadow-sm"
+                          >
+                            {displayFullName(c, locale)}
+                            {c.isDeceased && " 🕊️"}
+                          </Link>
+                        ) : (
+                          <span
+                            key={c.id}
+                            style={genderTagStyle(c.gender)}
+                            dir={locale === "ur" ? "rtl" : "ltr"}
+                            className="family-child-pill rounded-full border px-3 py-1 text-sm transition group-hover:-translate-y-px"
+                          >
+                            {displayFullName(c, locale)}
+                            {c.isDeceased && " 🕊️"}
+                          </span>
+                        ),
+                      )}
+                    </div>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setOpenFamily(family)}
+                  className={`family-graph-button relative mt-auto w-full min-w-0 overflow-hidden rounded-xl border px-4 py-2 text-center text-sm font-medium whitespace-normal transition sm:w-auto ${locale === "ur" ? "sm:self-start" : "sm:self-end"}`}
+                >
+                  {t.families.showGraph}
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setOpenFamily(family)}
-                className={`mt-auto w-full min-w-0 rounded-md border border-black/15 px-3 py-1.5 text-center text-sm whitespace-normal hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10 sm:w-auto ${locale === "ur" ? "sm:self-start" : "sm:self-end"}`}
-              >
-                {t.families.showGraph}
-              </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -246,38 +313,51 @@ export function FamiliesList({ families }: { families: Family[] }) {
               moveGraph(1);
             }
           }}
-          className={`fixed inset-0 m-auto max-h-[96vh] w-[calc(100%-2rem)] max-w-5xl rounded-xl border border-black/15 bg-white p-4 text-neutral-900 shadow-2xl backdrop:bg-black/70 dark:border-white/20 dark:bg-neutral-950 dark:text-white sm:p-6 ${graphFitReady ? "overflow-y-auto" : "overflow-y-hidden"}`}
+          className={`family-graph-dialog fixed inset-0 m-auto max-h-[96vh] w-[calc(100%-2rem)] max-w-5xl rounded-2xl border border-black/15 bg-white p-0 text-neutral-900 shadow-2xl backdrop:bg-black/70 dark:border-white/20 dark:bg-neutral-950 dark:text-white ${graphFitReady ? "overflow-y-auto" : "overflow-y-hidden"}`}
         >
-          <div className="mb-4 flex items-start justify-between gap-4">
-            <div>
-              <h2 id="family-graph-title" className="text-lg font-semibold">
+          <div className="family-graph-header flex items-start justify-between gap-4 border-b border-black/10 px-4 py-4 dark:border-white/10 sm:px-6 sm:py-5">
+            <div className="min-w-0">
+              <h2 id="family-graph-title" className="text-xl font-bold tracking-tight">
                 {t.families.graphTitle}
               </h2>
-              <p className="text-sm text-black/60 dark:text-white/60">
-                {openFamily.parents.map((p) => displayFullName(p, locale)).join(" + ")}
-              </p>
+              <div dir="ltr" className="mt-2 flex flex-wrap items-center gap-2">
+                {parentsLeftToRight(openFamily.parents).map((parent, index) => (
+                  <Fragment key={parent.id}>
+                    {index > 0 && (
+                      <span className="text-sm text-black/35 dark:text-white/35">+</span>
+                    )}
+                    <span
+                      style={genderTagStyle(parent.gender)}
+                      dir={locale === "ur" ? "rtl" : "ltr"}
+                      className="rounded-full border px-3 py-1 text-sm font-medium"
+                    >
+                      {displayFullName(parent, locale)}
+                    </span>
+                  </Fragment>
+                ))}
+              </div>
             </div>
             <button
               type="button"
               autoFocus
               onClick={() => dialogRef.current?.close()}
-              className="shrink-0 rounded-md border border-black/15 px-3 py-1 text-sm dark:border-white/20"
+              className="family-modal-close shrink-0 rounded-xl border border-black/15 px-3 py-2 text-sm font-medium transition dark:border-white/20"
             >
               {t.families.closeGraph}
             </button>
           </div>
-          <div dir="ltr" className="mb-3 flex items-center justify-between gap-3">
+          <div dir="ltr" className="family-graph-nav flex items-center justify-between gap-3 border-b border-black/10 px-4 py-3 dark:border-white/10 sm:px-6">
             <button
               type="button"
               aria-label={t.families.previousGraph}
               title={t.families.previousGraph}
               disabled={openFamilyIndex <= 0}
               onClick={() => moveGraph(-1)}
-              className="flex h-9 w-9 items-center justify-center rounded-md border border-black/15 text-lg disabled:opacity-40 dark:border-white/20"
+              className="family-graph-arrow flex h-11 w-11 items-center justify-center rounded-full border border-black/15 text-xl transition disabled:opacity-35 dark:border-white/20"
             >
               ←
             </button>
-            <span className="min-w-16 text-center text-sm text-black/60 dark:text-white/60">
+            <span className="family-graph-position min-w-20 rounded-full px-3 py-1.5 text-center text-sm font-medium text-black/65 dark:text-white/65">
               {openFamilyIndex + 1} / {filtered.length}
             </span>
             <button
@@ -286,20 +366,22 @@ export function FamiliesList({ families }: { families: Family[] }) {
               title={t.families.nextGraph}
               disabled={openFamilyIndex < 0 || openFamilyIndex >= filtered.length - 1}
               onClick={() => moveGraph(1)}
-              className="flex h-9 w-9 items-center justify-center rounded-md border border-black/15 text-lg disabled:opacity-40 dark:border-white/20"
+              className="family-graph-arrow flex h-11 w-11 items-center justify-center rounded-full border border-black/15 text-xl transition disabled:opacity-35 dark:border-white/20"
             >
               →
             </button>
           </div>
-          <div ref={graphContainerRef} className={`min-w-0 w-full ${graphFitReady ? "" : "invisible"}`}>
-            {graphWidth > 0 && (
-              <FamilyTree
-                key={`${openFamily.id}:${graphBaseZoom}`}
-                people={graphPeople}
-                center
-                baseZoom={graphBaseZoom}
-              />
-            )}
+          <div className="p-3 sm:p-5">
+            <div key={openFamily.id} ref={graphContainerRef} className={`family-graph-content min-w-0 w-full ${graphFitReady ? "" : "invisible"}`}>
+              {graphWidth > 0 && (
+                <FamilyTree
+                  key={`${openFamily.id}:${graphBaseZoom}`}
+                  people={graphPeople}
+                  center
+                  baseZoom={graphBaseZoom}
+                />
+              )}
+            </div>
           </div>
         </dialog>
       )}

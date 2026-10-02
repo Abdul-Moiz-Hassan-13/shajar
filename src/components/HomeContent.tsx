@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { useLanguage } from "@/components/LanguageProvider";
 import { localizeNumber } from "@/lib/i18n/numerals";
+import { genderTagStyle } from "@/lib/personColors";
 import { displayFullName } from "@/lib/personName";
 import type { Person } from "@/lib/types";
 
@@ -91,15 +92,41 @@ export function HomeContent({
       <div className="grid gap-4 sm:grid-cols-2">
         <Link
           href="/tree"
-          className="group flex flex-col gap-2 rounded-xl border border-black/10 bg-gradient-to-br from-emerald-500/5 to-transparent p-6 transition hover:border-emerald-500/40 dark:border-white/10"
+          className={`group rounded-xl border transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 ${isAdmin
+            ? "flex flex-col gap-2 border-black/10 bg-gradient-to-br from-emerald-500/5 to-transparent p-6 hover:border-emerald-500/40 dark:border-white/10"
+            : "flex items-center justify-between gap-4 border-emerald-500/25 bg-gradient-to-r from-emerald-500/10 via-teal-400/5 to-transparent p-6 hover:border-emerald-500/60 hover:from-emerald-500/15 dark:border-emerald-400/25 sm:col-span-2 sm:p-8"
+          }`}
         >
-          <span className="text-2xl">🗺️</span>
-          <span className="font-semibold group-hover:text-emerald-500">
-            {t.home.exploreTree}
-          </span>
-          <span className="text-sm text-black/60 dark:text-white/60">
-            {t.home.exploreTreeDesc}
-          </span>
+          {isAdmin ? (
+            <>
+              <span className="text-2xl">🗺️</span>
+              <span className="font-semibold group-hover:text-emerald-500">
+                {t.home.exploreTree}
+              </span>
+              <span className="text-sm text-black/60 dark:text-white/60">
+                {t.home.exploreTreeDesc}
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="flex min-w-0 items-center gap-4">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-2xl sm:h-14 sm:w-14" aria-hidden="true">
+                  🗺️
+                </span>
+                <span className="flex min-w-0 flex-col gap-1">
+                  <span className="text-lg font-semibold group-hover:text-emerald-500">
+                    {t.home.exploreTree}
+                  </span>
+                  <span className="text-sm text-black/60 dark:text-white/60">
+                    {t.home.exploreTreeDesc}
+                  </span>
+                </span>
+              </span>
+              <span className={`hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-emerald-500/30 text-xl text-emerald-600 transition group-hover:bg-emerald-500 group-hover:text-white dark:text-emerald-400 dark:group-hover:text-black sm:flex ${locale === "ur" ? "group-hover:-translate-x-1" : "group-hover:translate-x-1"}`} aria-hidden="true">
+                {locale === "ur" ? "←" : "→"}
+              </span>
+            </>
+          )}
         </Link>
         {isAdmin && (
           <Link
@@ -128,14 +155,16 @@ export function HomeContent({
                 <Link
                   key={p.id}
                   href={`/people/${p.id}`}
-                  className="rounded-full border border-black/10 px-4 py-1.5 text-sm hover:border-emerald-500/40 hover:text-emerald-500 dark:border-white/10"
+                  style={genderTagStyle(p.gender)}
+                  className="rounded-full border px-4 py-1.5 text-sm transition hover:brightness-110 hover:underline"
                 >
                   {displayFullName(p, locale)}
                 </Link>
               ) : (
                 <span
                   key={p.id}
-                  className="rounded-full border border-black/10 px-4 py-1.5 text-sm dark:border-white/10"
+                  style={genderTagStyle(p.gender)}
+                  className="rounded-full border px-4 py-1.5 text-sm"
                 >
                   {displayFullName(p, locale)}
                 </span>
