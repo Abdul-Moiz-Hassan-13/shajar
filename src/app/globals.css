@@ -312,6 +312,63 @@ button:disabled {
   background: color-mix(in srgb, var(--foreground) 1.5%, transparent);
 }
 
+.person-details-hero,
+.person-details-section {
+  border-color: color-mix(in srgb, var(--foreground) 12%, transparent);
+  background: color-mix(in srgb, var(--foreground) 1.5%, transparent);
+}
+
+.person-details-hero {
+  box-shadow: 0 12px 30px rgb(0 0 0 / 0.05);
+}
+
+.person-details-back:hover {
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  transform: translateY(-1px);
+}
+
+html[dir="rtl"] .person-details-page .person-details-tag-label {
+  display: inline-block;
+  transform: translateY(-2px);
+}
+
+html[dir="rtl"] .person-details-page a,
+html[dir="rtl"] .person-details-page .person-details-back {
+  line-height: 1.55 !important;
+  padding-block: 0.2rem 0.45rem !important;
+}
+
+html[dir="rtl"] .person-details-page .person-details-hero > span {
+  align-items: center;
+  line-height: 1.5 !important;
+  padding-block: 0.05rem 0.4rem !important;
+}
+
+html[dir="rtl"] .person-details-back-label {
+  display: inline-block;
+  transform: translateY(-2px);
+}
+
+html[dir="rtl"] .people-add-first-link {
+  transform: none;
+}
+
+html[dir="rtl"] .urdu-add-person-label {
+  display: inline-block;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 767px) {
+  .navbar-pill-label {
+    display: inline-block;
+    transform: translateY(0);
+  }
+
+  html[dir="rtl"] .person-details-page .person-details-tag-label {
+    transform: translateY(0);
+  }
+}
+
 .person-form > label,
 .person-form-section {
   padding: 1rem;
@@ -503,6 +560,12 @@ html[dir="rtl"] .family-parent-label {
   transform: translateY(-3px);
 }
 
+html[dir="rtl"] .family-parent-plus-label,
+html[dir="rtl"] .family-child-count-label {
+  display: inline-block;
+  transform: translateY(-3px);
+}
+
 .family-empty-children {
   border-color: color-mix(in srgb, var(--family-primary) 30%, transparent);
   background: color-mix(in srgb, var(--family-primary) 6%, transparent);
@@ -568,6 +631,28 @@ html[dir="rtl"] .relation-candidate-label {
 html[dir="rtl"] .relation-path-label {
   display: inline-block;
   transform: translateY(-3px);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+  animation-timing-function: ease-out;
+}
+
+::view-transition-old(root) {
+  animation-name: page-fade-out;
+}
+
+::view-transition-new(root) {
+  animation-name: page-fade-in;
+}
+
+@keyframes page-fade-out {
+  to { opacity: 0; transform: translateY(-3px); }
+}
+
+@keyframes page-fade-in {
+  from { opacity: 0; transform: translateY(3px); }
 }
 
 @media (max-width: 640px) {

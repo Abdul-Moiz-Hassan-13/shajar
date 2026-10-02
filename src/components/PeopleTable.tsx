@@ -42,6 +42,7 @@ export function PeopleTable({ people }: { people: Person[] }) {
   const { isAdmin } = useAuth();
   const router = useRouter();
   const [query, setQuery] = useState("");
+  const [openPicker, setOpenPicker] = useState(!isAdmin);
 
   useEffect(() => {
     const key = "people-page-scroll-y";
@@ -79,6 +80,16 @@ export function PeopleTable({ people }: { people: Person[] }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (isAdmin || !openPicker) return;
+    function closeOnOutsidePointer(event: PointerEvent) {
+      if (!(event.target instanceof Element)) return;
+      if (!event.target.closest(".people-name-picker")) setOpenPicker(false);
+    }
+    document.addEventListener("pointerdown", closeOnOutsidePointer, true);
+    return () => document.removeEventListener("pointerdown", closeOnOutsidePointer, true);
+  }, [isAdmin, openPicker]);
+
   const byId = useMemo(() => new Map(people.map((p) => [p.id, p])), [people]);
 
   const sorted = useMemo(
@@ -93,12 +104,25 @@ export function PeopleTable({ people }: { people: Person[] }) {
   }, [sorted, query]);
 
   function openPerson(id: string) {
-    if (isAdmin) {
-      const scrollPosition = String(window.scrollY);
-      sessionStorage.setItem("people-page-scroll-y", scrollPosition);
-      sessionStorage.setItem("people-return-scroll-y", scrollPosition);
+    rememberScroll();
+    navigateToPerson(id);
+  }
+
+  function navigateToPerson(id: string) {
+    const viewTransitionDocument = document as Document & {
+      startViewTransition?: (callback: () => void) => unknown;
+    };
+    if (viewTransitionDocument.startViewTransition) {
+      viewTransitionDocument.startViewTransition(() => router.push(`/people/${id}`));
+    } else {
       router.push(`/people/${id}`);
     }
+  }
+
+  function rememberScroll() {
+    const scrollPosition = String(window.scrollY);
+    sessionStorage.setItem("people-page-scroll-y", scrollPosition);
+    sessionStorage.setItem("people-return-scroll-y", scrollPosition);
   }
 
   if (people.length === 0) {
@@ -108,8 +132,8 @@ export function PeopleTable({ people }: { people: Person[] }) {
         {isAdmin && (
           <>
             {" "}
-            <Link href="/people/new" className="underline">
-              {t.people.addFirstPerson}
+            <Link href="/people/new" className="people-add-first-link underline">
+              <span className="urdu-add-person-label">{t.people.addFirstPerson}</span>
             </Link>
           </>
         )}
@@ -120,19 +144,73 @@ export function PeopleTable({ people }: { people: Person[] }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <input
-        type="search"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder={t.people.searchPlaceholder}
-        className="people-search-input w-full rounded-xl border border-black/15 px-3 py-2.5 text-sm dark:border-white/20 dark:bg-transparent"
-      />
+      {isAdmin ? (
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t.people.searchPlaceholder}
+          className="people-search-input w-full rounded-xl border border-black/15 px-3 py-2.5 text-sm dark:border-white/20 dark:bg-transparent"
+        />
+      ) : (
+        <div className={`people-name-picker relative ${openPicker ? "z-20" : ""}`}>
+          <input
+            type="search"
+            value={query}
+            onFocus={() => setOpenPicker(true)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setOpenPicker(true);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && filtered.length > 0) {
+                event.preventDefault();
+                rememberScroll();
+                setOpenPicker(false);
+                navigateToPerson(filtered[0].id);
+              }
+            }}
+            placeholder={t.people.searchPlaceholder}
+            className="people-search-input w-full rounded-xl border border-black/15 px-3 py-2.5 pe-10 text-sm dark:border-white/20 dark:bg-transparent"
+          />
+          <button
+            type="button"
+            aria-label={t.people.searchPlaceholder}
+            onClick={() => setOpenPicker((previous) => !previous)}
+            className="absolute inset-y-0 end-0 flex w-10 items-center justify-center text-xs text-black/50 dark:text-white/50"
+          >
+            ▼
+          </button>
+          {openPicker && (
+            <div className="relation-dropdown absolute inset-x-0 top-[calc(100%+0.4rem)] max-h-64 overflow-x-hidden overflow-y-auto rounded-xl border border-black/15 bg-white p-1 shadow-xl dark:border-white/20 dark:bg-neutral-950">
+              {filtered.length === 0 ? (
+                <p className="px-3 py-2 text-sm text-black/50 dark:text-white/50">{t.people.noMatches(query)}</p>
+              ) : filtered.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => {
+                    rememberScroll();
+                    setOpenPicker(false);
+                    navigateToPerson(p.id);
+                  }}
+                  className="relation-candidate flex w-full min-w-0 items-center justify-start rounded-lg px-2 py-1.5 text-start text-sm transition hover:bg-black/5 dark:hover:bg-white/10"
+                >
+                  <span style={genderTagStyle(p.gender)} className="max-w-full min-w-0 rounded-full border px-2.5 py-0.5 whitespace-normal break-words">
+                    {displayFullName(p, locale)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {filtered.length === 0 ? (
         <p className="text-sm text-black/60 dark:text-white/60">
           {t.people.noMatches(query)}
         </p>
-      ) : (
+      ) : !isAdmin ? null : (
         <>
           {/* Below `sm` a wide fixed-column table only ever fit by scrolling
               sideways, which is fiddly to read a row from on a phone - a
@@ -145,15 +223,15 @@ export function PeopleTable({ people }: { people: Person[] }) {
                 key={p.id}
                 onClick={() => openPerson(p.id)}
                 onKeyDown={(event) => {
-                  if (isAdmin && (event.key === "Enter" || event.key === " ")) {
+                  if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
                     openPerson(p.id);
                   }
                 }}
-                role={isAdmin ? "link" : undefined}
-                tabIndex={isAdmin ? 0 : undefined}
+                role="link"
+                tabIndex={0}
                 style={{ borderColor: `color-mix(in srgb, ${p.gender === "male" ? "#8fb8de" : p.gender === "female" ? "#e6a4c4" : "var(--foreground)"} 35%, transparent)` }}
-                className={`people-person-card flex flex-col gap-3 rounded-2xl border p-4 text-sm transition ${isAdmin ? "cursor-pointer" : ""}`}
+                    className="people-person-card flex cursor-pointer flex-col gap-3 rounded-2xl border p-4 text-sm transition"
               >
                 <div className="flex items-center justify-between gap-2">
                   <span style={genderTagStyle(p.gender)} className="rounded-full border px-3 py-1 font-semibold">
@@ -207,14 +285,14 @@ export function PeopleTable({ people }: { people: Person[] }) {
                     key={p.id}
                     onClick={() => openPerson(p.id)}
                     onKeyDown={(event) => {
-                      if (isAdmin && (event.key === "Enter" || event.key === " ")) {
+                      if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
                         openPerson(p.id);
                       }
                     }}
-                    role={isAdmin ? "link" : undefined}
-                    tabIndex={isAdmin ? 0 : undefined}
-                    className={`people-table-row border-b border-black/5 last:border-0 dark:border-white/5 ${isAdmin ? "cursor-pointer" : ""}`}
+                    role="link"
+                    tabIndex={0}
+                    className="people-table-row cursor-pointer border-b border-black/5 last:border-0 dark:border-white/5"
                   >
                     <td className="break-words px-4 py-2">
                       <span style={genderTagStyle(p.gender)} className="inline-flex rounded-full border px-3 py-1 font-medium">

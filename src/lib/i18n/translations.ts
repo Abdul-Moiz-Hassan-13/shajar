@@ -79,6 +79,8 @@ export interface TranslationDict {
     colSpouses: string;
     yes: string;
     edit: string;
+    backToPeople: string;
+    siblingOrder: string;
   };
   tree: {
     title: string;
@@ -229,6 +231,8 @@ const en: TranslationDict = {
     colSpouses: "Spouse",
     yes: "Yes",
     edit: "Edit",
+    backToPeople: "Back",
+    siblingOrder: "Birth order among siblings",
   },
   tree: {
     title: "Family tree",
@@ -287,7 +291,7 @@ const en: TranslationDict = {
     divorced: "Divorced",
     save: "Save",
     saving: "Saving…",
-    cancel: "Cancel",
+    cancel: "Back",
     somethingWrong: "Something went wrong.",
   },
   deletePerson: {
@@ -376,6 +380,8 @@ const ur: TranslationDict = {
     colSpouses: "شریک حیات",
     yes: "ہاں",
     edit: "ترمیم",
+    backToPeople: "واپس",
+    siblingOrder: "بہن بھائیوں میں پیدائشی ترتیب",
   },
   tree: {
     title: "شجرہ نسب",
@@ -451,7 +457,7 @@ const ur: TranslationDict = {
     divorced: "طلاق یافتہ",
     save: "محفوظ کریں",
     saving: "محفوظ ہو رہا ہے…",
-    cancel: "منسوخ کریں",
+    cancel: "واپس",
     somethingWrong: "کچھ غلط ہو گیا۔",
   },
   deletePerson: {

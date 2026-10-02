@@ -475,15 +475,12 @@ export function FamilyTree({
 
   const handleNodeClick = useCallback(
     (id: string) => {
-      // Read-only visitors have nowhere to navigate to - /people/[id] is the
-      // edit form, and it's gated behind login.
-      if (!isAdmin) return;
       if (clickTimeout.current) clearTimeout(clickTimeout.current);
       clickTimeout.current = setTimeout(() => {
         router.push(`/people/${id}`);
       }, 250);
     },
-    [router, isAdmin],
+    [router],
   );
 
   const startEditing = useCallback(
@@ -631,7 +628,7 @@ export function FamilyTree({
               transform={`translate(${node.x - NODE_WIDTH / 2}, ${node.y})`}
             >
               <g
-                className={isAdmin ? "cursor-pointer" : "cursor-default"}
+                className="cursor-pointer"
                 onClick={() => handleNodeClick(node.person.id)}
                 onDoubleClick={() => startEditing(node.person)}
               >
@@ -744,7 +741,6 @@ export function FamilyTree({
       nameDraft,
       highlightedId,
       locale,
-      isAdmin,
       isGesturing,
       handleNodeClick,
       startEditing,

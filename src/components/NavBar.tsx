@@ -56,7 +56,7 @@ export function NavBar() {
             onClick={toggleLocale}
             className="navbar-pill inline-flex shrink-0 items-center justify-center rounded-full border border-black/15 px-3 py-1.5 text-sm font-medium leading-5! hover:border-emerald-500/40 hover:text-emerald-500 dark:border-white/20"
           >
-            {t.languageToggle.label}
+            <span className="navbar-pill-label">{t.languageToggle.label}</span>
           </button>
           <button
             type="button"
@@ -64,7 +64,7 @@ export function NavBar() {
             aria-label={theme === "dark" ? t.themeToggle.toLight : t.themeToggle.toDark}
             className="navbar-pill inline-flex shrink-0 items-center justify-center rounded-full border border-black/15 px-3 py-1.5 text-sm leading-5! hover:border-emerald-500/40 hover:text-emerald-500 dark:border-white/20"
           >
-            {theme === "dark" ? "☀️" : "🌙"}
+            <span className="navbar-pill-label">{theme === "dark" ? "☀️" : "🌙"}</span>
           </button>
           {isAdmin && (
             <button

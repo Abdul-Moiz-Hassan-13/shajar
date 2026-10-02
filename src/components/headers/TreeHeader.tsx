@@ -13,7 +13,7 @@ export function TreeHeader() {
         href="/people/new"
         className="tree-add-button rounded-xl bg-black px-4 py-2 text-sm font-medium text-white transition dark:bg-white dark:text-black"
       >
-        {t.people.addPerson}
+        <span className="urdu-add-person-label">{t.people.addPerson}</span>
       </Link>
     </div>
   );

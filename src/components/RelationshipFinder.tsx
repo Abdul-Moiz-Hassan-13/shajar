@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { FamilyTree } from "@/components/FamilyTree";
 import { useLanguage } from "@/components/LanguageProvider";
@@ -296,14 +297,15 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
                       {arrow} ({EDGE_LABEL[step.edgeFromPrevious]}) {arrow}
                     </span>
                   )}
-                  <span
+                  <Link
+                    href={`/people/${step.person.id}`}
                     style={genderTagStyle(step.person.gender)}
-                    className="rounded-full border px-3 py-1.5 font-medium"
+                    className="rounded-full border px-3 py-1.5 font-medium transition hover:brightness-110"
                   >
                     <span className="relation-path-label">
                       {displayFullName(step.person, locale)}
                     </span>
-                  </span>
+                  </Link>
                 </span>
               ))}
             </div>

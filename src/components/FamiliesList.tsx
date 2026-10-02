@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { Fragment, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { useAuth } from "@/components/AuthProvider";
 import { FamilyTree } from "@/components/FamilyTree";
 import { useLanguage } from "@/components/LanguageProvider";
 import type { Family } from "@/lib/families";
@@ -45,7 +44,6 @@ function childrenInTreeOrder(children: Person[]): Person[] {
 
 export function FamiliesList({ families }: { families: Family[] }) {
   const { t, locale } = useLanguage();
-  const { isAdmin } = useAuth();
   const [query, setQuery] = useState("");
   const [openFamily, setOpenFamily] = useState<Family | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -196,33 +194,20 @@ export function FamiliesList({ families }: { families: Family[] }) {
                           className="family-parent-plus flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold"
                           aria-hidden="true"
                         >
-                          +
+                          <span className="family-parent-plus-label">+</span>
                         </span>
                       )}
-                      {isAdmin ? (
-                        <Link
-                          href={`/people/${p.id}`}
-                          style={genderTagStyle(p.gender)}
-                          dir={locale === "ur" ? "rtl" : "ltr"}
-                          className="family-parent-pill rounded-full border px-3 py-1 text-sm font-semibold transition hover:brightness-110"
-                        >
-                          <span className="family-parent-label">
-                            {displayFullName(p, locale)}
-                            {p.isDeceased && " 🕊️"}
-                          </span>
-                        </Link>
-                      ) : (
-                        <span
-                          style={genderTagStyle(p.gender)}
-                          dir={locale === "ur" ? "rtl" : "ltr"}
-                          className="family-parent-pill rounded-full border px-3 py-1 text-sm font-semibold"
-                        >
-                          <span className="family-parent-label">
-                            {displayFullName(p, locale)}
-                            {p.isDeceased && " 🕊️"}
-                          </span>
+                      <Link
+                        href={`/people/${p.id}`}
+                        style={genderTagStyle(p.gender)}
+                        dir={locale === "ur" ? "rtl" : "ltr"}
+                        className="family-parent-pill rounded-full border px-3 py-1 text-sm font-semibold transition hover:brightness-110"
+                      >
+                        <span className="family-parent-label">
+                          {displayFullName(p, locale)}
+                          {p.isDeceased && " 🕊️"}
                         </span>
-                      )}
+                      </Link>
                     </Fragment>
                   ))}
                   {displayedParents.length === 1 && (
@@ -249,7 +234,7 @@ export function FamiliesList({ families }: { families: Family[] }) {
                       {t.families.childrenLabel}
                     </span>
                     <span className="family-child-count flex h-6 min-w-6 items-center justify-center rounded-full px-2 text-xs font-semibold">
-                      {displayedChildren.length}
+                      <span className="family-child-count-label">{displayedChildren.length}</span>
                     </span>
                   </div>
                   {displayedChildren.length === 0 ? (
@@ -258,8 +243,7 @@ export function FamiliesList({ families }: { families: Family[] }) {
                     </p>
                   ) : (
                     <div dir="ltr" className="family-child-row mt-2 flex flex-wrap gap-2">
-                      {displayedChildren.map((c) =>
-                        isAdmin ? (
+                      {displayedChildren.map((c) => (
                           <Link
                             key={c.id}
                             href={`/people/${c.id}`}
@@ -272,20 +256,7 @@ export function FamiliesList({ families }: { families: Family[] }) {
                             {c.isDeceased && " 🕊️"}
                           </span>
                           </Link>
-                        ) : (
-                          <span
-                            key={c.id}
-                            style={genderTagStyle(c.gender)}
-                            dir={locale === "ur" ? "rtl" : "ltr"}
-                            className="family-child-pill rounded-full border px-3 py-1 text-sm transition group-hover:-translate-y-px"
-                          >
-                          <span className="family-child-label">
-                            {displayFullName(c, locale)}
-                            {c.isDeceased && " 🕊️"}
-                          </span>
-                          </span>
-                        ),
-                      )}
+                      ))}
                     </div>
                   )}
                 </div>
