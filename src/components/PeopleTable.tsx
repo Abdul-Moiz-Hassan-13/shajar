@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { DeletePersonButton } from "@/components/DeletePersonButton";
 import { useLanguage } from "@/components/LanguageProvider";
+import { genderTagStyle } from "@/lib/personColors";
 import { displayFullName } from "@/lib/personName";
 import type { Locale } from "@/lib/i18n/translations";
 import type { Person } from "@/lib/types";
@@ -38,7 +40,44 @@ function currentSpouseNames(
 export function PeopleTable({ people }: { people: Person[] }) {
   const { t, locale } = useLanguage();
   const { isAdmin } = useAuth();
+  const router = useRouter();
   const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    const key = "people-page-scroll-y";
+    const returnKey = "people-return-scroll-y";
+    const previousRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = "manual";
+    const restoreScroll = () => {
+      const current = sessionStorage.getItem(returnKey) ?? sessionStorage.getItem(key);
+      if (current) window.scrollTo({ top: Number(current), behavior: "auto" });
+    };
+    const restoreAfterNavigation = () => {
+      window.setTimeout(restoreScroll, 0);
+      window.setTimeout(restoreScroll, 100);
+      window.setTimeout(restoreScroll, 300);
+    };
+    const firstRestore = requestAnimationFrame(restoreScroll);
+    const secondRestore = window.setTimeout(restoreScroll, 150);
+    const finalRestore = window.setTimeout(restoreScroll, 400);
+    const restoreInterval = window.setInterval(restoreScroll, 50);
+    const stopInterval = window.setTimeout(() => window.clearInterval(restoreInterval), 1200);
+    window.addEventListener("popstate", restoreAfterNavigation);
+    window.addEventListener("pageshow", restoreAfterNavigation);
+    const saveScroll = () => sessionStorage.setItem(key, String(window.scrollY));
+    window.addEventListener("scroll", saveScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(firstRestore);
+      window.clearTimeout(secondRestore);
+      window.clearTimeout(finalRestore);
+      window.clearTimeout(stopInterval);
+      window.clearInterval(restoreInterval);
+      window.removeEventListener("popstate", restoreAfterNavigation);
+      window.removeEventListener("pageshow", restoreAfterNavigation);
+      window.history.scrollRestoration = previousRestoration;
+      window.removeEventListener("scroll", saveScroll);
+    };
+  }, []);
 
   const byId = useMemo(() => new Map(people.map((p) => [p.id, p])), [people]);
 
@@ -52,6 +91,15 @@ export function PeopleTable({ people }: { people: Person[] }) {
     if (!q) return sorted;
     return sorted.filter((p) => fullName(p).toLowerCase().includes(q));
   }, [sorted, query]);
+
+  function openPerson(id: string) {
+    if (isAdmin) {
+      const scrollPosition = String(window.scrollY);
+      sessionStorage.setItem("people-page-scroll-y", scrollPosition);
+      sessionStorage.setItem("people-return-scroll-y", scrollPosition);
+      router.push(`/people/${id}`);
+    }
+  }
 
   if (people.length === 0) {
     return (
@@ -77,7 +125,7 @@ export function PeopleTable({ people }: { people: Person[] }) {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={t.people.searchPlaceholder}
-        className="w-full rounded-md border border-black/15 px-3 py-2 text-sm dark:border-white/20 dark:bg-transparent"
+        className="people-search-input w-full rounded-xl border border-black/15 px-3 py-2.5 text-sm dark:border-white/20 dark:bg-transparent"
       />
 
       {filtered.length === 0 ? (
@@ -95,10 +143,22 @@ export function PeopleTable({ people }: { people: Person[] }) {
             {filtered.map((p) => (
               <div
                 key={p.id}
-                className="flex flex-col gap-2 rounded-md border border-black/10 p-4 text-sm dark:border-white/10"
+                onClick={() => openPerson(p.id)}
+                onKeyDown={(event) => {
+                  if (isAdmin && (event.key === "Enter" || event.key === " ")) {
+                    event.preventDefault();
+                    openPerson(p.id);
+                  }
+                }}
+                role={isAdmin ? "link" : undefined}
+                tabIndex={isAdmin ? 0 : undefined}
+                style={{ borderColor: `color-mix(in srgb, ${p.gender === "male" ? "#8fb8de" : p.gender === "female" ? "#e6a4c4" : "var(--foreground)"} 35%, transparent)` }}
+                className={`people-person-card flex flex-col gap-3 rounded-2xl border p-4 text-sm transition ${isAdmin ? "cursor-pointer" : ""}`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-semibold">{displayFullName(p, locale)}</span>
+                  <span style={genderTagStyle(p.gender)} className="rounded-full border px-3 py-1 font-semibold">
+                    {displayFullName(p, locale)}
+                  </span>
                   {p.isDeceased && <span aria-label={t.people.colDeceased}>🕊️</span>}
                 </div>
                 <div>
@@ -115,9 +175,6 @@ export function PeopleTable({ people }: { people: Person[] }) {
                 </div>
                 {isAdmin && (
                   <div className="flex items-center gap-3 pt-1">
-                    <Link href={`/people/${p.id}`} className="hover:underline">
-                      {t.people.edit}
-                    </Link>
                     <DeletePersonButton id={p.id} name={displayFullName(p, locale)} />
                   </div>
                 )}
@@ -125,8 +182,8 @@ export function PeopleTable({ people }: { people: Person[] }) {
             ))}
           </div>
 
-          <div className="hidden overflow-x-auto rounded-md border border-black/10 sm:block dark:border-white/10">
-            <table className="w-full min-w-[640px] table-fixed text-left text-sm">
+              <div className="people-table-frame hidden overflow-x-auto rounded-2xl border border-black/10 sm:block dark:border-white/10">
+            <table className="people-table w-full min-w-[640px] table-fixed text-left text-sm">
               <thead className="border-b border-black/10 bg-black/[0.02] dark:border-white/10 dark:bg-white/[0.03]">
                 <tr>
                   <th className={`${isAdmin ? "w-[22%]" : "w-[25%]"} px-4 py-2 font-medium`}>
@@ -148,21 +205,28 @@ export function PeopleTable({ people }: { people: Person[] }) {
                 {filtered.map((p) => (
                   <tr
                     key={p.id}
-                    className="border-b border-black/5 last:border-0 dark:border-white/5"
+                    onClick={() => openPerson(p.id)}
+                    onKeyDown={(event) => {
+                      if (isAdmin && (event.key === "Enter" || event.key === " ")) {
+                        event.preventDefault();
+                        openPerson(p.id);
+                      }
+                    }}
+                    role={isAdmin ? "link" : undefined}
+                    tabIndex={isAdmin ? 0 : undefined}
+                    className={`people-table-row border-b border-black/5 last:border-0 dark:border-white/5 ${isAdmin ? "cursor-pointer" : ""}`}
                   >
-                    <td className="break-words px-4 py-2">{displayFullName(p, locale)}</td>
+                    <td className="break-words px-4 py-2">
+                      <span style={genderTagStyle(p.gender)} className="inline-flex rounded-full border px-3 py-1 font-medium">
+                        {displayFullName(p, locale)}
+                      </span>
+                    </td>
                     <td className="break-words px-4 py-2">{p.isDeceased ? t.people.yes : "-"}</td>
                     <td className="break-words px-4 py-2">{names(p.parentIds, byId, locale)}</td>
                     <td className="break-words px-4 py-2">{currentSpouseNames(p, byId, locale)}</td>
                     {isAdmin && (
                       <td className="px-4 py-2">
                         <div className="flex items-center gap-3">
-                          <Link
-                            href={`/people/${p.id}`}
-                            className="text-sm hover:underline"
-                          >
-                            {t.people.edit}
-                          </Link>
                           <DeletePersonButton id={p.id} name={displayFullName(p, locale)} />
                         </div>
                       </td>

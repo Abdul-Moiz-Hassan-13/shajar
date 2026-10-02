@@ -135,7 +135,9 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
               style={personA ? genderTagStyle(personA.gender) : undefined}
               className="relation-person-index flex h-7 min-w-7 items-center justify-center rounded-full border border-black/10 px-2 text-xs font-bold dark:border-white/10"
             >
-              A
+              <span className="relation-person-index-label">
+                {locale === "ur" ? "۱" : "1"}
+              </span>
             </span>
             {t.relations.personA}
           </span>
@@ -180,7 +182,7 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
                     className="relation-candidate flex w-full min-w-0 items-center justify-start rounded-lg px-2 py-1.5 text-start text-sm transition hover:bg-black/5 dark:hover:bg-white/10"
                   >
                     <span style={genderTagStyle(p.gender)} className="max-w-full min-w-0 rounded-full border px-2.5 py-0.5 whitespace-normal break-words">
-                      {displayFullName(p, locale)}
+                      <span className="relation-candidate-label">{displayFullName(p, locale)}</span>
                     </span>
                   </button>
                 ))}
@@ -190,7 +192,7 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
         </label>
 
         <div aria-hidden="true" className="relation-picker-connector hidden h-10 w-10 items-center justify-center self-center rounded-full border border-black/10 text-lg text-black/45 dark:border-white/10 dark:text-white/45 sm:flex">
-          ↔
+          <span className="relation-picker-connector-icon">↔</span>
         </div>
 
         <label className={`relation-person-field relative z-10 flex min-w-0 flex-col gap-2 rounded-xl border border-black/10 p-3 text-sm dark:border-white/10 ${openB ? "z-30" : ""}`}>
@@ -199,7 +201,9 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
               style={personB ? genderTagStyle(personB.gender) : undefined}
               className="relation-person-index flex h-7 min-w-7 items-center justify-center rounded-full border border-black/10 px-2 text-xs font-bold dark:border-white/10"
             >
-              B
+              <span className="relation-person-index-label">
+                {locale === "ur" ? "۲" : "2"}
+              </span>
             </span>
             {t.relations.personB}
           </span>
@@ -244,7 +248,7 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
                     className="relation-candidate flex w-full min-w-0 items-center justify-start rounded-lg px-2 py-1.5 text-start text-sm transition hover:bg-black/5 dark:hover:bg-white/10"
                   >
                     <span style={genderTagStyle(p.gender)} className="max-w-full min-w-0 rounded-full border px-2.5 py-0.5 whitespace-normal break-words">
-                      {displayFullName(p, locale)}
+                      <span className="relation-candidate-label">{displayFullName(p, locale)}</span>
                     </span>
                   </button>
                 ))}
@@ -296,7 +300,9 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
                     style={genderTagStyle(step.person.gender)}
                     className="rounded-full border px-3 py-1.5 font-medium"
                   >
-                    {displayFullName(step.person, locale)}
+                    <span className="relation-path-label">
+                      {displayFullName(step.person, locale)}
+                    </span>
                   </span>
                 </span>
               ))}

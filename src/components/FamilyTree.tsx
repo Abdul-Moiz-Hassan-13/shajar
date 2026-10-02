@@ -768,7 +768,7 @@ export function FamilyTree({
   const toolbarMaxWidth = locale === "ur" ? "max-w-[27rem]" : "max-w-sm";
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="family-tree-widget flex flex-col gap-3">
       {!center && (
         <div className={`relative w-full ${toolbarMaxWidth}`}>
           <input
@@ -786,7 +786,7 @@ export function FamilyTree({
               }
             }}
             placeholder={t.people.searchPlaceholder}
-            className="h-12 w-full rounded-md border border-black/15 px-3 text-sm dark:border-white/20 dark:bg-transparent"
+            className="tree-search-input h-12 w-full rounded-xl border border-black/15 px-3 text-sm dark:border-white/20 dark:bg-transparent"
           />
           {searchOpen && searchQuery && (
             <div className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-black/15 bg-white dark:border-white/20 dark:bg-neutral-900">
@@ -810,7 +810,7 @@ export function FamilyTree({
         </div>
       )}
       <div
-        className={`flex w-full items-center justify-between gap-2 ${center ? "flex-wrap" : `overflow-x-auto ${toolbarMaxWidth}`}`}
+        className={`family-tree-toolbar flex w-full items-center justify-between gap-2 rounded-xl border border-black/10 p-2 dark:border-white/10 ${center ? "flex-wrap" : `overflow-x-auto ${toolbarMaxWidth}`}`}
       >
         <div className="flex shrink-0 items-center gap-2">
           <button
@@ -852,9 +852,11 @@ export function FamilyTree({
             type="button"
             onClick={handleExport}
             disabled={isExporting}
-            className="flex h-12 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-black/15 px-3 text-xs disabled:opacity-40 dark:border-white/20"
+            className="tree-export-button flex h-12 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-black/15 px-3 text-xs disabled:opacity-40 dark:border-white/20"
           >
-            {isExporting ? t.tree.exporting : t.tree.exportImage}
+            <span className="tree-export-label">
+              {isExporting ? t.tree.exporting : t.tree.exportImage}
+            </span>
           </button>
         </div>
       </div>
@@ -862,7 +864,7 @@ export function FamilyTree({
         ref={scrollRef}
         dir="ltr"
         style={{ touchAction: "pan-x pan-y" }}
-        className={`rounded-md border border-black/10 dark:border-white/10 ${
+        className={`family-tree-canvas rounded-2xl border border-black/10 dark:border-white/10 ${
           center ? "overflow-x-auto overflow-y-hidden" : "overflow-auto"
         }`}
       >

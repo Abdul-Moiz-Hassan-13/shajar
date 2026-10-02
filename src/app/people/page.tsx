@@ -6,7 +6,7 @@ export default async function PeoplePage() {
   const people = await getAllPeople();
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="people-page-shell flex flex-col gap-6">
       <PeopleHeader />
       <PeopleTable people={people} />
     </div>

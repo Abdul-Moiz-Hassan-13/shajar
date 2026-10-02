@@ -7,11 +7,11 @@ export function TreeHeader() {
   const { t } = useLanguage();
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="tree-page-header flex items-center justify-between gap-4">
       <h1 className="text-2xl font-semibold">{t.tree.title}</h1>
       <Link
         href="/people/new"
-        className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white dark:bg-white dark:text-black"
+        className="tree-add-button rounded-xl bg-black px-4 py-2 text-sm font-medium text-white transition dark:bg-white dark:text-black"
       >
         {t.people.addPerson}
       </Link>

@@ -156,7 +156,7 @@ export function HomeContent({
                   key={p.id}
                   href={`/people/${p.id}`}
                   style={genderTagStyle(p.gender)}
-                  className="rounded-full border px-4 py-1.5 text-sm transition hover:brightness-110 hover:underline"
+                  className="rounded-full border px-4 py-1.5 text-sm transition hover:brightness-110"
                 >
                   {displayFullName(p, locale)}
                 </Link>

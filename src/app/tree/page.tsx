@@ -6,7 +6,7 @@ export default async function TreePage() {
   const people = await getAllPeople();
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="tree-page-shell flex flex-col gap-6">
       <TreeHeader />
       <FamilyTree people={people} />
     </div>

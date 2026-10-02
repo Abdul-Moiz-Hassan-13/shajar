@@ -102,6 +102,13 @@ html[dir="rtl"] .navbar-pill {
   padding-bottom: 0.625rem !important;
 }
 
+@media (max-width: 640px) {
+  html[dir="rtl"] .navbar-pill {
+    padding-top: 0.375rem !important;
+    padding-bottom: 0.375rem !important;
+  }
+}
+
 /* Chrome/Edge paint autofilled fields with their own opaque background
    (recognized email/password, saved addresses, etc.) that a plain
    `background-color` can't override - this is the standard workaround: an
@@ -194,6 +201,16 @@ button:disabled {
   background: color-mix(in srgb, var(--foreground) 5%, transparent);
 }
 
+@media (min-width: 641px) {
+  html:not([dir="rtl"]) .relation-picker-connector-icon {
+    transform: translate(0.5px, -1px);
+  }
+
+  html[dir="rtl"] .relation-picker-connector-icon {
+    transform: translate(0.5px, -5px);
+  }
+}
+
 .relation-search-input:focus {
   border-color: color-mix(in srgb, var(--foreground) 35%, transparent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--foreground) 8%, transparent);
@@ -239,6 +256,205 @@ button:disabled {
   background: color-mix(in srgb, var(--foreground) 1.5%, transparent);
 }
 
+.tree-page-header {
+  padding-bottom: 0.25rem;
+}
+
+.people-page-header {
+  padding-bottom: 0.25rem;
+}
+
+.people-add-button:hover {
+  box-shadow: 0 8px 22px rgb(0 0 0 / 0.16);
+  transform: translateY(-1px);
+}
+
+.people-search-input:focus {
+  border-color: color-mix(in srgb, var(--foreground) 35%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--foreground) 8%, transparent);
+  outline: none;
+}
+
+.people-person-card {
+  background: color-mix(in srgb, var(--foreground) 1.5%, transparent);
+}
+
+.people-person-card:hover {
+  border-color: color-mix(in srgb, var(--foreground) 28%, transparent) !important;
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.07);
+  transform: translateY(-2px);
+}
+
+.people-person-card:focus-visible,
+.people-table-row:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--foreground) 45%, transparent);
+  outline-offset: -2px;
+}
+
+.people-table-frame {
+  background: color-mix(in srgb, var(--foreground) 1.5%, transparent);
+  scrollbar-color: color-mix(in srgb, var(--foreground) 35%, transparent) transparent;
+  scrollbar-width: thin;
+}
+
+.people-table-row {
+  transition: background 160ms ease;
+}
+
+.people-table-row:hover {
+  background: color-mix(in srgb, var(--foreground) 4%, transparent);
+}
+
+.person-form {
+  padding: 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
+  border-radius: 1.25rem;
+  background: color-mix(in srgb, var(--foreground) 1.5%, transparent);
+}
+
+.person-form > label,
+.person-form-section {
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
+  border-radius: 1rem;
+  background: var(--background);
+}
+
+.person-name-grid {
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
+  border-radius: 1rem;
+  background: var(--background);
+}
+
+.person-form input:not([type="checkbox"]),
+.person-form select,
+.person-form textarea {
+  border-radius: 0.75rem;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.person-form input:not([type="checkbox"]):focus,
+.person-form select:focus,
+.person-form textarea:focus {
+  border-color: color-mix(in srgb, var(--foreground) 35%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--foreground) 8%, transparent);
+  outline: none;
+}
+
+.person-form-section > div {
+  scrollbar-color: color-mix(in srgb, var(--foreground) 35%, transparent) transparent;
+  scrollbar-width: thin;
+}
+
+.person-form input[type="checkbox"] {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: 0 0 auto;
+  accent-color: #1f3f8f;
+  cursor: pointer;
+}
+
+.person-form input[type="checkbox"]:checked {
+  accent-color: #152d70;
+}
+
+.person-form-section label:has(input[type="checkbox"]):hover {
+  color: color-mix(in srgb, var(--foreground) 85%, #8fb8de);
+}
+
+.person-form-save:hover {
+  box-shadow: 0 8px 22px rgb(0 0 0 / 0.16);
+  transform: translateY(-1px);
+}
+
+.person-form-actions > button:last-child:hover {
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+}
+
+@media (max-width: 640px) {
+  .person-form {
+    padding: 0.75rem;
+  }
+
+  .person-name-grid {
+    grid-template-columns: 1fr;
+    padding: 0.75rem;
+  }
+
+  .person-form > label,
+  .person-form-section {
+    padding: 0.75rem;
+  }
+
+  .person-form-actions {
+    flex-direction: column;
+  }
+
+  .person-form-actions button {
+    width: 100%;
+  }
+}
+
+.tree-add-button:hover {
+  box-shadow: 0 8px 22px rgb(0 0 0 / 0.16);
+  transform: translateY(-1px);
+}
+
+.tree-search-input:focus {
+  border-color: color-mix(in srgb, var(--foreground) 35%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--foreground) 8%, transparent);
+  outline: none;
+}
+
+.family-tree-toolbar {
+  background: color-mix(in srgb, var(--foreground) 2%, transparent);
+}
+
+.tree-zoom-button,
+.tree-export-button {
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.tree-zoom-button:not(:disabled):hover,
+.tree-export-button:not(:disabled):hover {
+  border-color: color-mix(in srgb, var(--foreground) 35%, transparent);
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  box-shadow: 0 6px 16px rgb(0 0 0 / 0.08);
+  transform: translateY(-1px);
+}
+
+.family-tree-canvas {
+  background: color-mix(in srgb, var(--foreground) 1.5%, transparent);
+  box-shadow: 0 14px 34px rgb(0 0 0 / 0.04) inset;
+  scrollbar-color: color-mix(in srgb, var(--foreground) 35%, transparent) transparent;
+  scrollbar-width: thin;
+}
+
+.family-tree-canvas::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+
+.family-tree-canvas::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--foreground) 35%, transparent);
+  background-clip: padding-box;
+}
+
+@media (max-width: 640px) {
+  .family-tree-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .family-tree-toolbar > div {
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
 .family-card {
   border-color: color-mix(in srgb, var(--family-primary) 35%, transparent);
   animation: family-card-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -273,6 +489,20 @@ button:disabled {
   background: color-mix(in srgb, var(--family-primary) 14%, transparent);
 }
 
+.family-parent-pill {
+  display: inline-flex;
+  align-items: center;
+}
+
+.family-parent-label {
+  display: inline-block;
+  text-align: center;
+}
+
+html[dir="rtl"] .family-parent-label {
+  transform: translateY(-3px);
+}
+
 .family-empty-children {
   border-color: color-mix(in srgb, var(--family-primary) 30%, transparent);
   background: color-mix(in srgb, var(--family-primary) 6%, transparent);
@@ -297,6 +527,76 @@ button:disabled {
   box-shadow:
     0 28px 80px rgb(0 0 0 / 0.28),
     0 0 0 1px rgb(255 255 255 / 0.03) inset;
+}
+
+.family-graph-dialog button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.5 !important;
+}
+
+html[dir="rtl"] .family-graph-arrow-icon {
+  transform: translateY(-6px);
+}
+
+html[dir="rtl"] .family-graph-position-label {
+  display: inline-block;
+  transform: translateY(-4px);
+}
+
+html[dir="rtl"] .tree-export-label {
+  display: inline-block;
+  transform: translateY(-5px);
+}
+
+html[dir="rtl"] .family-modal-close-label {
+  display: inline-block;
+  transform: translateY(-5px);
+}
+
+html[dir="rtl"] .relation-person-index-label {
+  display: inline-block;
+  transform: translate(0.5px, -2px);
+}
+
+html[dir="rtl"] .relation-candidate-label {
+  display: inline-block;
+  transform: translateY(-2px);
+}
+
+html[dir="rtl"] .relation-path-label {
+  display: inline-block;
+  transform: translateY(-3px);
+}
+
+@media (max-width: 640px) {
+  .family-parent-label {
+    transform: translateY(2px);
+  }
+
+  html[dir="rtl"] .family-parent-label {
+    transform: translateY(-1px);
+  }
+
+  .family-child-pill {
+    transform: none;
+  }
+
+  .family-child-label {
+    display: inline-block;
+    text-align: center;
+    transform: translateY(4px);
+  }
+
+  html:not([dir="rtl"]) .family-parent-label {
+    transform: translateY(0);
+  }
+
+  html:not([dir="rtl"]) .family-child-label {
+    transform: translateY(1px);
+  }
+
 }
 
 .family-graph-header {

@@ -187,7 +187,7 @@ export function FamiliesList({ families }: { families: Family[] }) {
               >
                 <div
                   dir="ltr"
-                  className="relative flex flex-wrap items-center gap-2.5"
+                  className="family-parent-row relative flex flex-wrap items-center gap-2.5"
                 >
                   {displayedParents.map((p, i) => (
                     <Fragment key={p.id}>
@@ -204,19 +204,23 @@ export function FamiliesList({ families }: { families: Family[] }) {
                           href={`/people/${p.id}`}
                           style={genderTagStyle(p.gender)}
                           dir={locale === "ur" ? "rtl" : "ltr"}
-                          className="family-parent-pill rounded-full border px-3 py-1 font-semibold transition hover:brightness-110"
+                          className="family-parent-pill rounded-full border px-3 py-1 text-sm font-semibold transition hover:brightness-110"
                         >
-                          {displayFullName(p, locale)}
-                          {p.isDeceased && " 🕊️"}
+                          <span className="family-parent-label">
+                            {displayFullName(p, locale)}
+                            {p.isDeceased && " 🕊️"}
+                          </span>
                         </Link>
                       ) : (
                         <span
                           style={genderTagStyle(p.gender)}
                           dir={locale === "ur" ? "rtl" : "ltr"}
-                          className="family-parent-pill rounded-full border px-3 py-1 font-semibold"
+                          className="family-parent-pill rounded-full border px-3 py-1 text-sm font-semibold"
                         >
-                          {displayFullName(p, locale)}
-                          {p.isDeceased && " 🕊️"}
+                          <span className="family-parent-label">
+                            {displayFullName(p, locale)}
+                            {p.isDeceased && " 🕊️"}
+                          </span>
                         </span>
                       )}
                     </Fragment>
@@ -253,7 +257,7 @@ export function FamiliesList({ families }: { families: Family[] }) {
                       {t.families.noChildren}
                     </p>
                   ) : (
-                    <div dir="ltr" className="mt-2 flex flex-wrap gap-2">
+                    <div dir="ltr" className="family-child-row mt-2 flex flex-wrap gap-2">
                       {displayedChildren.map((c) =>
                         isAdmin ? (
                           <Link
@@ -263,8 +267,10 @@ export function FamiliesList({ families }: { families: Family[] }) {
                             dir={locale === "ur" ? "rtl" : "ltr"}
                             className="family-child-pill rounded-full border px-3 py-1 text-sm transition hover:-translate-y-0.5 hover:brightness-110 hover:shadow-sm"
                           >
+                          <span className="family-child-label">
                             {displayFullName(c, locale)}
                             {c.isDeceased && " 🕊️"}
+                          </span>
                           </Link>
                         ) : (
                           <span
@@ -273,8 +279,10 @@ export function FamiliesList({ families }: { families: Family[] }) {
                             dir={locale === "ur" ? "rtl" : "ltr"}
                             className="family-child-pill rounded-full border px-3 py-1 text-sm transition group-hover:-translate-y-px"
                           >
+                          <span className="family-child-label">
                             {displayFullName(c, locale)}
                             {c.isDeceased && " 🕊️"}
+                          </span>
                           </span>
                         ),
                       )}
@@ -331,7 +339,9 @@ export function FamiliesList({ families }: { families: Family[] }) {
                       dir={locale === "ur" ? "rtl" : "ltr"}
                       className="rounded-full border px-3 py-1 text-sm font-medium"
                     >
-                      {displayFullName(parent, locale)}
+                      <span className="family-parent-label">
+                        {displayFullName(parent, locale)}
+                      </span>
                     </span>
                   </Fragment>
                 ))}
@@ -343,7 +353,7 @@ export function FamiliesList({ families }: { families: Family[] }) {
               onClick={() => dialogRef.current?.close()}
               className="family-modal-close shrink-0 rounded-xl border border-black/15 px-3 py-2 text-sm font-medium transition dark:border-white/20"
             >
-              {t.families.closeGraph}
+              <span className="family-modal-close-label">{t.families.closeGraph}</span>
             </button>
           </div>
           <div dir="ltr" className="family-graph-nav flex items-center justify-between gap-3 border-b border-black/10 px-4 py-3 dark:border-white/10 sm:px-6">
@@ -355,10 +365,12 @@ export function FamiliesList({ families }: { families: Family[] }) {
               onClick={() => moveGraph(-1)}
               className="family-graph-arrow flex h-11 w-11 items-center justify-center rounded-full border border-black/15 text-xl transition disabled:opacity-35 dark:border-white/20"
             >
-              ←
+              <span className="family-graph-arrow-icon">←</span>
             </button>
             <span className="family-graph-position min-w-20 rounded-full px-3 py-1.5 text-center text-sm font-medium text-black/65 dark:text-white/65">
-              {openFamilyIndex + 1} / {filtered.length}
+              <span className="family-graph-position-label">
+                {openFamilyIndex + 1} / {filtered.length}
+              </span>
             </span>
             <button
               type="button"
@@ -368,7 +380,7 @@ export function FamiliesList({ families }: { families: Family[] }) {
               onClick={() => moveGraph(1)}
               className="family-graph-arrow flex h-11 w-11 items-center justify-center rounded-full border border-black/15 text-xl transition disabled:opacity-35 dark:border-white/20"
             >
-              →
+              <span className="family-graph-arrow-icon">→</span>
             </button>
           </div>
           <div className="p-3 sm:p-5">

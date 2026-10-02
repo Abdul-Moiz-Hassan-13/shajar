@@ -120,14 +120,14 @@ export function PersonForm({ person, people }: PersonFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6 max-w-xl">
+    <form onSubmit={handleSubmit} className="person-form flex max-w-xl flex-col gap-6">
       {error && (
         <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
           {error}
         </p>
       )}
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="person-name-grid grid grid-cols-2 gap-4">
         <label className="flex flex-col gap-1 text-sm">
           {t.form.firstName}
           <input
@@ -226,7 +226,7 @@ export function PersonForm({ person, people }: PersonFormProps) {
         />
       </label>
 
-      <fieldset className="flex flex-col gap-2">
+      <fieldset className="person-form-section flex flex-col gap-2">
         <legend className="text-sm font-medium">
           {t.form.parents}
         </legend>
@@ -266,7 +266,7 @@ export function PersonForm({ person, people }: PersonFormProps) {
         </div>
       </fieldset>
 
-      <fieldset className="flex flex-col gap-2">
+      <fieldset className="person-form-section flex flex-col gap-2">
         <legend className="text-sm font-medium">{t.form.spouses}</legend>
         {otherPeople.length > 0 && (
           <input
@@ -313,18 +313,18 @@ export function PersonForm({ person, people }: PersonFormProps) {
         </div>
       </fieldset>
 
-      <div className="flex gap-3">
+      <div className="person-form-actions flex gap-3">
         <button
           type="submit"
           disabled={saving}
-          className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
+          className="person-form-save rounded-xl bg-black px-4 py-2.5 text-sm font-medium text-white transition disabled:opacity-50 dark:bg-white dark:text-black"
         >
           {saving ? t.form.saving : t.form.save}
         </button>
         <button
           type="button"
           onClick={() => router.back()}
-          className="rounded-md border border-black/15 px-4 py-2 text-sm font-medium dark:border-white/20"
+          className="rounded-xl border border-black/15 px-4 py-2.5 text-sm font-medium transition dark:border-white/20"
         >
           {t.form.cancel}
         </button>
