@@ -618,6 +618,33 @@ html[dir="rtl"] .family-modal-close-label {
   transform: translateY(-5px);
 }
 
+html:not([dir="rtl"]) .home-explore-arrow-label {
+  display: inline-block;
+  transform: translateY(-2px);
+}
+
+html[dir="rtl"] .home-explore-arrow-label,
+html[dir="rtl"] .home-map-label,
+html[dir="rtl"] .home-root-tag-label {
+  display: inline-block;
+  transform: translateY(-2px);
+}
+
+@media (min-width: 768px) {
+  html[dir="rtl"] .home-explore-arrow-label,
+  html[dir="rtl"] .home-explore-arrow-label {
+    transform: translateY(-7px);
+  }
+
+  html[dir="rtl"] .home-map-label {
+    transform: translateY(-8px);
+  }
+
+  html[dir="rtl"] .home-root-tag-label {
+    transform: translateY(-3px);
+  }
+}
+
 html[dir="rtl"] .relation-person-index-label {
   display: inline-block;
   transform: translate(0.5px, -2px);

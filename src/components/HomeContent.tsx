@@ -99,7 +99,7 @@ export function HomeContent({
         >
           {isAdmin ? (
             <>
-              <span className="text-2xl">🗺️</span>
+              <span className="text-2xl"><span className="home-map-label">🗺️</span></span>
               <span className="font-semibold group-hover:text-emerald-500">
                 {t.home.exploreTree}
               </span>
@@ -111,7 +111,7 @@ export function HomeContent({
             <>
               <span className="flex min-w-0 items-center gap-4">
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-2xl sm:h-14 sm:w-14" aria-hidden="true">
-                  🗺️
+                  <span className="home-map-label">🗺️</span>
                 </span>
                 <span className="flex min-w-0 flex-col gap-1">
                   <span className="text-lg font-semibold group-hover:text-emerald-500">
@@ -123,7 +123,7 @@ export function HomeContent({
                 </span>
               </span>
               <span className={`hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-emerald-500/30 text-xl text-emerald-600 transition group-hover:bg-emerald-500 group-hover:text-white dark:text-emerald-400 dark:group-hover:text-black sm:flex ${locale === "ur" ? "group-hover:-translate-x-1" : "group-hover:translate-x-1"}`} aria-hidden="true">
-                {locale === "ur" ? "←" : "→"}
+                <span className="home-explore-arrow-label">{locale === "ur" ? "←" : "→"}</span>
               </span>
             </>
           )}
@@ -157,7 +157,7 @@ export function HomeContent({
                 style={genderTagStyle(p.gender)}
                 className="rounded-full border px-4 py-1.5 text-sm transition hover:brightness-110"
               >
-                {displayFullName(p, locale)}
+                <span className="home-root-tag-label">{displayFullName(p, locale)}</span>
               </Link>
             ))}
           </div>
