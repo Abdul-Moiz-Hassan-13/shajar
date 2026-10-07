@@ -44,3 +44,5 @@ next-env.d.ts
 /data/family.json
 /data/family.backup-*.json
 /scripts/add-urdu-names.js
+
+.vercel

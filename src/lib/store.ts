@@ -15,6 +15,7 @@ type PersonRow = {
   spouse_ids: string[];
   divorced_spouse_ids: string[];
   sibling_order: number | null;
+  align_to_spouse_generation?: boolean | null;
 };
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -47,6 +48,7 @@ function fromRow(row: PersonRow): Person {
     spouseIds: row.spouse_ids ?? [],
     divorcedSpouseIds: row.divorced_spouse_ids ?? [],
     siblingOrder: row.sibling_order ?? undefined,
+    alignToSpouseGeneration: row.align_to_spouse_generation ? true : undefined,
   };
 }
 
@@ -64,6 +66,11 @@ function toRow(person: Person): PersonRow {
     spouse_ids: person.spouseIds ?? [],
     divorced_spouse_ids: person.divorcedSpouseIds ?? [],
     sibling_order: person.siblingOrder ?? null,
+    // Only sent when set: the column is optional in the schema, and omitting
+    // it keeps saves working for everyone else if it hasn't been added yet.
+    ...(person.alignToSpouseGeneration
+      ? { align_to_spouse_generation: true }
+      : {}),
   };
 }
 

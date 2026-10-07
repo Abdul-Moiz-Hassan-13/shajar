@@ -19,6 +19,15 @@ export interface Person {
   spouseIds: string[];
   /** subset of spouseIds whose relationship with this person ended in divorce. */
   divorcedSpouseIds?: string[];
+  /**
+   * Tree-layout exception, set in the data file only. Normally a married
+   * couple sits on the deeper of the two partners' generations, which drags
+   * the shallower partner (and their siblings' row) down. With this set, this
+   * person is instead lifted to their spouse's generation, even if that is the
+   * same row as their own parents; the line from their parents then loops
+   * under the parents and enters this person from below.
+   */
+  alignToSpouseGeneration?: boolean;
 }
 
 export interface FamilyData {

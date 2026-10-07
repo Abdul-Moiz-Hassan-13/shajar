@@ -539,7 +539,7 @@ export function FamilyTree({
         {layout.parentEdges.map((edge, i) => {
           const key = `parent-${i}`;
           const active = key === activeKey;
-          const d = `M ${edge.parentMidX} ${edge.parentBottomY} L ${edge.parentMidX} ${edge.midY} L ${edge.childX} ${edge.midY} L ${edge.childX} ${edge.childTopY}`;
+          const d = `M ${edge.parentMidX} ${edge.parentBottomY} L ${edge.parentMidX} ${edge.midY} L ${edge.childX} ${edge.midY} L ${edge.childX} ${edge.childEndY}`;
           return (
             <g key={key}>
               <path

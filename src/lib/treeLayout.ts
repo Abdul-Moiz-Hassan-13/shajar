@@ -24,7 +24,7 @@ export interface SpouseEdge {
 
 export interface ParentEdge {
   childX: number;
-  childTopY: number;
+  childEndY: number;
   parentMidX: number;
   parentBottomY: number;
   midY: number;
@@ -49,6 +49,13 @@ export function computeLayout(people: Person[]): TreeLayout {
   const genCache = new Map<string, number>();
   for (const p of people) genCache.set(p.id, 0);
 
+  function isSpouseAligned(p: Person): boolean {
+    return (
+      p.alignToSpouseGeneration === true &&
+      p.spouseIds.some((sid) => byId.has(sid))
+    );
+  }
+
   let changed = true;
   let iterations = 0;
   const maxIterations = people.length + 5;
@@ -58,6 +65,7 @@ export function computeLayout(people: Person[]): TreeLayout {
     for (const p of people) {
       const validParentIds = p.parentIds.filter((pid) => byId.has(pid));
       if (validParentIds.length === 0) continue;
+      if (isSpouseAligned(p)) continue;
       const newGen =
         1 + Math.max(...validParentIds.map((pid) => genCache.get(pid)!));
       if (newGen > genCache.get(p.id)!) {
@@ -70,12 +78,19 @@ export function computeLayout(people: Person[]): TreeLayout {
         if (!byId.has(sid)) continue;
         const g1 = genCache.get(p.id)!;
         const g2 = genCache.get(sid)!;
-        if (g1 !== g2) {
+        if (g1 === g2) continue;
+        // Exception: a spouse-aligned person follows their partner's row
+        // instead of dragging the partner down to theirs.
+        if (isSpouseAligned(p)) {
+          genCache.set(p.id, g2);
+        } else if (byId.get(sid)!.alignToSpouseGeneration) {
+          genCache.set(sid, g1);
+        } else {
           const max = Math.max(g1, g2);
           genCache.set(p.id, max);
           genCache.set(sid, max);
-          changed = true;
         }
+        changed = true;
       }
     }
   }
@@ -293,10 +308,16 @@ export function computeLayout(people: Person[]): TreeLayout {
     // the full distance 50/50, which for a multi-generation gap (e.g. a
     // spouse pulled forward several generations) would land the jog inside
     // some unrelated row's circles in between.
-    const midY = Math.min(parentBottomY + GEN_GAP / 2, childTopY);
+    // A spouse-aligned child can sit on their parents' own row (or above
+    // it), so there is no "down" to the child: drop into the gap under the
+    // parents, run across, and come up into the child's bottom edge.
+    const reachesFromBelow = childTopY <= parentBottomY - NODE_HEIGHT;
+    const midY = reachesFromBelow
+      ? parentBottomY + GEN_GAP / 2
+      : Math.min(parentBottomY + GEN_GAP / 2, childTopY);
     parentEdges.push({
       childX: positions.get(p.id)!,
-      childTopY,
+      childEndY: reachesFromBelow ? childTopY + NODE_HEIGHT : childTopY,
       parentMidX: parentXs.reduce((a, b) => a + b, 0) / parentXs.length,
       parentBottomY,
       midY,
