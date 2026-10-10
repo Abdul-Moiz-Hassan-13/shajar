@@ -84,11 +84,16 @@ export function PeopleTable({ people }: { people: Person[] }) {
     if (isAdmin || !openPicker) return;
     function closeOnOutsidePointer(event: PointerEvent) {
       if (!(event.target instanceof Element)) return;
+      if (event.target.closest(".admin-preview-toggle")) return;
       if (!event.target.closest(".people-name-picker")) setOpenPicker(false);
     }
     document.addEventListener("pointerdown", closeOnOutsidePointer, true);
     return () => document.removeEventListener("pointerdown", closeOnOutsidePointer, true);
   }, [isAdmin, openPicker]);
+
+  useEffect(() => {
+    if (!isAdmin) setOpenPicker(true);
+  }, [isAdmin]);
 
   const byId = useMemo(() => new Map(people.map((p) => [p.id, p])), [people]);
 

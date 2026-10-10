@@ -75,7 +75,7 @@ export function NavBar() {
             <button
               type="button"
               onClick={toggleAdminPreview}
-              className="navbar-pill hidden shrink-0 items-center justify-center rounded-full border border-black/15 px-3 py-1.5 text-sm leading-5! hover:border-emerald-500/40 hover:text-emerald-500 sm:inline-flex dark:border-white/20"
+              className="admin-preview-toggle navbar-pill hidden shrink-0 items-center justify-center rounded-full border border-black/15 px-3 py-1.5 text-sm leading-5! hover:border-emerald-500/40 hover:text-emerald-500 sm:inline-flex dark:border-white/20"
             >
               {isPreviewingNonAdmin ? t.auth.viewAsAdmin : t.auth.viewAsNonAdmin}
             </button>
@@ -135,7 +135,7 @@ export function NavBar() {
               <button
                 type="button"
                 onClick={toggleAdminPreview}
-                className="block w-full rounded-md px-3 py-2 text-left text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+                className="admin-preview-toggle block w-full rounded-md px-3 py-2 text-left text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
               >
                 {isPreviewingNonAdmin ? t.auth.viewAsAdmin : t.auth.viewAsNonAdmin}
               </button>
