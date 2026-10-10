@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { DeletePersonButton } from "@/components/DeletePersonButton";
 import { useLanguage } from "@/components/LanguageProvider";
 import { displayFullName } from "@/lib/personName";
 import type { Person, PersonInput } from "@/lib/types";
@@ -321,13 +322,13 @@ export function PersonForm({ person, people }: PersonFormProps) {
         >
           {saving ? t.form.saving : t.form.save}
         </button>
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="rounded-xl border border-black/15 px-4 py-2.5 text-sm font-medium transition dark:border-white/20"
-        >
-          {t.form.cancel}
-        </button>
+        {person && (
+          <DeletePersonButton
+            id={person.id}
+            name={displayFullName(person, locale)}
+            onDeleted={() => router.push("/people")}
+          />
+        )}
       </div>
     </form>
   );

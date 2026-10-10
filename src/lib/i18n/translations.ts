@@ -154,6 +154,7 @@ export interface TranslationDict {
   };
   deletePerson: {
     confirm: (name: string) => string;
+    warning: string;
     deleting: string;
     delete: string;
   };
@@ -308,6 +309,7 @@ const en: TranslationDict = {
   },
   deletePerson: {
     confirm: (name) => `Delete ${name}? This cannot be undone.`,
+    warning: "Deleting a person also removes their family relationships.",
     deleting: "Deleting…",
     delete: "Delete",
   },
@@ -480,6 +482,7 @@ const ur: TranslationDict = {
   },
   deletePerson: {
     confirm: (name) => `${name} کو حذف کریں؟ یہ واپس نہیں ہو سکتا۔`,
+    warning: "فرد کو حذف کرنے سے اس کے خاندانی تعلقات بھی ختم ہو جائیں گے۔",
     deleting: "حذف ہو رہا ہے…",
     delete: "حذف کریں",
   },

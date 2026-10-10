@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { PersonFormHeading } from "@/components/headers/PersonFormHeading";
+import { PersonFormBackButton } from "@/components/PersonFormBackButton";
 import { PersonForm } from "@/components/PersonForm";
 import { PersonDetails } from "@/components/PersonDetails";
 import { isAuthenticated } from "@/lib/auth";
@@ -27,9 +28,12 @@ export default async function EditPersonPage({ params }: PageProps) {
   }
 
   return (
-    <div className="mx-auto flex max-w-xl flex-col gap-6">
-      <PersonFormHeading person={person} />
-      <PersonForm person={person} people={people} />
+    <div className="person-form-page relative mx-auto flex w-full max-w-5xl flex-col gap-6">
+      <PersonFormBackButton />
+      <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
+        <PersonFormHeading person={person} />
+        <PersonForm person={person} people={people} />
+      </div>
     </div>
   );
 }

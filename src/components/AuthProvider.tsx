@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState } from "react";
+import { useEffect } from "react";
 import type { ReactNode } from "react";
 
 interface AuthContextValue {
@@ -21,6 +22,17 @@ export function AuthProvider({
   initialIsAdmin: boolean;
 }) {
   const [isAdmin] = useState(initialIsAdmin);
+
+  useEffect(() => {
+    if (!initialIsAdmin) return;
+
+    function refreshRestoredPage(event: PageTransitionEvent) {
+      if (event.persisted) window.location.reload();
+    }
+
+    window.addEventListener("pageshow", refreshRestoredPage);
+    return () => window.removeEventListener("pageshow", refreshRestoredPage);
+  }, [initialIsAdmin]);
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
