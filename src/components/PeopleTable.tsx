@@ -109,14 +109,7 @@ export function PeopleTable({ people }: { people: Person[] }) {
   }
 
   function navigateToPerson(id: string) {
-    const viewTransitionDocument = document as Document & {
-      startViewTransition?: (callback: () => void) => unknown;
-    };
-    if (viewTransitionDocument.startViewTransition) {
-      viewTransitionDocument.startViewTransition(() => router.push(`/people/${id}`));
-    } else {
-      router.push(`/people/${id}`);
-    }
+    router.push(`/people/${id}`);
   }
 
   function rememberScroll() {
@@ -253,7 +246,7 @@ export function PeopleTable({ people }: { people: Person[] }) {
                 </div>
                 {isAdmin && (
                   <div className="flex items-center gap-3 pt-1">
-                    <DeletePersonButton id={p.id} name={displayFullName(p, locale)} />
+                    <DeletePersonButton id={p.id} name={displayFullName(p, locale)} compact />
                   </div>
                 )}
               </div>
@@ -305,7 +298,7 @@ export function PeopleTable({ people }: { people: Person[] }) {
                     {isAdmin && (
                       <td className="px-4 py-2">
                         <div className="flex items-center gap-3">
-                          <DeletePersonButton id={p.id} name={displayFullName(p, locale)} />
+                          <DeletePersonButton id={p.id} name={displayFullName(p, locale)} compact />
                         </div>
                       </td>
                     )}

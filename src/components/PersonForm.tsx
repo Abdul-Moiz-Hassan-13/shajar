@@ -318,7 +318,11 @@ export function PersonForm({ person, people }: PersonFormProps) {
         <button
           type="submit"
           disabled={saving}
-          className="person-form-save rounded-xl bg-black px-4 py-2.5 text-sm font-medium text-white transition disabled:opacity-50 dark:bg-white dark:text-black"
+          className={`person-form-save rounded-xl bg-black px-4 py-2.5 text-sm font-medium text-white transition hover:bg-black/80 disabled:hover:bg-black/40 dark:bg-white dark:text-black dark:hover:bg-white/80 dark:disabled:hover:bg-white/80 ${
+            person
+              ? "disabled:bg-black/40 dark:disabled:bg-white/80"
+              : "person-form-save-new disabled:bg-black/20 dark:disabled:bg-white/60"
+          }`}
         >
           {saving ? t.form.saving : t.form.save}
         </button>

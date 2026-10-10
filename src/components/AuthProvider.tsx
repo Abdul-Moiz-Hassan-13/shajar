@@ -1,11 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
-import { useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
 interface AuthContextValue {
   isAdmin: boolean;
+  isActualAdmin: boolean;
+  isPreviewingNonAdmin: boolean;
+  toggleAdminPreview: () => void;
   logout: () => Promise<void>;
 }
 
@@ -21,7 +23,12 @@ export function AuthProvider({
    * the locale/theme cookies do. */
   initialIsAdmin: boolean;
 }) {
-  const [isAdmin] = useState(initialIsAdmin);
+  const [isPreviewingNonAdmin, setIsPreviewingNonAdmin] = useState(false);
+  const isAdmin = initialIsAdmin && !isPreviewingNonAdmin;
+
+  function toggleAdminPreview() {
+    setIsPreviewingNonAdmin((previous) => !previous);
+  }
 
   useEffect(() => {
     if (!initialIsAdmin) return;
@@ -43,7 +50,15 @@ export function AuthProvider({
   }
 
   return (
-    <AuthContext.Provider value={{ isAdmin, logout }}>
+    <AuthContext.Provider
+      value={{
+        isAdmin,
+        isActualAdmin: initialIsAdmin,
+        isPreviewingNonAdmin,
+        toggleAdminPreview,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

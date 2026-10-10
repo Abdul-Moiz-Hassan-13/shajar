@@ -11,7 +11,12 @@ export function NavBar() {
   const pathname = usePathname();
   const { t, toggleLocale } = useLanguage();
   const { theme, toggleTheme } = useTheme();
-  const { isAdmin, logout } = useAuth();
+  const {
+    isActualAdmin,
+    isPreviewingNonAdmin,
+    toggleAdminPreview,
+    logout,
+  } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const LINKS = [
@@ -27,7 +32,7 @@ export function NavBar() {
   }
 
   return (
-    <header className="sticky top-0 z-10 border-b border-black/10 bg-white/80 backdrop-blur dark:border-white/10 dark:bg-black/60">
+    <header className="sticky top-0 z-10 border-b border-black/10 bg-white dark:border-white/10 dark:bg-black">
       <nav className="mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-4 sm:px-6 sm:py-5">
         <Link href="/" className="brand-logo flex items-center text-xl font-bold">
           <span className="bg-gradient-to-r from-emerald-500 to-teal-400 bg-clip-text text-transparent">
@@ -66,7 +71,16 @@ export function NavBar() {
           >
             <span className="navbar-pill-label">{theme === "dark" ? "☀️" : "🌙"}</span>
           </button>
-          {isAdmin && (
+          {isActualAdmin && (
+            <button
+              type="button"
+              onClick={toggleAdminPreview}
+              className="navbar-pill hidden shrink-0 items-center justify-center rounded-full border border-black/15 px-3 py-1.5 text-sm leading-5! hover:border-emerald-500/40 hover:text-emerald-500 sm:inline-flex dark:border-white/20"
+            >
+              {isPreviewingNonAdmin ? t.auth.viewAsAdmin : t.auth.viewAsNonAdmin}
+            </button>
+          )}
+          {isActualAdmin && (
             <button
               type="button"
               onClick={logout}
@@ -105,7 +119,7 @@ export function NavBar() {
               </Link>
             </li>
           ))}
-          {isAdmin && (
+          {isActualAdmin && (
             <li>
               <button
                 type="button"
@@ -113,6 +127,17 @@ export function NavBar() {
                 className="block w-full rounded-md px-3 py-2 text-left text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
               >
                 {t.auth.logout}
+              </button>
+            </li>
+          )}
+          {isActualAdmin && (
+            <li>
+              <button
+                type="button"
+                onClick={toggleAdminPreview}
+                className="block w-full rounded-md px-3 py-2 text-left text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+              >
+                {isPreviewingNonAdmin ? t.auth.viewAsAdmin : t.auth.viewAsNonAdmin}
               </button>
             </li>
           )}

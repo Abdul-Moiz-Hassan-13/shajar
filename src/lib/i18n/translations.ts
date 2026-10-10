@@ -44,6 +44,8 @@ export interface TranslationDict {
     featureStories: string;
     featurePrivate: string;
     logout: string;
+    viewAsNonAdmin: string;
+    viewAsAdmin: string;
     email: string;
     password: string;
     signIn: string;
@@ -199,6 +201,8 @@ const en: TranslationDict = {
     featureStories: "Keep the stories behind every name",
     featurePrivate: "Your tree stays private and in your control",
     logout: "Logout",
+    viewAsNonAdmin: "View as non-admin",
+    viewAsAdmin: "Return to admin view",
     email: "Email",
     password: "Password",
     signIn: "Sign in",
@@ -355,6 +359,8 @@ const ur: TranslationDict = {
     featureStories: "ناموں کے پیچھے چھپی کہانیاں محفوظ کریں",
     featurePrivate: "آپ کا شجرہ نجی اور آپ کے اختیار میں ہے",
     logout: "لاگ آؤٹ",
+    viewAsNonAdmin: "نان ایڈمن کے طور پر دیکھیں",
+    viewAsAdmin: "ایڈمن ویو پر واپس جائیں",
     email: "ای میل",
     password: "پاس ورڈ",
     signIn: "سائن ان کریں",

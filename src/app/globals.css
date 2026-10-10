@@ -66,6 +66,10 @@ html[dir="rtl"] .family-child-pill {
   padding-bottom: 0.5rem;
 }
 
+html[dir="rtl"] .delete-person-button {
+  padding-block: 0.25rem !important;
+}
+
 html[dir="rtl"] .text-left {
   text-align: right !important;
 }
@@ -361,7 +365,11 @@ html[dir="rtl"] .urdu-add-person-label {
 @media (max-width: 767px) {
   .navbar-pill-label {
     display: inline-block;
-    transform: translateY(0);
+    transform: translate(0, 0);
+  }
+
+  html[dir="rtl"] .navbar-pill-label {
+    transform: translate(0.5px, -4px);
   }
 
   html[dir="rtl"] .person-details-page .person-details-tag-label {
@@ -420,13 +428,12 @@ html[dir="rtl"] .urdu-add-person-label {
   color: color-mix(in srgb, var(--foreground) 85%, #8fb8de);
 }
 
-.person-form-save:hover {
-  box-shadow: 0 8px 22px rgb(0 0 0 / 0.16);
-  transform: translateY(-1px);
+.person-form-save-new:disabled {
+  background-color: rgb(0 0 0 / 0.2) !important;
 }
 
-.person-form-actions > button:last-child:hover {
-  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+html.dark .person-form-save-new:disabled {
+  background-color: rgb(255 255 255 / 0.6) !important;
 }
 
 @media (max-width: 640px) {
