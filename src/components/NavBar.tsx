@@ -75,9 +75,34 @@ export function NavBar() {
             <button
               type="button"
               onClick={toggleAdminPreview}
+              aria-label={isPreviewingNonAdmin ? t.auth.viewAsAdmin : t.auth.viewAsNonAdmin}
+              title={isPreviewingNonAdmin ? t.auth.viewAsAdmin : t.auth.viewAsNonAdmin}
               className="admin-preview-toggle navbar-pill hidden shrink-0 items-center justify-center rounded-full border border-black/15 px-3 py-1.5 text-sm leading-5! hover:border-emerald-500/40 hover:text-emerald-500 sm:inline-flex dark:border-white/20"
             >
-              {isPreviewingNonAdmin ? t.auth.viewAsAdmin : t.auth.viewAsNonAdmin}
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                className="h-5 w-5"
+              >
+                {isPreviewingNonAdmin ? (
+                  <>
+                    <rect x="5" y="10" width="14" height="10" rx="2" />
+                    <path d="M8 10V7a4 4 0 0 1 8 0v3" strokeLinecap="round" />
+                    <circle cx="12" cy="14.5" r="1" fill="currentColor" stroke="none" />
+                    <path d="M12 15.5v2" strokeLinecap="round" />
+                  </>
+                ) : (
+                  <>
+                    <rect x="5" y="10" width="14" height="10" rx="2" />
+                    <path d="M8 10V7a4 4 0 0 1 7.2-2.4" strokeLinecap="round" />
+                    <circle cx="12" cy="14.5" r="1" fill="currentColor" stroke="none" />
+                    <path d="M12 15.5v2" strokeLinecap="round" />
+                  </>
+                )}
+              </svg>
             </button>
           )}
           {isActualAdmin && (
