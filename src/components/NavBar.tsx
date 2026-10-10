@@ -40,7 +40,7 @@ export function NavBar() {
           </span>
         </Link>
         <div className="flex items-center gap-3 sm:gap-6">
-          <ul className="hidden gap-6 text-sm sm:flex">
+          <ul className="navbar-desktop-links hidden gap-6 text-sm">
             {LINKS.map((link) => (
               <li key={link.href}>
                 <Link
@@ -77,7 +77,7 @@ export function NavBar() {
               onClick={toggleAdminPreview}
               aria-label={isPreviewingNonAdmin ? t.auth.viewAsAdmin : t.auth.viewAsNonAdmin}
               title={isPreviewingNonAdmin ? t.auth.viewAsAdmin : t.auth.viewAsNonAdmin}
-              className="admin-preview-toggle navbar-pill hidden shrink-0 items-center justify-center rounded-full border border-black/15 px-3 py-1.5 text-sm leading-5! hover:border-emerald-500/40 hover:text-emerald-500 sm:inline-flex dark:border-white/20"
+              className="admin-preview-toggle navbar-desktop-action navbar-pill hidden shrink-0 items-center justify-center rounded-full border border-black/15 px-3 py-1.5 text-sm leading-5! hover:border-emerald-500/40 hover:text-emerald-500 dark:border-white/20"
             >
               <svg
                 aria-hidden="true"
@@ -109,7 +109,7 @@ export function NavBar() {
             <button
               type="button"
               onClick={logout}
-              className="navbar-pill hidden shrink-0 items-center justify-center rounded-full border border-black/15 px-3 py-1.5 text-sm leading-5! hover:border-emerald-500/40 hover:text-emerald-500 sm:inline-flex dark:border-white/20"
+              className="navbar-desktop-action navbar-pill hidden shrink-0 items-center justify-center rounded-full border border-black/15 px-3 py-1.5 text-sm leading-5! hover:border-emerald-500/40 hover:text-emerald-500 dark:border-white/20"
             >
               {t.auth.logout}
             </button>
@@ -119,7 +119,7 @@ export function NavBar() {
             onClick={() => setMenuOpen((prev) => !prev)}
             aria-label={t.nav.menu}
             aria-expanded={menuOpen}
-            className="flex shrink-0 flex-col items-center justify-center gap-1 rounded-md border border-black/15 p-2 sm:hidden dark:border-white/20"
+            className="navbar-mobile-menu flex shrink-0 flex-col items-center justify-center gap-1 rounded-md border border-black/15 p-2 dark:border-white/20"
           >
             <span className="block h-0.5 w-5 bg-current" />
             <span className="block h-0.5 w-5 bg-current" />
@@ -128,7 +128,7 @@ export function NavBar() {
         </div>
       </nav>
       {menuOpen && (
-        <ul className="flex flex-col gap-1 border-t border-black/10 px-4 py-3 text-sm sm:hidden dark:border-white/10">
+        <ul className="navbar-mobile-menu flex flex-col gap-1 border-t border-black/10 px-4 py-3 text-sm dark:border-white/10">
           {LINKS.map((link) => (
             <li key={link.href}>
               <Link

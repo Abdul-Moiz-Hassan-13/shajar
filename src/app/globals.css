@@ -264,6 +264,32 @@ button:disabled {
   padding-bottom: 0.25rem;
 }
 
+.navbar-mobile-menu {
+  display: none;
+}
+
+@media (max-width: 810px) {
+  .navbar-desktop-links,
+  .navbar-desktop-action {
+    display: none !important;
+  }
+
+  button.navbar-mobile-menu,
+  ul.navbar-mobile-menu {
+    display: flex;
+  }
+}
+
+@media (min-width: 811px) {
+  .navbar-desktop-links {
+    display: flex;
+  }
+
+  .navbar-desktop-action {
+    display: inline-flex;
+  }
+}
+
 .tree-overview {
   background:
     radial-gradient(circle at 88% 12%, rgb(143 184 222 / 0.2), transparent 34%),
@@ -386,9 +412,24 @@ button:disabled {
 }
 
 .people-table-frame {
+  display: block;
   background: color-mix(in srgb, var(--foreground) 1.5%, transparent);
   scrollbar-color: color-mix(in srgb, var(--foreground) 35%, transparent) transparent;
   scrollbar-width: thin;
+}
+
+.people-mobile-cards {
+  display: none;
+}
+
+@media (max-width: 724px) {
+  .people-mobile-cards {
+    display: flex;
+  }
+
+  .people-table-frame {
+    display: none;
+  }
 }
 
 .people-table-row {

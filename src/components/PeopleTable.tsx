@@ -215,7 +215,7 @@ export function PeopleTable({ people }: { people: Person[] }) {
               stacked card per person scrolls with the rest of the page
               instead. Desktop keeps the table; only one of the two renders
               at a given width. */}
-          <div className="flex flex-col gap-3 sm:hidden">
+          <div className="people-mobile-cards flex flex-col gap-3">
             {filtered.map((p) => (
               <div
                 key={p.id}
@@ -258,7 +258,7 @@ export function PeopleTable({ people }: { people: Person[] }) {
             ))}
           </div>
 
-              <div className="people-table-frame hidden overflow-x-auto rounded-2xl border border-black/10 sm:block dark:border-white/10">
+              <div className="people-table-frame overflow-x-auto rounded-2xl border border-black/10 dark:border-white/10">
             <table className="people-table w-full min-w-[640px] table-fixed text-left text-sm">
               <thead className="border-b border-black/10 bg-black/[0.02] dark:border-white/10 dark:bg-white/[0.03]">
                 <tr>
