@@ -264,6 +264,96 @@ button:disabled {
   padding-bottom: 0.25rem;
 }
 
+.tree-overview {
+  background:
+    radial-gradient(circle at 88% 12%, rgb(143 184 222 / 0.2), transparent 34%),
+    radial-gradient(circle at 12% 100%, rgb(230 164 196 / 0.14), transparent 36%),
+    color-mix(in srgb, var(--foreground) 2%, transparent);
+  box-shadow: 0 18px 42px rgb(0 0 0 / 0.05);
+}
+
+.tree-overview-glow {
+  position: absolute;
+  width: 12rem;
+  height: 12rem;
+  right: -5rem;
+  top: -6rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.2);
+  filter: blur(1px);
+  pointer-events: none;
+}
+
+.tree-stat-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.15rem;
+  border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
+  border-radius: 0.9rem;
+  padding: 0.7rem 0.8rem;
+  background: color-mix(in srgb, var(--background) 65%, transparent);
+}
+
+.tree-stat-card strong {
+  font-size: 1.25rem;
+  line-height: 1.1;
+}
+
+.tree-stat-card span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.7rem;
+  color: color-mix(in srgb, var(--foreground) 55%, transparent);
+}
+
+.tree-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 1.75rem;
+}
+
+.tree-legend-panel {
+  border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
+  border-radius: 0.9rem;
+  padding: 0.75rem 0.9rem;
+  background: color-mix(in srgb, var(--background) 42%, transparent);
+}
+
+.tree-legend-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 1.5rem;
+  row-gap: 0.15rem;
+}
+
+.tree-legend-dot {
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 999px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--foreground) 5%, transparent);
+}
+
+.tree-legend-dot-dashed {
+  border: 1px dashed color-mix(in srgb, var(--foreground) 55%, transparent);
+  background: transparent;
+}
+
+.tree-legend-divorced {
+  display: inline-block;
+  width: 1.35rem;
+  border-top: 2px dashed color-mix(in srgb, var(--foreground) 55%, transparent);
+}
+
+@media (max-width: 480px) {
+  .tree-legend-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .people-page-header {
   padding-bottom: 0.25rem;
 }
@@ -489,10 +579,69 @@ html.dark .person-form-save-new:disabled {
 }
 
 .family-tree-canvas {
-  background: color-mix(in srgb, var(--foreground) 1.5%, transparent);
-  box-shadow: 0 14px 34px rgb(0 0 0 / 0.04) inset;
+  background:
+    linear-gradient(
+      color-mix(in srgb, var(--foreground) 4%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--foreground) 4%, transparent) 1px,
+      transparent 1px
+    ),
+    radial-gradient(circle at 50% 0%, color-mix(in srgb, #8fb8de 11%, transparent), transparent 55%),
+    color-mix(in srgb, var(--foreground) 1.5%, transparent);
+  background-size: 32px 32px, 32px 32px, 100% 100%, auto;
+  background-position: 0 0, 0 0, 0 0, 0 0;
+  box-shadow:
+    0 14px 34px rgb(0 0 0 / 0.04) inset,
+    0 18px 45px rgb(15 23 42 / 0.08);
   scrollbar-color: color-mix(in srgb, var(--foreground) 35%, transparent) transparent;
   scrollbar-width: thin;
+  isolation: isolate;
+  animation: tree-canvas-breathe 5s ease-in-out infinite alternate;
+}
+
+.tree-canvas-gesturing {
+  animation-play-state: paused;
+}
+
+.family-tree-canvas::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 18% 20%, rgb(143 184 222 / 0.09), transparent 24%),
+    radial-gradient(circle at 82% 72%, rgb(230 164 196 / 0.08), transparent 26%);
+  content: "";
+  pointer-events: none;
+}
+
+@keyframes tree-canvas-breathe {
+  from {
+    background-position: 0 0, 0 0, 0 0, 0 0;
+  }
+  to {
+    background-position: 18px 12px, 18px 12px, 0 0, 0 0;
+  }
+}
+
+.tree-node-interactive {
+  transition: filter 110ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: filter;
+}
+
+.tree-node-interactive:hover {
+  filter: drop-shadow(0 0 10px color-mix(in srgb, currentColor 18%, transparent));
+}
+
+.tree-node-interactive:hover circle:not(:first-child) {
+  stroke-width: 2.5;
+}
+
+.tree-node-interactive:focus-visible {
+  outline: 2px solid #f59e0b;
+  outline-offset: 5px;
 }
 
 .family-tree-canvas::-webkit-scrollbar {

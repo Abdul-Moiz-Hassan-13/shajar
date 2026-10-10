@@ -120,7 +120,16 @@ export function computeLayout(people: Person[]): TreeLayout {
       visited.add(person.id);
       const others = person.spouseIds
         .filter((sid) => sid !== cameFromId && !visited.has(sid) && byId.has(sid))
-        .map((sid) => byId.get(sid)!);
+        .map((sid) => byId.get(sid)!)
+        .sort((a, b) => {
+          const aIsDivorced =
+            (person.divorcedSpouseIds ?? []).includes(a.id) ||
+            (a.divorcedSpouseIds ?? []).includes(person.id);
+          const bIsDivorced =
+            (person.divorcedSpouseIds ?? []).includes(b.id) ||
+            (b.divorcedSpouseIds ?? []).includes(person.id);
+          return Number(bIsDivorced) - Number(aIsDivorced);
+        });
 
       const branches = others.map((s) => expand(s, person.id));
 
@@ -145,9 +154,46 @@ export function computeLayout(people: Person[]): TreeLayout {
       return [...branches[0], person, ...branches.slice(1).flat()];
     }
 
+    function placeDivorcedWivesLeft(unit: Person[]): Person[] {
+      const ordered = [...unit];
+      const husband = unit.find(
+        (candidate) =>
+          candidate.gender === "male" &&
+          candidate.spouseIds
+            .map((spouseId) => byId.get(spouseId))
+            .some((spouse) => spouse?.gender === "female"),
+      );
+      if (!husband) return ordered;
+
+      const wives = unit.filter(
+        (candidate) =>
+          candidate.gender === "female" &&
+          husband.spouseIds.includes(candidate.id),
+      );
+      if (wives.length === 0) return ordered;
+
+      const divorcedWives = wives.filter(
+        (wife) =>
+          (husband.divorcedSpouseIds ?? []).includes(wife.id) ||
+          (wife.divorcedSpouseIds ?? []).includes(husband.id),
+      );
+      const currentWives = wives.filter((wife) => !divorcedWives.includes(wife));
+      const wifeIds = new Set(wives.map((wife) => wife.id));
+      const remaining = ordered.filter((person) => !wifeIds.has(person.id));
+      const insertionIndex = remaining.indexOf(husband);
+      remaining.splice(
+        insertionIndex,
+        1,
+        ...divorcedWives,
+        husband,
+        ...currentWives,
+      );
+      return remaining;
+    }
+
     for (const p of people) {
       if (visited.has(p.id)) continue;
-      const unit = expand(p, null);
+      const unit = placeDivorcedWivesLeft(expand(p, null));
       const idx = units.length;
       units.push(unit);
       for (const member of unit) unitIndexOf.set(member.id, idx);
@@ -162,12 +208,56 @@ export function computeLayout(people: Person[]): TreeLayout {
   // with their own siblings rather than drifting to their spouse's side.
   const ownerUnitIndex = new Map<number, number | null>();
   const repMemberOf = new Map<number, Person | null>();
+  const parentGroupSize = new Map<string, number>();
+  const parentChildCount = new Map<string, number>();
+  for (const person of people) {
+    const parentKey = person.parentIds
+      .filter((parentId) => byId.has(parentId))
+      .sort()
+      .join("|");
+    if (parentKey) {
+      parentGroupSize.set(parentKey, (parentGroupSize.get(parentKey) ?? 0) + 1);
+    }
+    for (const parentId of person.parentIds) {
+      if (byId.has(parentId)) {
+        parentChildCount.set(
+          parentId,
+          (parentChildCount.get(parentId) ?? 0) + 1,
+        );
+      }
+    }
+  }
+
   units.forEach((unit, idx) => {
     const candidates = unit.filter((m) =>
       m.parentIds.some((pid) => byId.has(pid)),
     );
-    const rep =
-      candidates.find((m) => m.siblingOrder !== undefined) ?? candidates[0];
+    const rep = [...candidates].sort((a, b) => {
+      const parentKeyA = a.parentIds
+        .filter((parentId) => byId.has(parentId))
+        .sort()
+        .join("|");
+      const parentKeyB = b.parentIds
+        .filter((parentId) => byId.has(parentId))
+        .sort()
+        .join("|");
+      const familySizeA = a.parentIds.reduce(
+        (sum, parentId) => sum + (parentChildCount.get(parentId) ?? 0),
+        0,
+      );
+      const familySizeB = b.parentIds.reduce(
+        (sum, parentId) => sum + (parentChildCount.get(parentId) ?? 0),
+        0,
+      );
+      if (familySizeA !== familySizeB) return familySizeB - familySizeA;
+      const groupSizeDifference =
+        (parentGroupSize.get(parentKeyB) ?? 0) -
+        (parentGroupSize.get(parentKeyA) ?? 0);
+      if (groupSizeDifference !== 0) return groupSizeDifference;
+      if (a.siblingOrder !== undefined && b.siblingOrder === undefined) return -1;
+      if (a.siblingOrder === undefined && b.siblingOrder !== undefined) return 1;
+      return 0;
+    })[0];
     repMemberOf.set(idx, rep ?? null);
     if (!rep) {
       ownerUnitIndex.set(idx, null);

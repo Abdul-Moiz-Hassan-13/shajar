@@ -92,6 +92,12 @@ export interface TranslationDict {
   };
   tree: {
     title: string;
+    subtitle: string;
+    peopleCount: (count: number) => string;
+    generationCount: (count: number) => string;
+    living: string;
+    deceased: string;
+    legend: string;
     nothingToShow: string;
     addSomeone: string;
     toGetStarted: string;
@@ -258,6 +264,12 @@ const en: TranslationDict = {
   },
   tree: {
     title: "Family tree",
+    subtitle: "See your family story unfold across generations.",
+    peopleCount: (count) => `${count} people`,
+    generationCount: (count) => `${count} generations`,
+    living: "Living",
+    deceased: "Deceased",
+    legend: "Legend",
     nothingToShow: "Nothing to show yet.",
     addSomeone: "Add someone",
     toGetStarted: "to get started.",
@@ -421,6 +433,12 @@ const ur: TranslationDict = {
   },
   tree: {
     title: "شجرہ نسب",
+    subtitle: "اپنے خاندان کی داستان کو نسل در نسل دیکھیں۔",
+    peopleCount: (count) => `${count} افراد`,
+    generationCount: (count) => `${count} نسلیں`,
+    living: "حیات",
+    deceased: "مرحوم",
+    legend: "علامتیں",
     nothingToShow: "ابھی دکھانے کے لیے کچھ نہیں ہے۔",
     addSomeone: "کسی کو شامل کریں",
     toGetStarted: "شروع کرنے کے لیے۔",

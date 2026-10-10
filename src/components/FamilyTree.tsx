@@ -265,6 +265,7 @@ export function FamilyTree({
   // the moving parts down to plain circles/lines, which compose cheaply
   // regardless of script; labels reappear once the gesture settles.
   const [isGesturing, setIsGesturing] = useState(false);
+  const [isZooming, setIsZooming] = useState(false);
   const gestureEndTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Set by a gesture just before calling setZoom; consumed by the
   // useLayoutEffect below once the resize has actually landed in the DOM,
@@ -335,15 +336,16 @@ export function FamilyTree({
     let latestGesture: { newZoom: number; clientX: number; clientY: number } | null = null;
 
     function markGesturing() {
-      if (locale !== "ur") return;
+      setIsZooming(true);
       if (gestureEndTimer.current) {
         clearTimeout(gestureEndTimer.current);
-      } else {
+      } else if (locale === "ur") {
         setIsGesturing(true);
       }
       gestureEndTimer.current = setTimeout(() => {
         gestureEndTimer.current = null;
-        setIsGesturing(false);
+        setIsZooming(false);
+        if (locale === "ur") setIsGesturing(false);
       }, 200);
     }
 
@@ -593,20 +595,9 @@ export function FamilyTree({
                 stroke={active ? HIGHLIGHT_COLOR : "currentColor"}
                 strokeOpacity={active ? 1 : 0.3}
                 strokeWidth={active ? 3 : 1.5}
-                strokeDasharray={edge.status !== "married" ? "5 4" : undefined}
+                strokeDasharray={edge.status === "divorced" ? "5 4" : undefined}
                 pointerEvents="none"
               />
-              {edge.status === "divorced" && (
-                <line
-                  x1={(edge.x1 + edge.x2) / 2 - 5}
-                  y1={edge.y + 8}
-                  x2={(edge.x1 + edge.x2) / 2 + 5}
-                  y2={edge.y - 8}
-                  stroke={active ? HIGHLIGHT_COLOR : "currentColor"}
-                  strokeWidth={2}
-                  pointerEvents="none"
-                />
-              )}
             </g>
           );
         })}
@@ -625,10 +616,11 @@ export function FamilyTree({
           return (
             <g
               key={node.person.id}
+              className="tree-node"
               transform={`translate(${node.x - NODE_WIDTH / 2}, ${node.y})`}
             >
               <g
-                className="cursor-pointer"
+                className="tree-node-interactive cursor-pointer"
                 onClick={() => handleNodeClick(node.person.id)}
                 onDoubleClick={() => startEditing(node.person)}
               >
@@ -864,7 +856,9 @@ export function FamilyTree({
         ref={scrollRef}
         dir="ltr"
         style={{ touchAction: "pan-x pan-y" }}
-        className={`family-tree-canvas rounded-2xl border border-black/10 dark:border-white/10 ${
+        className={`family-tree-canvas relative rounded-2xl border border-black/10 dark:border-white/10 ${
+          isZooming ? "tree-canvas-gesturing" : ""
+        } ${
           center ? "overflow-x-auto overflow-y-hidden" : "overflow-auto"
         }`}
       >
@@ -895,11 +889,36 @@ export function FamilyTree({
           // zoom frame instead of just resizing an existing bitmap, which
           // is what made pinching feel fine in English but janky in Urdu.
           willChange: "transform",
+          backfaceVisibility: "hidden",
+          contain: "layout paint",
         }}
       >
         {treeContent}
       </svg>
       </div>
+      </div>
+      <div className="tree-legend-panel">
+        <div className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-black/55 dark:text-white/55">
+          {t.tree.legend}
+        </div>
+        <div className="tree-legend-grid text-xs text-black/65 dark:text-white/65">
+          <span className="tree-legend-item">
+            <i className="tree-legend-dot bg-[#8fb8de]" />
+            {t.form.male}
+          </span>
+          <span className="tree-legend-item">
+            <i className="tree-legend-dot bg-[#e6a4c4]" />
+            {t.form.female}
+          </span>
+          <span className="tree-legend-item">
+            <i className="tree-legend-divorced" />
+            {t.form.divorced}
+          </span>
+          <span className="tree-legend-item">
+            <i className="tree-legend-dot tree-legend-dot-dashed" />
+            {t.tree.deceased}
+          </span>
+        </div>
       </div>
     </div>
   );
