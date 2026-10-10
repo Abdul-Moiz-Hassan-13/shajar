@@ -116,6 +116,68 @@ function syncRelations(people: Person[], person: Person): void {
   }
 }
 
+function syncChildren(people: Person[], person: Person, childIds: string[]): void {
+  const selectedChildren = new Set(childIds);
+  for (const child of people) {
+    if (child.id === person.id) continue;
+    const hasParent = child.parentIds.includes(person.id);
+    const shouldHaveParent = selectedChildren.has(child.id);
+    if (shouldHaveParent && !hasParent && child.parentIds.length < 2) {
+      child.parentIds.push(person.id);
+    } else if (!shouldHaveParent && hasParent) {
+      child.parentIds = child.parentIds.filter((id) => id !== person.id);
+    }
+  }
+}
+
+export function validateRelationshipInput(
+  people: Person[],
+  input: PersonInput,
+  existingPerson?: Person,
+): string | null {
+  if ((input.parentIds ?? []).length > 2) {
+    return "A person cannot have more than two parents.";
+  }
+
+  const selectedParents = (input.parentIds ?? [])
+    .map((id) => people.find((person) => person.id === id))
+    .filter((person): person is Person => Boolean(person));
+  const parentGenders = selectedParents
+    .map((parent) => parent.gender)
+    .filter((gender): gender is "male" | "female" => gender === "male" || gender === "female");
+  if (new Set(parentGenders).size !== parentGenders.length) {
+    return "Parents must have different genders.";
+  }
+
+  const selectedSpouses = (input.spouseIds ?? [])
+    .map((id) => people.find((person) => person.id === id))
+    .filter((person): person is Person => Boolean(person));
+  if (
+    (input.gender === "male" || input.gender === "female") &&
+    selectedSpouses.some((spouse) => spouse.gender === input.gender)
+  ) {
+    return "Spouses must have different genders.";
+  }
+
+  if (input.gender === "female") {
+    const previousSpouseIds = new Set(existingPerson?.spouseIds ?? []);
+    const addingSpouse = (input.spouseIds ?? []).some((id) => !previousSpouseIds.has(id));
+    if (addingSpouse) {
+      const previousHusbands = (existingPerson?.spouseIds ?? [])
+        .map((id) => people.find((candidate) => candidate.id === id))
+        .filter((candidate): candidate is Person => Boolean(candidate));
+      if (
+        previousHusbands.length === 0 ||
+        previousHusbands.some((husband) => !husband.isDeceased)
+      ) {
+        return "A new spouse can only be added after a previous husband has died.";
+      }
+    }
+  }
+
+  return null;
+}
+
 export async function createPerson(input: PersonInput): Promise<Person> {
   const people = await readPeople();
   const person: Person = {
@@ -134,6 +196,7 @@ export async function createPerson(input: PersonInput): Promise<Person> {
   };
   people.push(person);
   syncRelations(people, person);
+  syncChildren(people, person, input.childIds ?? []);
   await writePeople(people);
   return person;
 }
@@ -156,6 +219,7 @@ export async function updatePerson(id: string, input: PersonInput): Promise<Pers
     siblingOrder: input.siblingOrder,
   });
   syncRelations(people, existing);
+  syncChildren(people, existing, input.childIds ?? []);
   await writePeople(people);
   return existing;
 }

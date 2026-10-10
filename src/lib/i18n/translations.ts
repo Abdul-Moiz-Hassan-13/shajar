@@ -148,6 +148,11 @@ export interface TranslationDict {
     noOtherPeople: string;
     noMatches: string;
     spouses: string;
+    children: string;
+    addParent: string;
+    addSpouse: string;
+    addChild: string;
+    spouseUnavailable: string;
     divorced: string;
     save: string;
     saving: string;
@@ -300,11 +305,16 @@ const en: TranslationDict = {
     notes: "Notes",
     siblingOrder: "Birth order among siblings (optional)",
     siblingOrderPlaceholder: "1 = oldest, 2 = next, …",
-    parents: "Parents (up to 2)",
+    parents: "Parents",
     searchPlaceholder: "Search…",
     noOtherPeople: "No other people yet.",
     noMatches: "No matches.",
-    spouses: "Spouse / partner",
+    spouses: "Spouse",
+    children: "Children",
+    addParent: "Add a parent",
+    addSpouse: "Add a spouse",
+    addChild: "Add a child",
+    spouseUnavailable: "A new spouse can be added after a previous husband has died.",
     divorced: "Divorced",
     save: "Save",
     saving: "Saving…",
@@ -475,11 +485,16 @@ const ur: TranslationDict = {
     notes: "نوٹس",
     siblingOrder: "بہن بھائیوں میں پیدائشی ترتیب (اختیاری)",
     siblingOrderPlaceholder: "1 = سب سے بڑا، 2 = اس کے بعد، …",
-    parents: "والدین (زیادہ سے زیادہ 2)",
+    parents: "والدین",
     searchPlaceholder: "تلاش کریں…",
     noOtherPeople: "ابھی کوئی اور فرد موجود نہیں۔",
     noMatches: "کوئی میل نہیں ملا۔",
     spouses: "شریک حیات",
+    children: "اولاد",
+    addParent: "والدین شامل کریں",
+    addSpouse: "شریک حیات شامل کریں",
+    addChild: "اولاد شامل کریں",
+    spouseUnavailable: "نئے شریک حیات کا اضافہ سابق شوہر کے انتقال کے بعد ممکن ہے۔",
     divorced: "طلاق یافتہ",
     save: "محفوظ کریں",
     saving: "محفوظ ہو رہا ہے…",

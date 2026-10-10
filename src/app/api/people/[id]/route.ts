@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
-import { deletePerson, getPerson, renamePerson, updatePerson } from "@/lib/store";
+import {
+  deletePerson,
+  getAllPeople,
+  getPerson,
+  renamePerson,
+  updatePerson,
+  validateRelationshipInput,
+} from "@/lib/store";
 import type { PersonInput } from "@/lib/types";
 
 interface RouteParams {
@@ -29,6 +36,16 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       { error: "firstName and gender are required" },
       { status: 400 },
     );
+  }
+
+  const existingPerson = await getPerson(id);
+  const relationshipError = validateRelationshipInput(
+    await getAllPeople(),
+    body,
+    existingPerson,
+  );
+  if (relationshipError) {
+    return NextResponse.json({ error: relationshipError }, { status: 400 });
   }
 
   const person = await updatePerson(id, body);

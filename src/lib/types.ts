@@ -34,4 +34,7 @@ export interface FamilyData {
   people: Person[];
 }
 
-export type PersonInput = Omit<Person, "id">;
+export type PersonInput = Omit<Person, "id"> & {
+  /** Relationship-only input used when saving a person and assigning children. */
+  childIds?: string[];
+};

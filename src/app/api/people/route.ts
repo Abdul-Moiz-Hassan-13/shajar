@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
-import { createPerson, getAllPeople } from "@/lib/store";
+import { createPerson, getAllPeople, validateRelationshipInput } from "@/lib/store";
 import type { PersonInput } from "@/lib/types";
 
 export async function GET() {
@@ -20,6 +20,11 @@ export async function POST(request: NextRequest) {
       { error: "firstName and gender are required" },
       { status: 400 },
     );
+  }
+
+  const relationshipError = validateRelationshipInput(await getAllPeople(), body);
+  if (relationshipError) {
+    return NextResponse.json({ error: relationshipError }, { status: 400 });
   }
 
   const person = await createPerson(body);
