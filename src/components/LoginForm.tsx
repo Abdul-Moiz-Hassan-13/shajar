@@ -16,45 +16,53 @@ export function LoginForm() {
     setError(null);
     setSubmitting(true);
 
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (!res.ok) {
+      if (!res.ok) {
+        setSubmitting(false);
+        setError(
+          res.status === 401 ? t.auth.invalidCredentials : t.auth.genericError,
+        );
+        return;
+      }
+
+      // Full reload so the root layout re-reads the new session cookie
+      // server-side instead of leaving AuthProvider's client state stale.
+      window.location.href = "/";
+    } catch {
       setSubmitting(false);
-      setError(
-        res.status === 401 ? t.auth.invalidCredentials : t.auth.genericError,
-      );
-      return;
+      setError(t.auth.genericError);
     }
-
-    // Full reload so the root layout re-reads the new session cookie
-    // server-side instead of leaving AuthProvider's client state stale.
-    window.location.href = "/";
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex max-w-sm flex-col gap-4">
+    <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4">
       {error && (
-        <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+        <p
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/80 dark:bg-red-950/40 dark:text-red-300"
+        >
           {error}
         </p>
       )}
-      <label className="flex flex-col gap-1 text-sm">
-        {t.auth.email}
+      <label className="flex flex-col gap-1.5 text-sm font-medium">
+        <span>{t.auth.email}</span>
         <input
           type="email"
           required
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="rounded-md border border-black/15 px-3 py-2 dark:border-white/20 dark:bg-transparent"
+          className="rounded-xl border border-black/15 bg-black/[0.02] px-4 py-2.5 outline-none transition placeholder:text-black/35 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15 dark:border-white/20 dark:bg-white/[0.03] dark:placeholder:text-white/35"
         />
       </label>
-      <label className="flex flex-col gap-1 text-sm">
-        {t.auth.password}
+      <label className="flex flex-col gap-1.5 text-sm font-medium">
+        <span>{t.auth.password}</span>
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
@@ -62,13 +70,13 @@ export function LoginForm() {
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-md border border-black/15 px-3 py-2 pr-10 dark:border-white/20 dark:bg-transparent"
+            className="w-full rounded-xl border border-black/15 bg-black/[0.02] px-4 py-2.5 pr-12 outline-none transition placeholder:text-black/35 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15 dark:border-white/20 dark:bg-white/[0.03] dark:placeholder:text-white/35"
           />
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
             aria-label={showPassword ? t.auth.hidePassword : t.auth.showPassword}
-            className="absolute inset-y-0 right-0 flex w-9 items-center justify-center text-black/50 hover:text-black dark:text-white/50 dark:hover:text-white"
+            className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-xl text-black/50 transition hover:text-emerald-600 dark:text-white/50 dark:hover:text-emerald-400"
           >
             <svg
               viewBox="0 0 24 24"
@@ -90,10 +98,24 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={submitting}
-        className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
+        className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 transition hover:from-emerald-500 hover:to-teal-400 focus:outline-none focus:ring-4 focus:ring-emerald-500/25 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {submitting ? t.auth.signingIn : t.auth.signIn}
       </button>
+      <p className="flex items-center justify-center gap-2 text-center text-xs text-black/50 dark:text-white/50">
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          className="h-4 w-4 shrink-0 text-emerald-500"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <rect x="4" y="10" width="16" height="10" rx="2" />
+          <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+        </svg>
+        {t.auth.secureMessage}
+      </p>
     </form>
   );
 }

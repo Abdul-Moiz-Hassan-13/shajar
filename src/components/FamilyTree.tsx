@@ -752,9 +752,13 @@ export function FamilyTree({
     return (
       <p className="text-black/60 dark:text-white/60">
         {t.tree.nothingToShow}{" "}
-        <Link href="/people/new" className="underline">
-          {t.tree.addSomeone}
-        </Link>{" "}
+        {isAdmin && (
+          <>
+            <Link href="/people/new" className="underline">
+              {t.tree.addSomeone}
+            </Link>{" "}
+          </>
+        )}
         {t.tree.toGetStarted}
       </p>
     );

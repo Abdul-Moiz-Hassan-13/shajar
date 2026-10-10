@@ -37,6 +37,12 @@ export interface TranslationDict {
   };
   auth: {
     login: string;
+    loginSubtitle: string;
+    loginDescription: string;
+    secureMessage: string;
+    featureTree: string;
+    featureStories: string;
+    featurePrivate: string;
     logout: string;
     email: string;
     password: string;
@@ -185,6 +191,12 @@ const en: TranslationDict = {
   },
   auth: {
     login: "Login",
+    loginSubtitle: "Welcome back to your family tree",
+    loginDescription: "Preserve, explore, and grow your family story in one place.",
+    secureMessage: "Your family data is private and protected.",
+    featureTree: "See your family branches at a glance",
+    featureStories: "Keep the stories behind every name",
+    featurePrivate: "Your tree stays private and in your control",
     logout: "Logout",
     email: "Email",
     password: "Password",
@@ -334,6 +346,12 @@ const ur: TranslationDict = {
   },
   auth: {
     login: "لاگ ان",
+    loginSubtitle: "اپنے خاندانی شجرے میں واپس آئیں",
+    loginDescription: "اپنے خاندان کی کہانی کو محفوظ رکھیں، دریافت کریں اور آگے بڑھائیں۔",
+    secureMessage: "آپ کا خاندانی ڈیٹا محفوظ اور صرف آپ کے لیے ہے۔",
+    featureTree: "اپنے خاندان کی شاخیں ایک نظر میں دیکھیں",
+    featureStories: "ناموں کے پیچھے چھپی کہانیاں محفوظ کریں",
+    featurePrivate: "آپ کا شجرہ نجی اور آپ کے اختیار میں ہے",
     logout: "لاگ آؤٹ",
     email: "ای میل",
     password: "پاس ورڈ",
