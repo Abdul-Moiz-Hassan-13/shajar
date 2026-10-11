@@ -99,7 +99,9 @@ export function HomeContent({
         >
           {isAdmin ? (
             <>
-              <span className="text-2xl"><span className="home-map-label">🗺️</span></span>
+              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/15 text-2xl" aria-hidden="true">
+                <span className="home-map-label home-map-label-admin">🗺️</span>
+              </span>
               <span className="font-semibold group-hover:text-emerald-500">
                 {t.home.exploreTree}
               </span>
@@ -111,7 +113,7 @@ export function HomeContent({
             <>
               <span className="flex min-w-0 items-center gap-4">
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-2xl sm:h-14 sm:w-14" aria-hidden="true">
-                  <span className="home-map-label">🗺️</span>
+                  <span className="home-map-label home-map-label-non-admin">🗺️</span>
                 </span>
                 <span className="flex min-w-0 flex-col gap-1">
                   <span className="text-lg font-semibold group-hover:text-emerald-500">
@@ -133,7 +135,9 @@ export function HomeContent({
             href="/people/new"
             className="group flex flex-col gap-2 rounded-xl border border-black/10 bg-gradient-to-br from-teal-400/5 to-transparent p-6 transition hover:border-teal-400/40 dark:border-white/10"
           >
-            <span className="text-2xl">➕</span>
+            <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-400/15 text-2xl" aria-hidden="true">
+              <span className="home-add-label">➕</span>
+            </span>
             <span className="font-semibold group-hover:text-teal-400">
               {t.home.addSomeoneNew}
             </span>
