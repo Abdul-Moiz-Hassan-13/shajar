@@ -40,7 +40,7 @@ export function PersonDetails({ person, people }: { person: Person; people: Pers
           <h2 className="text-xs font-semibold uppercase tracking-wide text-black/50 dark:text-white/50">{t.form.parents}</h2>
           <div className="mt-3 flex flex-wrap gap-2">
             {parents.length > 0 ? parents.map((parent) => (
-              <Link key={parent.id} href={`/people/${parent.id}`} style={genderTagStyle(parent.gender)} className="rounded-full border px-3 py-1 text-sm transition hover:brightness-110">
+              <Link key={parent.id} href={`/people/${parent.id}`} style={genderTagStyle(parent.gender)} className="urdu-content-pill rounded-full border px-3 py-1 text-sm transition hover:brightness-110">
                 <span className="person-details-tag-label">{displayFullName(parent, locale)}</span>
               </Link>
             )) : <span className="text-sm text-black/50 dark:text-white/50">-</span>}
@@ -50,7 +50,7 @@ export function PersonDetails({ person, people }: { person: Person; people: Pers
           <h2 className="text-xs font-semibold uppercase tracking-wide text-black/50 dark:text-white/50">{t.form.spouses}</h2>
           <div className="mt-3 flex flex-wrap gap-2">
             {spouses.length > 0 ? spouses.map((spouse) => (
-              <Link key={spouse.id} href={`/people/${spouse.id}`} style={genderTagStyle(spouse.gender)} className="rounded-full border px-3 py-1 text-sm transition hover:brightness-110">
+              <Link key={spouse.id} href={`/people/${spouse.id}`} style={genderTagStyle(spouse.gender)} className="urdu-content-pill rounded-full border px-3 py-1 text-sm transition hover:brightness-110">
                 <span className="person-details-tag-label">{displayFullName(spouse, locale)}</span>
               </Link>
             )) : <span className="text-sm text-black/50 dark:text-white/50">-</span>}
@@ -63,7 +63,7 @@ export function PersonDetails({ person, people }: { person: Person; people: Pers
           <h2 className="text-xs font-semibold uppercase tracking-wide text-black/50 dark:text-white/50">{t.families.childrenLabel}</h2>
           <div className="mt-3 flex flex-wrap gap-2">
             {children.map((child) => (
-              <Link key={child.id} href={`/people/${child.id}`} style={genderTagStyle(child.gender)} className="rounded-full border px-3 py-1 text-sm transition hover:brightness-110">
+              <Link key={child.id} href={`/people/${child.id}`} style={genderTagStyle(child.gender)} className="urdu-content-pill rounded-full border px-3 py-1 text-sm transition hover:brightness-110">
                 <span className="person-details-tag-label">{displayFullName(child, locale)}</span>
               </Link>
             ))}

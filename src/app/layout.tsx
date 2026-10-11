@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 import { Geist, Geist_Mono, Noto_Nastaliq_Urdu } from "next/font/google";
+import { Suspense } from "react";
 import { AuthProvider } from "@/components/AuthProvider";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import { NavBar } from "@/components/NavBar";
+import { NavigationProgressBar } from "@/components/NavigationProgressBar";
 import { ThemeProvider, type Theme } from "@/components/ThemeProvider";
 import { isAuthenticated } from "@/lib/auth";
 import type { Locale } from "@/lib/i18n/translations";
@@ -62,6 +64,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <ThemeProvider initialTheme={initialTheme}>
           <LanguageProvider initialLocale={initialLocale}>
             <AuthProvider initialIsAdmin={initialIsAdmin}>
+              <Suspense fallback={null}>
+                <NavigationProgressBar />
+              </Suspense>
               <NavBar />
               <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">
                 {children}

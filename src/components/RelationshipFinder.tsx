@@ -182,7 +182,7 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
                     onClick={() => selectA(p)}
                     className="relation-candidate flex w-full min-w-0 items-center justify-start rounded-lg px-2 py-1.5 text-start text-sm transition hover:bg-black/5 dark:hover:bg-white/10"
                   >
-                    <span style={genderTagStyle(p.gender)} className="max-w-full min-w-0 rounded-full border px-2.5 py-0.5 whitespace-normal break-words">
+                    <span style={genderTagStyle(p.gender)} className="urdu-content-pill max-w-full min-w-0 rounded-full border px-2.5 py-0.5 whitespace-normal break-words">
                       <span className="relation-candidate-label">{displayFullName(p, locale)}</span>
                     </span>
                   </button>
@@ -248,7 +248,7 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
                     onClick={() => selectB(p)}
                     className="relation-candidate flex w-full min-w-0 items-center justify-start rounded-lg px-2 py-1.5 text-start text-sm transition hover:bg-black/5 dark:hover:bg-white/10"
                   >
-                    <span style={genderTagStyle(p.gender)} className="max-w-full min-w-0 rounded-full border px-2.5 py-0.5 whitespace-normal break-words">
+                    <span style={genderTagStyle(p.gender)} className="urdu-content-pill max-w-full min-w-0 rounded-full border px-2.5 py-0.5 whitespace-normal break-words">
                       <span className="relation-candidate-label">{displayFullName(p, locale)}</span>
                     </span>
                   </button>
@@ -300,7 +300,7 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
                   <Link
                     href={`/people/${step.person.id}`}
                     style={genderTagStyle(step.person.gender)}
-                    className="rounded-full border px-3 py-1.5 font-medium transition hover:brightness-110"
+                    className="urdu-content-pill rounded-full border px-3 py-1.5 font-medium transition hover:brightness-110"
                   >
                     <span className="relation-path-label">
                       {displayFullName(step.person, locale)}

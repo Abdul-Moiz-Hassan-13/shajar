@@ -4,22 +4,17 @@ import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { useLanguage } from "@/components/LanguageProvider";
 import { localizeNumber } from "@/lib/i18n/numerals";
-import { genderTagStyle } from "@/lib/personColors";
-import { displayFullName } from "@/lib/personName";
-import type { Person } from "@/lib/types";
 
 export function HomeContent({
   peopleCount,
   generations,
   couples,
   living,
-  roots,
 }: {
   peopleCount: number;
   generations: number;
   couples: number;
   living: number;
-  roots: Person[];
 }) {
   const { t, locale } = useLanguage();
   const { isAdmin } = useAuth();
@@ -148,25 +143,6 @@ export function HomeContent({
         )}
       </div>
 
-      {roots.length > 0 && (
-        <div>
-          <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-black/50 dark:text-white/50">
-            {t.home.oldestBranches}
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {roots.map((p) => (
-              <Link
-                key={p.id}
-                href={`/people/${p.id}`}
-                style={genderTagStyle(p.gender)}
-                className="rounded-full border px-4 py-1.5 text-sm transition hover:brightness-110"
-              >
-                <span className="home-root-tag-label">{displayFullName(p, locale)}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

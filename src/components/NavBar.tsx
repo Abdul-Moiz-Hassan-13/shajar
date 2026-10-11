@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { useLanguage } from "@/components/LanguageProvider";
 import { useTheme } from "@/components/ThemeProvider";
@@ -18,6 +18,18 @@ export function NavBar() {
     logout,
   } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setMenuOpen(false);
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const LINKS = [
     { href: "/", label: t.nav.home },
@@ -119,55 +131,87 @@ export function NavBar() {
             onClick={() => setMenuOpen((prev) => !prev)}
             aria-label={t.nav.menu}
             aria-expanded={menuOpen}
-            className="navbar-mobile-menu flex shrink-0 flex-col items-center justify-center gap-1 rounded-md border border-black/15 p-2 dark:border-white/20"
+            className="navbar-mobile-menu relative flex h-9 w-9 shrink-0 flex-col items-center justify-center gap-1.5 rounded-lg border border-black/15 p-1.5 transition-colors hover:border-black/30 dark:border-white/20 dark:hover:border-white/40"
           >
-            <span className="block h-0.5 w-5 bg-current" />
-            <span className="block h-0.5 w-5 bg-current" />
-            <span className="block h-0.5 w-5 bg-current" />
+            <span
+              className={`block h-0.5 w-5 rounded-full bg-current transition-all duration-300 ease-in-out ${
+                menuOpen ? "translate-y-2 rotate-45" : ""
+              }`}
+            />
+            <span
+              className={`block h-0.5 w-5 rounded-full bg-current transition-all duration-300 ease-in-out ${
+                menuOpen ? "opacity-0 -translate-x-1" : ""
+              }`}
+            />
+            <span
+              className={`block h-0.5 w-5 rounded-full bg-current transition-all duration-300 ease-in-out ${
+                menuOpen ? "-translate-y-2 -rotate-45" : ""
+              }`}
+            />
           </button>
         </div>
       </nav>
-      {menuOpen && (
-        <ul className="navbar-mobile-menu flex flex-col gap-1 border-t border-black/10 px-4 py-3 text-sm dark:border-white/10">
-          {LINKS.map((link) => (
-            <li key={link.href}>
-              <Link
-                href={link.href}
-                onClick={() => setMenuOpen(false)}
-                className={
-                  isActive(link.href)
-                    ? "block rounded-md px-3 py-2 font-medium underline underline-offset-4"
-                    : "block rounded-md px-3 py-2 text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
-                }
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
-          {isActualAdmin && (
-            <li>
-              <button
-                type="button"
-                onClick={logout}
-                className="block w-full rounded-md px-3 py-2 text-left text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
-              >
-                {t.auth.logout}
-              </button>
-            </li>
-          )}
-          {isActualAdmin && (
-            <li>
-              <button
-                type="button"
-                onClick={toggleAdminPreview}
-                className="admin-preview-toggle block w-full rounded-md px-3 py-2 text-left text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
-              >
-                {isPreviewingNonAdmin ? t.auth.viewAsAdmin : t.auth.viewAsNonAdmin}
-              </button>
-            </li>
-          )}
-        </ul>
-      )}
+      <div
+        className={`navbar-mobile-dropdown grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
+          menuOpen
+            ? "grid-rows-[1fr] opacity-100"
+            : "grid-rows-[0fr] opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div
+            className={`border-t border-black/10 transition-transform duration-300 ease-in-out dark:border-white/10 ${
+              menuOpen ? "translate-y-0" : "-translate-y-2"
+            }`}
+          >
+            <ul className="navbar-mobile-menu flex flex-col gap-1 px-4 py-3 text-sm">
+              {LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    onClick={() => setMenuOpen(false)}
+                    className={
+                      isActive(link.href)
+                        ? "block rounded-md px-3 py-2 font-medium underline underline-offset-4"
+                        : "block rounded-md px-3 py-2 text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+                    }
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+              {isActualAdmin && (
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      logout();
+                      setMenuOpen(false);
+                    }}
+                    className="block w-full rounded-md px-3 py-2 text-left text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+                  >
+                    {t.auth.logout}
+                  </button>
+                </li>
+              )}
+              {isActualAdmin && (
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      toggleAdminPreview();
+                      setMenuOpen(false);
+                    }}
+                    className="admin-preview-toggle block w-full rounded-md px-3 py-2 text-left text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+                  >
+                    {isPreviewingNonAdmin ? t.auth.viewAsAdmin : t.auth.viewAsNonAdmin}
+                  </button>
+                </li>
+              )}
+            </ul>
+          </div>
+        </div>
+      </div>
     </header>
   );
 }

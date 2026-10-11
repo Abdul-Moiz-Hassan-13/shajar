@@ -213,6 +213,8 @@ export function FamilyTree({
   people,
   center = false,
   baseZoom = 1,
+  showLegend = true,
+  showToolbar = true,
 }: {
   people: Person[];
   /** Center the diagram in its container instead of pinning it to the left
@@ -223,6 +225,8 @@ export function FamilyTree({
   center?: boolean;
   /** Visual scale represented by 100% in the zoom controls. */
   baseZoom?: number;
+  showLegend?: boolean;
+  showToolbar?: boolean;
 }) {
   const router = useRouter();
   const { t, locale } = useLanguage();
@@ -801,10 +805,11 @@ export function FamilyTree({
           )}
         </div>
       )}
-      <div
-        className={`family-tree-toolbar flex w-full items-center justify-between gap-2 rounded-xl border border-black/10 p-2 dark:border-white/10 ${center ? "flex-wrap" : `overflow-x-auto ${toolbarMaxWidth}`}`}
-      >
-        <div className="flex shrink-0 items-center gap-2">
+      {showToolbar && (
+        <div
+          className={`family-tree-toolbar flex w-full items-center justify-between gap-2 rounded-xl border border-black/10 p-2 dark:border-white/10 ${center ? "flex-wrap" : `overflow-x-auto ${toolbarMaxWidth}`}`}
+        >
+          <div className="flex shrink-0 items-center gap-2">
           <button
             type="button"
             onClick={() => zoomBy(-ZOOM_STEP)}
@@ -826,8 +831,8 @@ export function FamilyTree({
           >
             +
           </button>
-        </div>
-        <div className="flex shrink-0 items-center gap-2">
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
           {zoom !== baseZoom && (
             <button
               type="button"
@@ -850,8 +855,9 @@ export function FamilyTree({
               {isExporting ? t.tree.exporting : t.tree.exportImage}
             </span>
           </button>
+          </div>
         </div>
-      </div>
+      )}
       <div
         ref={scrollRef}
         dir="ltr"
@@ -897,29 +903,31 @@ export function FamilyTree({
       </svg>
       </div>
       </div>
-      <div className="tree-legend-panel">
-        <div className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-black/55 dark:text-white/55">
-          {t.tree.legend}
+      {showLegend && (
+        <div className="tree-legend-panel">
+          <div className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-black/55 dark:text-white/55">
+            {t.tree.legend}
+          </div>
+          <div className="tree-legend-grid text-xs text-black/65 dark:text-white/65">
+            <span className="tree-legend-item">
+              <i className="tree-legend-dot bg-[#8fb8de]" />
+              {t.form.male}
+            </span>
+            <span className="tree-legend-item">
+              <i className="tree-legend-dot bg-[#e6a4c4]" />
+              {t.form.female}
+            </span>
+            <span className="tree-legend-item">
+              <i className="tree-legend-divorced" />
+              {t.form.divorced}
+            </span>
+            <span className="tree-legend-item">
+              <i className="tree-legend-dot tree-legend-dot-dashed" />
+              {t.tree.deceased}
+            </span>
+          </div>
         </div>
-        <div className="tree-legend-grid text-xs text-black/65 dark:text-white/65">
-          <span className="tree-legend-item">
-            <i className="tree-legend-dot bg-[#8fb8de]" />
-            {t.form.male}
-          </span>
-          <span className="tree-legend-item">
-            <i className="tree-legend-dot bg-[#e6a4c4]" />
-            {t.form.female}
-          </span>
-          <span className="tree-legend-item">
-            <i className="tree-legend-divorced" />
-            {t.form.divorced}
-          </span>
-          <span className="tree-legend-item">
-            <i className="tree-legend-dot tree-legend-dot-dashed" />
-            {t.tree.deceased}
-          </span>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

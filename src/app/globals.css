@@ -61,11 +61,6 @@ html[dir="rtl"] .tree-zoom-button {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-html[dir="rtl"] .family-child-pill {
-  padding-top: 0;
-  padding-bottom: 0.5rem;
-}
-
 html[dir="rtl"] .delete-person-button {
   padding-block: 0.25rem !important;
 }
@@ -268,7 +263,8 @@ button:disabled {
   padding-bottom: 0.25rem;
 }
 
-.navbar-mobile-menu {
+.navbar-mobile-menu,
+.navbar-mobile-dropdown {
   display: none;
 }
 
@@ -278,7 +274,14 @@ button:disabled {
     display: none !important;
   }
 
-  button.navbar-mobile-menu,
+  button.navbar-mobile-menu {
+    display: flex;
+  }
+
+  .navbar-mobile-dropdown {
+    display: grid;
+  }
+
   ul.navbar-mobile-menu {
     display: flex;
   }
@@ -759,24 +762,86 @@ html.dark .person-form-save-new:disabled {
   background: color-mix(in srgb, var(--family-primary) 14%, transparent);
 }
 
-.family-parent-pill {
+.family-parent-plus-label {
+  display: inline-block;
+  transform: translateX(0.5px);
+}
+
+.home-deceased-root-pill {
+  position: relative;
+  border-color: transparent !important;
+  isolation: isolate;
+}
+
+.home-deceased-root-pill::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: repeating-conic-gradient(
+    from 0deg,
+    var(--pill-border-color) 0deg 18deg,
+    transparent 18deg 34deg
+  );
+  content: "";
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.home-deceased-root-pill > span {
+  position: relative;
+  z-index: 1;
+}
+
+.family-parent-pill,
+.family-child-pill {
   display: inline-flex;
   align-items: center;
 }
 
-.family-parent-label {
+.family-parent-label,
+.family-child-label {
   display: inline-block;
   text-align: center;
 }
 
-html[dir="rtl"] .family-parent-label {
-  transform: translateY(-3px);
+html[dir="rtl"] .family-parent-label,
+html[dir="rtl"] .family-child-label {
+  display: inline-block;
+  transform: translateY(-2px);
 }
 
-html[dir="rtl"] .family-parent-plus-label,
+html[dir="rtl"] .family-parent-pill,
+html[dir="rtl"] .family-child-pill {
+  padding-top: 0.375rem !important;
+  padding-bottom: 0.75rem !important;
+  padding-inline: 0.75rem !important;
+  line-height: 1.5 !important;
+}
+
+html[dir="rtl"] .urdu-content-pill {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.75rem !important;
+  line-height: 1.5 !important;
+}
+
 html[dir="rtl"] .family-child-count-label {
   display: inline-block;
-  transform: translateY(-3px);
+  transform: translate(0.5px, -3.8px);
+}
+
+html[dir="rtl"] .family-parent-plus,
+html[dir="rtl"] .family-parent-plus-label,
+html[dir="rtl"] .family-modal-parent-plus {
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+}
+
+html[dir="rtl"] .family-parent-plus-label {
+  display: inline-block;
+  transform: translate(0.5px, -1px) !important;
 }
 
 .family-empty-children {
@@ -921,7 +986,8 @@ html[dir="rtl"] .relation-path-label {
     transform: translateY(2px);
   }
 
-  html[dir="rtl"] .family-parent-label {
+  html[dir="rtl"] .family-parent-label,
+  html[dir="rtl"] .family-child-label {
     transform: translateY(-1px);
   }
 
@@ -932,15 +998,11 @@ html[dir="rtl"] .relation-path-label {
   .family-child-label {
     display: inline-block;
     text-align: center;
-    transform: translateY(4px);
   }
 
-  html:not([dir="rtl"]) .family-parent-label {
-    transform: translateY(0);
-  }
-
+  html:not([dir="rtl"]) .family-parent-label,
   html:not([dir="rtl"]) .family-child-label {
-    transform: translateY(1px);
+    transform: translateY(0);
   }
 
 }

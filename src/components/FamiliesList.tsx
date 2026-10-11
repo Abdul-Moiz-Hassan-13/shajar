@@ -91,8 +91,10 @@ export function FamiliesList({ families }: { families: Family[] }) {
   const graphBaseZoom = graphLayout && graphWidth > 0
     ? Math.min(
         0.95,
-        (graphWidth - 2) / (graphLayout.width + 40),
-        heightFit && heightFit.familyId === openFamily?.id ? heightFit.zoom : Infinity,
+        Math.min(
+          (graphWidth - 2) / (graphLayout.width + 40),
+          heightFit && heightFit.familyId === openFamily?.id ? heightFit.zoom : Infinity,
+        ) * 1.05,
       )
     : 0.95;
 
@@ -191,7 +193,7 @@ export function FamiliesList({ families }: { families: Family[] }) {
                     <Fragment key={p.id}>
                       {i > 0 && (
                         <span
-                          className="family-parent-plus flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold"
+                          className={`family-parent-plus flex h-7 w-7 items-center justify-center rounded-full text-sm ${locale === "ur" ? "font-bold" : "font-semibold"}`}
                           aria-hidden="true"
                         >
                           <span className="family-parent-plus-label">+</span>
@@ -199,13 +201,15 @@ export function FamiliesList({ families }: { families: Family[] }) {
                       )}
                       <Link
                         href={`/people/${p.id}`}
-                        style={genderTagStyle(p.gender)}
+                        style={{
+                          ...genderTagStyle(p.gender),
+                          ...(p.isDeceased ? { borderStyle: "dashed", borderWidth: "1.5px" } : {}),
+                        }}
                         dir={locale === "ur" ? "rtl" : "ltr"}
-                        className="family-parent-pill rounded-full border px-3 py-1 text-sm font-semibold transition hover:brightness-110"
+                        className={`urdu-content-pill family-parent-pill rounded-full border px-3 py-1 text-sm font-semibold transition hover:brightness-110 ${p.isDeceased ? "border-dashed" : ""}`}
                       >
                         <span className="family-parent-label">
                           {displayFullName(p, locale)}
-                          {p.isDeceased && " 🕊️"}
                         </span>
                       </Link>
                     </Fragment>
@@ -247,13 +251,15 @@ export function FamiliesList({ families }: { families: Family[] }) {
                           <Link
                             key={c.id}
                             href={`/people/${c.id}`}
-                            style={genderTagStyle(c.gender)}
+                            style={{
+                              ...genderTagStyle(c.gender),
+                              ...(c.isDeceased ? { borderStyle: "dashed", borderWidth: "1.5px" } : {}),
+                            }}
                             dir={locale === "ur" ? "rtl" : "ltr"}
-                            className="family-child-pill rounded-full border px-3 py-1 text-sm transition hover:-translate-y-0.5 hover:brightness-110 hover:shadow-sm"
+                            className={`urdu-content-pill family-child-pill rounded-full border px-3 py-1 text-sm transition hover:-translate-y-0.5 hover:brightness-110 hover:shadow-sm ${c.isDeceased ? "border-dashed" : ""}`}
                           >
                           <span className="family-child-label">
                             {displayFullName(c, locale)}
-                            {c.isDeceased && " 🕊️"}
                           </span>
                           </Link>
                       ))}
@@ -303,12 +309,15 @@ export function FamiliesList({ families }: { families: Family[] }) {
                 {parentsLeftToRight(openFamily.parents).map((parent, index) => (
                   <Fragment key={parent.id}>
                     {index > 0 && (
-                      <span className="text-sm text-black/35 dark:text-white/35">+</span>
+                      <span className={`family-modal-parent-plus text-sm text-black/35 dark:text-white/35 ${locale === "ur" ? "font-bold" : ""}`}>+</span>
                     )}
                     <span
-                      style={genderTagStyle(parent.gender)}
+                      style={{
+                        ...genderTagStyle(parent.gender),
+                        ...(parent.isDeceased ? { borderStyle: "dashed", borderWidth: "1.5px" } : {}),
+                      }}
                       dir={locale === "ur" ? "rtl" : "ltr"}
-                      className="rounded-full border px-3 py-1 text-sm font-medium"
+                      className={`family-parent-pill rounded-full border px-3 py-1 text-sm font-medium ${parent.isDeceased ? "border-dashed" : ""}`}
                     >
                       <span className="family-parent-label">
                         {displayFullName(parent, locale)}
@@ -362,6 +371,8 @@ export function FamiliesList({ families }: { families: Family[] }) {
                   people={graphPeople}
                   center
                   baseZoom={graphBaseZoom}
+                  showLegend={false}
+                  showToolbar={false}
                 />
               )}
             </div>

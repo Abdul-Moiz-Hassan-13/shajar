@@ -194,7 +194,7 @@ export function PeopleTable({ people }: { people: Person[] }) {
                   }}
                   className="relation-candidate flex w-full min-w-0 items-center justify-start rounded-lg px-2 py-1.5 text-start text-sm transition hover:bg-black/5 dark:hover:bg-white/10"
                 >
-                  <span style={genderTagStyle(p.gender)} className="max-w-full min-w-0 rounded-full border px-2.5 py-0.5 whitespace-normal break-words">
+                  <span style={genderTagStyle(p.gender)} className="urdu-content-pill max-w-full min-w-0 rounded-full border px-2.5 py-0.5 whitespace-normal break-words">
                     {displayFullName(p, locale)}
                   </span>
                 </button>
@@ -232,7 +232,7 @@ export function PeopleTable({ people }: { people: Person[] }) {
                     className="people-person-card flex cursor-pointer flex-col gap-3 rounded-2xl border p-4 text-sm transition"
               >
                 <div className="people-mobile-card-heading flex items-center justify-between gap-2">
-                  <span style={genderTagStyle(p.gender)} className="rounded-full border px-3 py-1 font-semibold">
+                  <span style={genderTagStyle(p.gender)} className="urdu-content-pill rounded-full border px-3 py-1 font-semibold">
                     {displayFullName(p, locale)}
                   </span>
                   {p.isDeceased && <span className="people-mobile-deceased-icon" aria-label={t.people.colDeceased}>🕊️</span>}
@@ -293,7 +293,7 @@ export function PeopleTable({ people }: { people: Person[] }) {
                     className="people-table-row cursor-pointer border-b border-black/5 last:border-0 dark:border-white/5"
                   >
                     <td className="break-words px-4 py-2">
-                      <span style={genderTagStyle(p.gender)} className="inline-flex rounded-full border px-3 py-1 font-medium">
+                      <span style={genderTagStyle(p.gender)} className="urdu-content-pill inline-flex rounded-full border px-3 py-1 font-medium">
                         {displayFullName(p, locale)}
                       </span>
                     </td>
