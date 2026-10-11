@@ -431,6 +431,18 @@ button:disabled {
     display: flex;
   }
 
+  html[dir="rtl"] .people-mobile-card-heading {
+    direction: rtl;
+  }
+
+  .people-mobile-deceased-icon {
+    transform: translateY(-14px);
+  }
+
+  html:not([dir="rtl"]) .people-mobile-deceased-icon {
+    transform: translateY(-8px);
+  }
+
   .people-table-frame {
     display: none;
   }

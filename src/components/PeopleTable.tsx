@@ -231,11 +231,11 @@ export function PeopleTable({ people }: { people: Person[] }) {
                 style={{ borderColor: `color-mix(in srgb, ${p.gender === "male" ? "#8fb8de" : p.gender === "female" ? "#e6a4c4" : "var(--foreground)"} 35%, transparent)` }}
                     className="people-person-card flex cursor-pointer flex-col gap-3 rounded-2xl border p-4 text-sm transition"
               >
-                <div className="flex items-center justify-between gap-2">
+                <div className="people-mobile-card-heading flex items-center justify-between gap-2">
                   <span style={genderTagStyle(p.gender)} className="rounded-full border px-3 py-1 font-semibold">
                     {displayFullName(p, locale)}
                   </span>
-                  {p.isDeceased && <span aria-label={t.people.colDeceased}>🕊️</span>}
+                  {p.isDeceased && <span className="people-mobile-deceased-icon" aria-label={t.people.colDeceased}>🕊️</span>}
                 </div>
                 <div>
                   <span className="text-xs uppercase tracking-wide text-black/50 dark:text-white/50">
