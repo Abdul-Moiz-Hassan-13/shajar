@@ -805,9 +805,9 @@ html[dir="rtl"] .family-graph-position-label {
   transform: translateY(-4px);
 }
 
-html[dir="rtl"] .tree-export-label {
+html[dir="rtl"] .tree-toolbar-label {
   display: inline-block;
-  transform: translateY(-5px);
+  transform: translateY(0);
 }
 
 html[dir="rtl"] .family-modal-close-label {
@@ -839,6 +839,14 @@ html[dir="rtl"] .home-root-tag-label {
 
   html[dir="rtl"] .home-root-tag-label {
     transform: translateY(-3px);
+  }
+}
+
+@media (max-width: 767px) {
+  .home-map-label {
+    display: inline-flex;
+    line-height: 1 !important;
+    transform: none !important;
   }
 }
 

@@ -837,7 +837,7 @@ export function FamilyTree({
               }}
               className="flex h-12 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-black/15 px-3 text-xs dark:border-white/20"
             >
-              {t.tree.resetZoom}
+              <span className="tree-toolbar-label">{t.tree.resetZoom}</span>
             </button>
           )}
           <button
@@ -846,7 +846,7 @@ export function FamilyTree({
             disabled={isExporting}
             className="tree-export-button flex h-12 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-black/15 px-3 text-xs disabled:opacity-40 dark:border-white/20"
           >
-            <span className="tree-export-label">
+            <span className="tree-toolbar-label">
               {isExporting ? t.tree.exporting : t.tree.exportImage}
             </span>
           </button>
