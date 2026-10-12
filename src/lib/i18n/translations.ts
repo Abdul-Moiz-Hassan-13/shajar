@@ -227,7 +227,7 @@ const en: TranslationDict = {
     emptyTagline:
       "Every family tree starts with a single name. Plant yours and watch the branches grow.",
     plantSeed: "Plant the first seed 🌱",
-    welcomeBack: "Welcome back",
+    welcomeBack: "Welcome back!",
     subtitle: (people, generations) =>
       `${people} ${people === 1 ? "story" : "stories"} across ${generations} ${
         generations === 1 ? "generation" : "generations"
@@ -396,7 +396,7 @@ const ur: TranslationDict = {
     emptyTagline:
       "ہر خاندانی شجرہ ایک نام سے شروع ہوتا ہے۔ اپنا نام لگائیں اور شاخوں کو بڑھتے دیکھیں۔",
     plantSeed: "پہلا بیج لگائیں 🌱",
-    welcomeBack: "خوش آمدید",
+    welcomeBack: "خوش آمدید!",
     subtitle: (people, generations) =>
       `${toUrduDigits(generations)} ${
         generations === 1 ? "نسل" : "نسلوں"

@@ -47,7 +47,7 @@ export function DeletePersonButton({
           setConfirmOpen(true);
         }}
         disabled={deleting}
-        className={`delete-person-button rounded-xl border border-red-700 bg-red-600 px-4 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50 dark:border-red-500 dark:bg-red-500 dark:hover:bg-red-600 ${
+        className={`delete-person-button rounded-lg border border-red-700 bg-red-600 px-4 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50 dark:border-red-600 dark:bg-red-600 dark:hover:bg-red-700 ${
           compact ? "py-1.5" : "py-2.5"
         }`}
       >
@@ -95,7 +95,7 @@ export function DeletePersonButton({
                 type="button"
                 onClick={handleDelete}
                 disabled={deleting}
-                className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50 dark:bg-red-500 dark:hover:bg-red-600"
+                className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50 dark:bg-red-600 dark:hover:bg-red-700"
               >
                 {deleting ? t.deletePerson.deleting : t.deletePerson.delete}
               </button>

@@ -55,8 +55,8 @@ export function HomeContent({
   ];
 
   return (
-    <div className="flex flex-col gap-12">
-      <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-gradient-to-br from-emerald-500/10 via-transparent to-teal-400/10 px-8 py-14 dark:border-white/10">
+    <div className="home-content -mt-2 flex flex-col gap-8">
+      <div className="home-welcome-panel relative overflow-hidden rounded-3xl border border-black/10 bg-gradient-to-br from-emerald-500/10 via-transparent to-teal-400/10 px-6 py-4 dark:border-white/10">
         <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-emerald-400/20 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-teal-400/20 blur-3xl" />
         <div className="relative flex flex-col items-center gap-2 text-center">
@@ -69,14 +69,14 @@ export function HomeContent({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="home-stats-grid grid grid-cols-2 gap-3 sm:grid-cols-4">
         {stats.map((s) => (
           <div
             key={s.label}
-            className="flex flex-col items-center gap-1 rounded-xl border border-black/10 py-6 dark:border-white/10"
+            className="home-stat-card flex flex-col items-center gap-0 rounded-xl border border-black/10 py-0 dark:border-white/10"
           >
-            <span className="text-2xl">{s.icon}</span>
-            <span className="text-2xl font-bold">{localizeNumber(s.value, locale)}</span>
+            <span className="text-xl">{s.icon}</span>
+            <span className="text-xl font-bold">{localizeNumber(s.value, locale)}</span>
             <span className="text-xs uppercase tracking-wide text-black/50 dark:text-white/50">
               {s.label}
             </span>
@@ -84,12 +84,12 @@ export function HomeContent({
         ))}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="home-actions-grid grid gap-3 sm:grid-cols-2">
         <Link
           href="/tree"
-          className={`group rounded-xl border transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 ${isAdmin
-            ? "flex flex-col gap-2 border-black/10 bg-gradient-to-br from-emerald-500/5 to-transparent p-6 hover:border-emerald-500/40 dark:border-white/10"
-            : "flex items-center justify-between gap-4 border-emerald-500/25 bg-gradient-to-r from-emerald-500/10 via-teal-400/5 to-transparent p-6 hover:border-emerald-500/60 hover:from-emerald-500/15 dark:border-emerald-400/25 sm:col-span-2 sm:p-8"
+          className={`home-action-card group rounded-xl border transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 ${isAdmin
+            ? "flex flex-col gap-2 border-black/10 bg-gradient-to-br from-emerald-500/5 to-transparent p-3 hover:border-emerald-500/40 dark:border-white/10"
+            : "flex items-center justify-between gap-4 border-emerald-500/25 bg-gradient-to-r from-emerald-500/10 via-teal-400/5 to-transparent p-3 hover:border-emerald-500/60 hover:from-emerald-500/15 dark:border-emerald-400/25 sm:col-span-2 sm:p-4"
           }`}
         >
           {isAdmin ? (
@@ -128,7 +128,7 @@ export function HomeContent({
         {isAdmin && (
           <Link
             href="/people/new"
-            className="group flex flex-col gap-2 rounded-xl border border-black/10 bg-gradient-to-br from-teal-400/5 to-transparent p-6 transition hover:border-teal-400/40 dark:border-white/10"
+            className="home-action-card group flex flex-col gap-2 rounded-xl border border-black/10 bg-gradient-to-br from-teal-400/5 to-transparent p-3 transition hover:border-teal-400/40 dark:border-white/10"
           >
             <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-400/15 text-2xl" aria-hidden="true">
               <span className="home-add-label">➕</span>

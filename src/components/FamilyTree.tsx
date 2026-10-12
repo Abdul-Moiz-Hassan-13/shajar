@@ -652,7 +652,7 @@ export function FamilyTree({
                   cy={NODE_HEIGHT / 2}
                   r={NODE_WIDTH / 2}
                   fill={GENDER_COLOR[node.person.gender]}
-                  fillOpacity={node.person.isDeceased ? 0.08 : 0.18}
+                  fillOpacity={0.18}
                   stroke={GENDER_COLOR[node.person.gender]}
                   strokeWidth={1.5}
                   strokeDasharray={

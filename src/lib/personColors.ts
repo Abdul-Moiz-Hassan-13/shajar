@@ -1,4 +1,5 @@
 import type { Gender } from "./types";
+import type { CSSProperties } from "react";
 
 export const GENDER_COLOR: Record<Gender, string> = {
   female: "#e6a4c4",
@@ -6,10 +7,12 @@ export const GENDER_COLOR: Record<Gender, string> = {
   other: "#c9c2e8",
 };
 
-export function genderTagStyle(gender: Gender) {
+export function genderTagStyle(gender: Gender): CSSProperties {
   const color = GENDER_COLOR[gender];
   return {
-    borderColor: color,
-    backgroundColor: `${color}26`,
+    "--gender-pill-color": color,
+    borderColor: "var(--gender-pill-color)",
+    backgroundColor:
+      "color-mix(in srgb, var(--gender-pill-color) var(--gender-pill-opacity), transparent)",
   };
 }
