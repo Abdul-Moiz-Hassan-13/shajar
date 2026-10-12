@@ -60,7 +60,7 @@ export function HomeContent({
         <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-emerald-400/20 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-teal-400/20 blur-3xl" />
         <div className="relative flex flex-col items-center gap-2 text-center">
-          <span className="text-3xl font-bold tracking-tight text-emerald-500">
+          <span className="home-welcome-title text-3xl font-bold tracking-tight text-emerald-500">
             {t.home.welcomeBack}
           </span>
           <p className="max-w-md text-lg text-black/70 dark:text-white/70">
