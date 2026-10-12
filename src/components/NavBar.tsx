@@ -185,12 +185,12 @@ export function NavBar() {
                   <button
                     type="button"
                     onClick={() => {
-                      logout();
+                      toggleAdminPreview();
                       setMenuOpen(false);
                     }}
-                    className="block w-full rounded-md px-3 py-2 text-left text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+                    className="admin-preview-toggle block w-full rounded-md px-3 py-2 text-left text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
                   >
-                    {t.auth.logout}
+                    {isPreviewingNonAdmin ? t.auth.viewAsAdmin : t.auth.viewAsNonAdmin}
                   </button>
                 </li>
               )}
@@ -199,12 +199,12 @@ export function NavBar() {
                   <button
                     type="button"
                     onClick={() => {
-                      toggleAdminPreview();
+                      logout();
                       setMenuOpen(false);
                     }}
-                    className="admin-preview-toggle block w-full rounded-md px-3 py-2 text-left text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+                    className="block w-full rounded-md px-3 py-2 text-left text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
                   >
-                    {isPreviewingNonAdmin ? t.auth.viewAsAdmin : t.auth.viewAsNonAdmin}
+                    {t.auth.logout}
                   </button>
                 </li>
               )}

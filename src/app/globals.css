@@ -102,7 +102,7 @@ html[dir="rtl"] .navbar-pill {
 }
 
 html[dir="rtl"] .admin-preview-toggle svg {
-  transform: translateY(3px);
+  transform: translateY(4px);
 }
 
 @media (max-width: 640px) {
@@ -436,14 +436,6 @@ button:disabled {
 
   html[dir="rtl"] .people-mobile-card-heading {
     direction: rtl;
-  }
-
-  .people-mobile-deceased-icon {
-    transform: translateY(-14px);
-  }
-
-  html:not([dir="rtl"]) .people-mobile-deceased-icon {
-    transform: translateY(-8px);
   }
 
   .people-table-frame {
@@ -841,7 +833,7 @@ html[dir="rtl"] .family-modal-parent-plus {
 
 html[dir="rtl"] .family-parent-plus-label {
   display: inline-block;
-  transform: translate(0.5px, -1px) !important;
+  transform: translate(0.5px, 0) !important;
 }
 
 .family-empty-children {
@@ -879,6 +871,31 @@ html[dir="rtl"] .family-parent-plus-label {
 
 html[dir="rtl"] .family-graph-arrow-icon {
   transform: translateY(-6px);
+}
+
+html[dir="ltr"] .family-graph-arrow-icon {
+  display: inline-block;
+  line-height: 1 !important;
+  position: relative;
+  top: -2px;
+}
+
+@media (max-width: 640px) {
+  html[dir="rtl"] .family-graph-arrow-icon,
+  html[dir="ltr"] .family-graph-arrow-icon {
+    display: inline-block;
+    line-height: 1 !important;
+    position: relative;
+    top: -12px;
+  }
+
+  html[dir="ltr"] .family-graph-arrow-icon {
+    top: -4px;
+  }
+
+  html[dir="rtl"] .family-graph-arrow-icon {
+    top: -3px;
+  }
 }
 
 html[dir="rtl"] .family-graph-position-label {

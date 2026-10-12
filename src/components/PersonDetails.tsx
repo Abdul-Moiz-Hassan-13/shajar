@@ -32,7 +32,7 @@ export function PersonDetails({ person, people }: { person: Person; people: Pers
         <h1 className="text-2xl font-bold tracking-tight">
           {displayFullName(person, locale)}
         </h1>
-        {person.isDeceased && <p className="mt-1 text-sm text-black/60 dark:text-white/60">🕊️ {t.people.colDeceased}</p>}
+        {person.isDeceased && <p className="mt-1 text-sm text-black/60 dark:text-white/60">{t.people.colDeceased}</p>}
       </div>
 
       <div className="person-details-grid grid gap-4 sm:grid-cols-2">

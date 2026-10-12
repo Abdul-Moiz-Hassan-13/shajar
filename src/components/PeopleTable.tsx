@@ -85,6 +85,9 @@ export function PeopleTable({ people }: { people: Person[] }) {
     function closeOnOutsidePointer(event: PointerEvent) {
       if (!(event.target instanceof Element)) return;
       if (event.target.closest(".admin-preview-toggle")) return;
+      // Keep the picker open while a navigation link starts its route change.
+      // The People page will unmount after navigation completes.
+      if (event.target.closest("a[href]")) return;
       if (!event.target.closest(".people-name-picker")) setOpenPicker(false);
     }
     document.addEventListener("pointerdown", closeOnOutsidePointer, true);
@@ -164,7 +167,6 @@ export function PeopleTable({ people }: { people: Person[] }) {
               if (event.key === "Enter" && filtered.length > 0) {
                 event.preventDefault();
                 rememberScroll();
-                setOpenPicker(false);
                 navigateToPerson(filtered[0].id);
               }
             }}
@@ -189,12 +191,11 @@ export function PeopleTable({ people }: { people: Person[] }) {
                   type="button"
                   onClick={() => {
                     rememberScroll();
-                    setOpenPicker(false);
                     navigateToPerson(p.id);
                   }}
                   className="relation-candidate flex w-full min-w-0 items-center justify-start rounded-lg px-2 py-1.5 text-start text-sm transition hover:bg-black/5 dark:hover:bg-white/10"
                 >
-                  <span style={genderTagStyle(p.gender)} className="urdu-content-pill max-w-full min-w-0 rounded-full border px-2.5 py-0.5 whitespace-normal break-words">
+                  <span style={{ ...genderTagStyle(p.gender), ...(p.isDeceased ? { borderStyle: "dashed", borderWidth: "1.5px" } : {}) }} className={`urdu-content-pill max-w-full min-w-0 rounded-full border px-2.5 py-0.5 whitespace-normal break-words ${p.isDeceased ? "border-dashed" : ""}`}>
                     {displayFullName(p, locale)}
                   </span>
                 </button>
@@ -232,10 +233,9 @@ export function PeopleTable({ people }: { people: Person[] }) {
                     className="people-person-card flex cursor-pointer flex-col gap-3 rounded-2xl border p-4 text-sm transition"
               >
                 <div className="people-mobile-card-heading flex items-center justify-between gap-2">
-                  <span style={genderTagStyle(p.gender)} className="urdu-content-pill rounded-full border px-3 py-1 font-semibold">
+                  <span style={{ ...genderTagStyle(p.gender), ...(p.isDeceased ? { borderStyle: "dashed", borderWidth: "1.5px" } : {}) }} className={`urdu-content-pill rounded-full border px-3 py-1 font-semibold ${p.isDeceased ? "border-dashed" : ""}`}>
                     {displayFullName(p, locale)}
                   </span>
-                  {p.isDeceased && <span className="people-mobile-deceased-icon" aria-label={t.people.colDeceased}>🕊️</span>}
                 </div>
                 <div>
                   <span className="text-xs uppercase tracking-wide text-black/50 dark:text-white/50">
@@ -293,7 +293,7 @@ export function PeopleTable({ people }: { people: Person[] }) {
                     className="people-table-row cursor-pointer border-b border-black/5 last:border-0 dark:border-white/5"
                   >
                     <td className="break-words px-4 py-2">
-                      <span style={genderTagStyle(p.gender)} className="urdu-content-pill inline-flex rounded-full border px-3 py-1 font-medium">
+                      <span style={{ ...genderTagStyle(p.gender), ...(p.isDeceased ? { borderStyle: "dashed", borderWidth: "1.5px" } : {}) }} className={`urdu-content-pill inline-flex rounded-full border px-3 py-1 font-medium ${p.isDeceased ? "border-dashed" : ""}`}>
                         {displayFullName(p, locale)}
                       </span>
                     </td>

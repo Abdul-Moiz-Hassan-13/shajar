@@ -146,6 +146,7 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
             <input
               type="search"
               value={displayedQueryA}
+              onFocus={() => setOpenA(true)}
               onChange={(e) => {
                 setQueryA(e.target.value);
                 setIdA("");
@@ -212,6 +213,7 @@ export function RelationshipFinder({ people }: { people: Person[] }) {
             <input
               type="search"
               value={displayedQueryB}
+              onFocus={() => setOpenB(true)}
               onChange={(e) => {
                 setQueryB(e.target.value);
                 setIdB("");

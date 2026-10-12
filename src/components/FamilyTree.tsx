@@ -708,22 +708,6 @@ export function FamilyTree({
                   />
                 </foreignObject>
               )}
-              {node.person.isDeceased && (
-                <g transform={`translate(${NODE_WIDTH - 20}, 20)`}>
-                  <circle
-                    r={12}
-                    className="fill-white stroke-black/20 dark:fill-neutral-900 dark:stroke-white/30"
-                    strokeWidth={1}
-                  />
-                  <text
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    fontSize={13}
-                  >
-                    🕊️
-                  </text>
-                </g>
-              )}
             </g>
           );
         })}
