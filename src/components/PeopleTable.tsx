@@ -25,7 +25,7 @@ function personPills(ids: string[], byId: Map<string, Person>, locale: Locale): 
         <span
           key={person.id}
           style={{ ...genderTagStyle(person.gender), ...(person.isDeceased ? { borderStyle: "dashed", borderWidth: "1.5px" } : {}) }}
-          className={`urdu-content-pill inline-flex rounded-full border px-2.5 py-0.5 text-xs ${person.isDeceased ? "border-dashed" : ""}`}
+          className={`people-relation-pill urdu-content-pill inline-flex rounded-full border px-3 py-1 text-sm ${person.isDeceased ? "border-dashed" : ""}`}
         >
           {displayFullName(person, locale)}
         </span>

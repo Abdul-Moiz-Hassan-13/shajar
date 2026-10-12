@@ -206,7 +206,7 @@ export function FamiliesList({ families }: { families: Family[] }) {
                           ...(p.isDeceased ? { borderStyle: "dashed", borderWidth: "1.5px" } : {}),
                         }}
                         dir={locale === "ur" ? "rtl" : "ltr"}
-                        className={`urdu-content-pill family-parent-pill rounded-full border px-3 py-1 text-sm font-semibold transition hover:brightness-110 ${p.isDeceased ? "border-dashed" : ""}`}
+                        className={`urdu-content-pill family-parent-pill rounded-full border px-3 py-1 text-sm transition hover:brightness-110 ${p.isDeceased ? "border-dashed" : ""}`}
                       >
                         <span className="family-parent-label">
                           {displayFullName(p, locale)}

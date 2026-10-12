@@ -408,6 +408,31 @@ button:disabled {
   background: color-mix(in srgb, var(--foreground) 1.5%, transparent);
 }
 
+.people-relation-pill,
+.people-mobile-card-heading > .urdu-content-pill {
+  box-sizing: border-box;
+  min-height: 2rem;
+  padding-block: 0.25rem !important;
+  line-height: 1.5 !important;
+}
+
+@media (min-width: 725px) {
+  .people-relation-pill {
+    min-height: 0;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0;
+    background: transparent !important;
+  }
+
+  .people-table th:nth-child(3),
+  .people-table td:nth-child(3),
+  .people-table th:nth-child(4),
+  .people-table td:nth-child(4) {
+    padding-left: 4rem;
+  }
+}
+
 .people-person-card:hover {
   border-color: color-mix(in srgb, var(--foreground) 28%, transparent) !important;
   box-shadow: 0 10px 24px rgb(0 0 0 / 0.07);
@@ -828,6 +853,11 @@ html.dark .person-form-save-new:disabled {
 .family-child-pill {
   display: inline-flex;
   align-items: center;
+  box-sizing: border-box;
+  min-height: 2rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.25;
 }
 
 .family-parent-label,
