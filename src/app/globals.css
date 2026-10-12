@@ -416,6 +416,12 @@ button:disabled {
   line-height: 1.5 !important;
 }
 
+@media (max-width: 724px) {
+  .people-parent-comma {
+    display: none;
+  }
+}
+
 @media (min-width: 725px) {
   .people-relation-pill {
     min-height: 0;
@@ -423,6 +429,12 @@ button:disabled {
     border: 0 !important;
     border-radius: 0;
     background: transparent !important;
+    text-decoration: none;
+  }
+
+  .people-relation-pill:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
   }
 
   .people-table th:nth-child(3),

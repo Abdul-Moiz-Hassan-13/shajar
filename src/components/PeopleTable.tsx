@@ -16,18 +16,29 @@ function fullName(p: Person): string {
   return `${p.firstName} ${p.lastName}`.trim();
 }
 
-function personPills(ids: string[], byId: Map<string, Person>, locale: Locale): ReactNode {
+function personPills(
+  ids: string[],
+  byId: Map<string, Person>,
+  locale: Locale,
+  commaSeparated = false,
+): ReactNode {
   const found = ids.map((id) => byId.get(id)).filter(Boolean) as Person[];
   if (found.length === 0) return "-";
   return (
     <span className="flex flex-wrap gap-1.5">
-      {found.map((person) => (
-        <span
-          key={person.id}
-          style={{ ...genderTagStyle(person.gender), ...(person.isDeceased ? { borderStyle: "dashed", borderWidth: "1.5px" } : {}) }}
-          className={`people-relation-pill urdu-content-pill inline-flex rounded-full border px-3 py-1 text-sm ${person.isDeceased ? "border-dashed" : ""}`}
-        >
-          {displayFullName(person, locale)}
+      {found.map((person, index) => (
+        <span key={person.id} className="inline-flex items-center">
+          <Link
+            href={`/people/${person.id}`}
+            onClick={(event) => event.stopPropagation()}
+            style={{ ...genderTagStyle(person.gender), ...(person.isDeceased ? { borderStyle: "dashed", borderWidth: "1.5px" } : {}) }}
+            className={`people-relation-pill urdu-content-pill inline-flex rounded-full border px-3 py-1 text-sm ${person.isDeceased ? "border-dashed" : ""}`}
+          >
+            {displayFullName(person, locale)}
+          </Link>
+          {commaSeparated && index < found.length - 1 && (
+            <span className="people-parent-comma" aria-hidden="true">,</span>
+          )}
         </span>
       ))}
     </span>
@@ -246,7 +257,7 @@ export function PeopleTable({ people }: { people: Person[] }) {
                   <span className="text-xs uppercase tracking-wide text-black/50 dark:text-white/50">
                     {t.people.colParents}
                   </span>
-                  <p>{personPills(p.parentIds, byId, locale)}</p>
+                  <p>{personPills(p.parentIds, byId, locale, true)}</p>
                 </div>
                 <div>
                   <span className="text-xs uppercase tracking-wide text-black/50 dark:text-white/50">
@@ -303,7 +314,7 @@ export function PeopleTable({ people }: { people: Person[] }) {
                       </span>
                     </td>
                     <td className="break-words px-4 py-2">{p.isDeceased ? t.people.yes : "-"}</td>
-                    <td className="break-words px-4 py-2">{personPills(p.parentIds, byId, locale)}</td>
+                    <td className="break-words px-4 py-2">{personPills(p.parentIds, byId, locale, true)}</td>
                     <td className="break-words px-4 py-2">{personPills(currentSpouseIds(p, byId), byId, locale)}</td>
                     {isAdmin && (
                       <td className="px-4 py-2">
