@@ -9,11 +9,13 @@ export function NavigationProgressBar() {
   const [progress, setProgress] = useState(0);
   const [visible, setVisible] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const completeTimerRef = useRef<NodeJS.Timeout | null>(null);
   const activeNavRef = useRef(false);
 
   function start() {
     activeNavRef.current = true;
     if (timerRef.current) clearInterval(timerRef.current);
+    if (completeTimerRef.current) clearTimeout(completeTimerRef.current);
     setProgress(18);
     setVisible(true);
 
@@ -24,11 +26,13 @@ export function NavigationProgressBar() {
         return Math.min(85, prev + diff);
       });
     }, 120);
+    completeTimerRef.current = setTimeout(complete, 1800);
   }
 
   function complete() {
     activeNavRef.current = false;
     if (timerRef.current) clearInterval(timerRef.current);
+    if (completeTimerRef.current) clearTimeout(completeTimerRef.current);
     setProgress(100);
     setTimeout(() => {
       setVisible(false);
@@ -93,6 +97,7 @@ export function NavigationProgressBar() {
       window.removeEventListener("click", handleClick, { capture: true });
       window.removeEventListener("popstate", handlePopState);
       if (timerRef.current) clearInterval(timerRef.current);
+      if (completeTimerRef.current) clearTimeout(completeTimerRef.current);
     };
   }, []);
 

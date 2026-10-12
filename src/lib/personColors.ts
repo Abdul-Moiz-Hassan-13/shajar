@@ -14,5 +14,5 @@ export function genderTagStyle(gender: Gender): CSSProperties {
     borderColor: "var(--gender-pill-color)",
     backgroundColor:
       "color-mix(in srgb, var(--gender-pill-color) var(--gender-pill-opacity), transparent)",
-  };
+  } as CSSProperties;
 }

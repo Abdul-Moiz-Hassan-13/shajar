@@ -37,7 +37,7 @@ export function HomeContent({
           {isAdmin && (
             <Link
               href="/people/new"
-              className="rounded-full bg-black px-6 py-3 text-sm font-medium text-white shadow-lg shadow-black/10 transition hover:scale-105 dark:bg-white dark:text-black"
+              className="rounded-lg bg-black px-6 py-3 text-sm font-medium text-white shadow-lg shadow-black/10 transition hover:scale-105 dark:bg-white dark:text-black"
             >
               {t.home.plantSeed}
             </Link>

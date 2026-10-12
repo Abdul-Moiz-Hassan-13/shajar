@@ -14,7 +14,7 @@ export function TreeHeader() {
       {isAdmin && (
         <Link
           href="/people/new"
-          className="tree-add-button rounded-xl bg-black px-4 py-2 text-sm font-medium text-white transition dark:bg-white dark:text-black"
+          className="tree-add-button rounded-lg bg-black px-4 py-2 text-sm font-medium text-white transition dark:bg-white dark:text-black"
         >
           <span className="urdu-add-person-label">{t.people.addPerson}</span>
         </Link>

@@ -3,14 +3,14 @@
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/components/LanguageProvider";
 
-export function PersonFormBackButton() {
+export function PersonFormBackButton({ returnTo }: { returnTo?: string }) {
   const router = useRouter();
   const { t, locale } = useLanguage();
 
   return (
     <button
       type="button"
-      onClick={() => router.back()}
+      onClick={() => (returnTo ? router.push(returnTo) : router.back())}
       aria-label={t.people.backToPeople}
       title={t.people.backToPeople}
       className="person-form-back relative self-start rounded-xl border border-black/15 p-2.5 text-sm font-medium transition md:absolute md:start-0 md:top-0 dark:border-white/20"

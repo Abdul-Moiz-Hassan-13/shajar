@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { DeletePersonButton } from "@/components/DeletePersonButton";
 import { useLanguage } from "@/components/LanguageProvider";
@@ -15,26 +16,30 @@ function fullName(p: Person): string {
   return `${p.firstName} ${p.lastName}`.trim();
 }
 
-function names(ids: string[], byId: Map<string, Person>, locale: Locale): string {
+function personPills(ids: string[], byId: Map<string, Person>, locale: Locale): ReactNode {
   const found = ids.map((id) => byId.get(id)).filter(Boolean) as Person[];
   if (found.length === 0) return "-";
-  return found.map((p) => displayFullName(p, locale)).join(", ");
+  return (
+    <span className="flex flex-wrap gap-1.5">
+      {found.map((person) => (
+        <span
+          key={person.id}
+          style={{ ...genderTagStyle(person.gender), ...(person.isDeceased ? { borderStyle: "dashed", borderWidth: "1.5px" } : {}) }}
+          className={`urdu-content-pill inline-flex rounded-full border px-2.5 py-0.5 text-xs ${person.isDeceased ? "border-dashed" : ""}`}
+        >
+          {displayFullName(person, locale)}
+        </span>
+      ))}
+    </span>
+  );
 }
 
-/** Only the current, living, non-divorced spouse(s) - not a deceased or
- * divorced former spouse. */
-function currentSpouseNames(
-  p: Person,
-  byId: Map<string, Person>,
-  locale: Locale,
-): string {
+function currentSpouseIds(p: Person, byId: Map<string, Person>): string[] {
   const divorced = new Set(p.divorcedSpouseIds ?? []);
-  const found = p.spouseIds
-    .filter((id) => !divorced.has(id))
-    .map((id) => byId.get(id))
-    .filter((sp): sp is Person => sp !== undefined && !sp.isDeceased);
-  if (found.length === 0) return "-";
-  return found.map((sp) => displayFullName(sp, locale)).join(", ");
+  return p.spouseIds.filter((id) => {
+    const spouse = byId.get(id);
+    return spouse !== undefined && !divorced.has(id) && !spouse.isDeceased;
+  });
 }
 
 export function PeopleTable({ people }: { people: Person[] }) {
@@ -241,13 +246,13 @@ export function PeopleTable({ people }: { people: Person[] }) {
                   <span className="text-xs uppercase tracking-wide text-black/50 dark:text-white/50">
                     {t.people.colParents}
                   </span>
-                  <p>{names(p.parentIds, byId, locale)}</p>
+                  <p>{personPills(p.parentIds, byId, locale)}</p>
                 </div>
                 <div>
                   <span className="text-xs uppercase tracking-wide text-black/50 dark:text-white/50">
                     {t.people.colSpouses}
                   </span>
-                  <p>{currentSpouseNames(p, byId, locale)}</p>
+                  <p>{personPills(currentSpouseIds(p, byId), byId, locale)}</p>
                 </div>
                 {isAdmin && (
                   <div className="flex items-center gap-3 pt-1">
@@ -298,8 +303,8 @@ export function PeopleTable({ people }: { people: Person[] }) {
                       </span>
                     </td>
                     <td className="break-words px-4 py-2">{p.isDeceased ? t.people.yes : "-"}</td>
-                    <td className="break-words px-4 py-2">{names(p.parentIds, byId, locale)}</td>
-                    <td className="break-words px-4 py-2">{currentSpouseNames(p, byId, locale)}</td>
+                    <td className="break-words px-4 py-2">{personPills(p.parentIds, byId, locale)}</td>
+                    <td className="break-words px-4 py-2">{personPills(currentSpouseIds(p, byId), byId, locale)}</td>
                     {isAdmin && (
                       <td className="px-4 py-2">
                         <div className="flex items-center gap-3">

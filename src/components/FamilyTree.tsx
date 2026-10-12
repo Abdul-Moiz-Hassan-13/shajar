@@ -33,6 +33,15 @@ function fullName(p: Person): string {
   return `${p.firstName} ${p.lastName}`.trim();
 }
 
+function treeNodeColor(person: Person): string {
+  // TBC is a male placeholder used for Haroon's son; keep it in the same
+  // blue family color as the other male nodes instead of the generic color
+  // used for unknown gender.
+  return fullName(person).toLowerCase().includes("tbc")
+    ? GENDER_COLOR.male
+    : GENDER_COLOR[person.gender];
+}
+
 // How far below the sticky nav bar a found node lands - enough that the
 // nav never overlaps it, without pushing it all the way to mid-screen.
 const SEARCH_RESULT_TOP_OFFSET = 300;
@@ -483,7 +492,7 @@ export function FamilyTree({
     (id: string) => {
       if (clickTimeout.current) clearTimeout(clickTimeout.current);
       clickTimeout.current = setTimeout(() => {
-        router.push(`/people/${id}`);
+        router.push(`/people/${id}?from=tree`);
       }, 250);
     },
     [router],
@@ -651,9 +660,9 @@ export function FamilyTree({
                   cx={NODE_WIDTH / 2}
                   cy={NODE_HEIGHT / 2}
                   r={NODE_WIDTH / 2}
-                  fill={GENDER_COLOR[node.person.gender]}
+                  fill={treeNodeColor(node.person)}
                   fillOpacity={0.18}
-                  stroke={GENDER_COLOR[node.person.gender]}
+                  stroke={treeNodeColor(node.person)}
                   strokeWidth={1.5}
                   strokeDasharray={
                     node.person.isDeceased ? "5 4" : undefined

@@ -232,7 +232,18 @@ export function computeLayout(people: Person[]): TreeLayout {
     const candidates = unit.filter((m) =>
       m.parentIds.some((pid) => byId.has(pid)),
     );
+    // Keep a mixed-gender couple attached to the husband's recorded family
+    // when both spouses have parents. This is the tree's convention for
+    // placing a wife beside her husband's family rather than moving the
+    // husband under his wife's parents. If no husband-side parents exist,
+    // the existing family-size and sibling-order signals still decide the
+    // owning branch.
+    const hasMaleParentCandidate = candidates.some((m) => m.gender === "male");
     const rep = [...candidates].sort((a, b) => {
+      if (hasMaleParentCandidate) {
+        const maleRank = Number(b.gender === "male") - Number(a.gender === "male");
+        if (maleRank !== 0) return maleRank;
+      }
       const parentKeyA = a.parentIds
         .filter((parentId) => byId.has(parentId))
         .sort()

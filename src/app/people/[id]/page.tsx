@@ -8,10 +8,12 @@ import { getAllPeople, getPerson } from "@/lib/store";
 
 interface PageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string }>;
 }
 
-export default async function EditPersonPage({ params }: PageProps) {
+export default async function EditPersonPage({ params, searchParams }: PageProps) {
   const { id } = await params;
+  const { from } = await searchParams;
   const [person, people] = await Promise.all([
     getPerson(id),
     getAllPeople(),
@@ -29,10 +31,10 @@ export default async function EditPersonPage({ params }: PageProps) {
 
   return (
     <div className="person-form-page relative mx-auto flex w-full max-w-5xl flex-col gap-6">
-      <PersonFormBackButton />
+      <PersonFormBackButton returnTo={from === "tree" ? "/tree" : undefined} />
       <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
         <PersonFormHeading person={person} />
-        <PersonForm person={person} people={people} />
+        <PersonForm person={person} people={people} returnTo={from === "tree" ? "/tree" : undefined} />
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ interface PersonFormProps {
   onSaved?: (person: Person) => void;
   allowRelationships?: boolean;
   restrictedGender?: Exclude<Gender, "other">;
+  returnTo?: string;
 }
 
 function fullName(p: Person): string {
@@ -25,6 +26,7 @@ export function PersonForm({
   onSaved,
   allowRelationships = true,
   restrictedGender,
+  returnTo,
 }: PersonFormProps) {
   const router = useRouter();
   const { t, locale } = useLanguage();
@@ -166,8 +168,12 @@ export function PersonForm({
       onSaved(savedPerson);
       return;
     }
-    router.refresh();
-    router.back();
+    if (returnTo) {
+      router.push(returnTo);
+    } else {
+      router.refresh();
+      router.back();
+    }
   }
 
   const relatedLabel =
@@ -459,7 +465,7 @@ export function PersonForm({
           <DeletePersonButton
             id={person.id}
             name={displayFullName(person, locale)}
-            onDeleted={() => router.push("/people")}
+            onDeleted={() => router.push(returnTo ?? "/people")}
           />
         )}
       </div>
