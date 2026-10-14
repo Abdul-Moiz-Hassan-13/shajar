@@ -45,7 +45,7 @@ export function PersonDetails({ person, people }: { person: Person; people: Pers
           </svg>
         )}
       </button>
-      <div className="mx-auto flex w-full max-w-xl flex-col gap-5">
+      <div className="person-details-content mx-auto flex w-full max-w-xl flex-col gap-5">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
           {displayFullName(person, locale)}
@@ -99,7 +99,7 @@ export function PersonDetails({ person, people }: { person: Person; people: Pers
       <button
         type="button"
         onClick={() => router.back()}
-        className={`person-details-back self-start inline-flex items-center justify-center rounded-xl border text-sm font-medium transition md:hidden ${isAdmin ? "px-4 py-2" : "person-details-arrow p-2.5"}`}
+        className={`person-details-back inline-flex items-center justify-center rounded-xl border text-sm font-medium transition md:hidden ${isAdmin ? "self-start px-4 py-2" : "person-details-arrow absolute start-0 top-0 p-2.5"}`}
       >
         {isAdmin ? (
           <span className="person-details-back-label">{t.people.backToPeople}</span>

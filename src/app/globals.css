@@ -555,6 +555,16 @@ button:disabled {
   border-color: color-mix(in srgb, var(--foreground) 20%, transparent);
 }
 
+@media (max-width: 767px) {
+  .person-details-page:has(.person-details-arrow) .person-details-content {
+    padding-top: 3.5rem;
+  }
+
+  html:not([dir="rtl"]) .person-details-page:has(.person-details-arrow) .person-details-content {
+    padding-top: 4.5rem;
+  }
+}
+
 html[dir="rtl"] .person-details-page .person-details-tag-label {
   display: inline-block;
   transform: translateY(-2px);
@@ -593,7 +603,7 @@ html[dir="rtl"] .person-details-page .person-details-arrow svg {
 
 html[dir="rtl"] .person-form-back svg {
   position: relative;
-  left: 2px;
+  left: 1px;
 }
 
 html:not([dir="rtl"]) .person-details-page .person-details-arrow {
