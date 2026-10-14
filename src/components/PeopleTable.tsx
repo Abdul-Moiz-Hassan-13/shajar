@@ -77,8 +77,6 @@ export function PeopleTable({ people }: { people: Person[] }) {
     const firstRestore = requestAnimationFrame(restoreScroll);
     const secondRestore = window.setTimeout(restoreScroll, 150);
     const finalRestore = window.setTimeout(restoreScroll, 400);
-    const restoreInterval = window.setInterval(restoreScroll, 50);
-    const stopInterval = window.setTimeout(() => window.clearInterval(restoreInterval), 1200);
     window.addEventListener("popstate", restoreAfterNavigation);
     window.addEventListener("pageshow", restoreAfterNavigation);
     const saveScroll = () => sessionStorage.setItem(key, String(window.scrollY));
@@ -87,8 +85,6 @@ export function PeopleTable({ people }: { people: Person[] }) {
       cancelAnimationFrame(firstRestore);
       window.clearTimeout(secondRestore);
       window.clearTimeout(finalRestore);
-      window.clearTimeout(stopInterval);
-      window.clearInterval(restoreInterval);
       window.removeEventListener("popstate", restoreAfterNavigation);
       window.removeEventListener("pageshow", restoreAfterNavigation);
       window.history.scrollRestoration = previousRestoration;

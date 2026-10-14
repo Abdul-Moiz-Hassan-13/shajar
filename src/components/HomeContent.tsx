@@ -89,7 +89,7 @@ export function HomeContent({
           href="/tree"
           className={`home-action-card group rounded-xl border transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 ${isAdmin
             ? "flex flex-col gap-2 border-black/10 bg-gradient-to-br from-emerald-500/5 to-transparent p-3 hover:border-emerald-500/40 dark:border-white/10"
-            : "flex items-center justify-between gap-4 border-emerald-500/25 bg-gradient-to-r from-emerald-500/10 via-teal-400/5 to-transparent p-3 hover:border-emerald-500/60 hover:from-emerald-500/15 dark:border-emerald-400/25 sm:col-span-2 sm:p-4"
+            : "flex flex-col items-start justify-between gap-4 border-emerald-500/25 bg-gradient-to-r from-emerald-500/10 via-teal-400/5 to-transparent p-3 text-start hover:border-emerald-500/60 hover:from-emerald-500/15 dark:border-emerald-400/25 sm:col-span-2 sm:flex-row sm:p-4"
           }`}
         >
           {isAdmin ? (
@@ -106,11 +106,11 @@ export function HomeContent({
             </>
           ) : (
             <>
-              <span className="flex min-w-0 items-center gap-4">
+              <span className="flex min-w-0 flex-col items-start gap-4 sm:flex-row">
                 <span className="home-map-icon flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-2xl sm:h-14 sm:w-14" aria-hidden="true">
                   <span className="home-map-label home-map-label-non-admin">🗺️</span>
                 </span>
-                <span className="flex min-w-0 flex-col gap-1">
+                <span className="flex min-w-0 flex-col items-start gap-1">
                   <span className="text-lg font-semibold group-hover:text-emerald-500">
                     {t.home.exploreTree}
                   </span>
