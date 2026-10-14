@@ -23,6 +23,8 @@ export interface SpouseEdge {
 }
 
 export interface ParentEdge {
+  parentIds: string[];
+  childId: string;
   childX: number;
   childEndY: number;
   parentMidX: number;
@@ -417,6 +419,8 @@ export function computeLayout(people: Person[]): TreeLayout {
       ? parentBottomY + GEN_GAP / 2
       : Math.min(parentBottomY + GEN_GAP / 2, childTopY);
     parentEdges.push({
+      parentIds: validParentIds,
+      childId: p.id,
       childX: positions.get(p.id)!,
       childEndY: reachesFromBelow ? childTopY + NODE_HEIGHT : childTopY,
       parentMidX: parentXs.reduce((a, b) => a + b, 0) / parentXs.length,

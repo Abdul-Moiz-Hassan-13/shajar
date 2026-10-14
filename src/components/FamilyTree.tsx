@@ -257,17 +257,18 @@ export function FamilyTree({
   const [isExporting, setIsExporting] = useState(false);
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
   const [pinnedKey, setPinnedKey] = useState<string | null>(null);
+  const [flowingParentId, setFlowingParentId] = useState<string | null>(null);
+  const [flowingLeafId, setFlowingLeafId] = useState<string | null>(null);
+  const [flowAnimationId, setFlowAnimationId] = useState(0);
   const activeKey = hoveredKey ?? pinnedKey;
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [nameDraft, setNameDraft] = useState("");
-  const clickTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const treeScaleRef = useRef<HTMLDivElement | null>(null);
   const [zoom, setZoom] = useState(baseZoom);
   const zoomRef = useRef(zoom);
-  useEffect(() => {
+  useLayoutEffect(() => {
     zoomRef.current = zoom;
   }, [zoom]);
   // Nastaliq glyphs (Urdu mode) are far costlier to rasterize than Latin
@@ -280,7 +281,7 @@ export function FamilyTree({
   const [isGesturing, setIsGesturing] = useState(false);
   const [isZooming, setIsZooming] = useState(false);
   const gestureEndTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // Set by a gesture just before calling setZoom; consumed by the
+  // Set by a toolbar zoom action just before calling setZoom; consumed by the
   // useLayoutEffect below once the resize has actually landed in the DOM,
   // so the point under the fingers/cursor stays visually still.
   const pendingFocalPoint = useRef<{
@@ -336,15 +337,16 @@ export function FamilyTree({
   // ctrlKey set, regardless of whether Ctrl is actually held.
   useEffect(() => {
     const container = scrollRef.current;
-    if (!container) return;
+    const scaleWrapper = treeScaleRef.current;
+    const svg = svgRef.current;
+    if (!container || !scaleWrapper || !svg) return;
 
     let pinchStartDistance = 0;
-    let zoomAtPinchStart = 1;
+    let zoomAtPinchStart = zoomRef.current;
 
-    // touchmove fires far more often than a phone can actually paint -
-    // applying every single event as its own state update/reflow is what
-    // made pinching feel janky. Coalescing to one update per animation
-    // frame keeps it in step with what the screen can show.
+    // Touch events can arrive faster than the display can paint. Coalesce
+    // them to one direct SVG transform update per animation frame and commit
+    // React zoom state only after the gesture settles.
     let rafId: number | null = null;
     let latestGesture: { newZoom: number; clientX: number; clientY: number } | null = null;
 
@@ -359,6 +361,7 @@ export function FamilyTree({
         gestureEndTimer.current = null;
         setIsZooming(false);
         if (locale === "ur") setIsGesturing(false);
+        setZoom(zoomRef.current);
       }, 200);
     }
 
@@ -369,25 +372,35 @@ export function FamilyTree({
         const gesture = latestGesture;
         latestGesture = null;
         if (!gesture) return;
-        setZoom((zoomBefore) => {
-          pendingFocalPoint.current = {
-            clientX: gesture.clientX,
-            clientY: gesture.clientY,
+        const zoomBefore = zoomRef.current;
+        if (gesture.newZoom === zoomBefore) return;
+
+        const svgBefore = svg.getBoundingClientRect();
+        scaleWrapper.style.width = `${(layout.width + PADDING * 2) * gesture.newZoom}px`;
+        scaleWrapper.style.height = `${(layout.height + PADDING * 2) * gesture.newZoom}px`;
+        svg.style.transform = `scale(${gesture.newZoom})`;
+
+        if (center) {
+          const contentX = (gesture.clientX - svgBefore.left) / zoomBefore;
+          const desiredLeft = gesture.clientX - contentX * gesture.newZoom;
+          container.scrollLeft += svg.getBoundingClientRect().left - desiredLeft;
+        } else {
+          keepPointStable(
+            container,
+            gesture.clientX,
+            gesture.clientY,
             zoomBefore,
-            svgLeft: center ? svgRef.current?.getBoundingClientRect().left : undefined,
-          };
-          return gesture.newZoom;
-        });
+            gesture.newZoom,
+          );
+        }
+        zoomRef.current = gesture.newZoom;
       });
     }
 
     function onTouchStart(e: TouchEvent) {
       if (e.touches.length !== 2) return;
       pinchStartDistance = touchDistance(e.touches);
-      setZoom((z) => {
-        zoomAtPinchStart = z;
-        return z;
-      });
+      zoomAtPinchStart = zoomRef.current;
     }
 
     function onTouchMove(e: TouchEvent) {
@@ -435,7 +448,7 @@ export function FamilyTree({
       if (rafId !== null) cancelAnimationFrame(rafId);
       if (gestureEndTimer.current) clearTimeout(gestureEndTimer.current);
     };
-  }, [locale, baseZoom, center]);
+  }, [locale, baseZoom, center, layout.width, layout.height]);
 
   function zoomBy(step: number) {
     const container = scrollRef.current;
@@ -466,6 +479,9 @@ export function FamilyTree({
     setSearchQuery("");
     setSearchOpen(false);
     setHighlightedId(personId);
+    setPinnedKey(null);
+    setFlowingParentId(null);
+    setFlowingLeafId(null);
     const node = layout.nodes.find((n) => n.person.id === personId);
     const container = scrollRef.current;
     if (node && container) centerOnNode(container, node, zoomRef.current);
@@ -488,48 +504,42 @@ export function FamilyTree({
     }
   }
 
-  const handleNodeClick = useCallback(
-    (id: string) => {
-      if (clickTimeout.current) clearTimeout(clickTimeout.current);
-      clickTimeout.current = setTimeout(() => {
-        router.push(`/people/${id}?from=tree`);
-      }, 250);
-    },
-    [router],
-  );
-
-  const startEditing = useCallback(
-    (person: Person) => {
-      if (!isAdmin) return;
-      if (clickTimeout.current) {
-        clearTimeout(clickTimeout.current);
-        clickTimeout.current = null;
-      }
-      setEditingId(person.id);
-      setNameDraft(`${person.firstName} ${person.lastName}`.trim());
-    },
-    [isAdmin],
-  );
-
-  const saveEditing = useCallback(async (person: Person) => {
-    const trimmed = nameDraft.trim();
-    setEditingId(null);
-    if (!trimmed) return;
-
-    const parts = trimmed.split(/\s+/);
-    const lastName = parts.length > 1 ? parts.pop()! : "";
-    const firstName = parts.join(" ");
-    if (firstName === person.firstName && lastName === person.lastName) {
-      return;
+  const handleNodeClick = useCallback((id: string) => {
+    const hasChildren = layout.parentEdges.some((edge) =>
+      edge.parentIds.includes(id),
+    );
+    const selectedEdge = layout.parentEdges.find((edge) => edge.childId === id);
+    const isLeaf = !hasChildren;
+    const canTraceLeafFamily = isLeaf && selectedEdge !== undefined;
+    setPinnedKey(null);
+    setHighlightedId(hasChildren || canTraceLeafFamily ? id : null);
+    setFlowingParentId(hasChildren ? id : null);
+    setFlowingLeafId(canTraceLeafFamily ? id : null);
+    if (hasChildren || canTraceLeafFamily) {
+      setFlowAnimationId((revision) => revision + 1);
     }
+  }, [layout.parentEdges]);
 
-    const res = await fetch(`/api/people/${person.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ firstName, lastName }),
-    });
-    if (res.ok) router.refresh();
-  }, [nameDraft, router]);
+  const handleNodeDoubleClick = useCallback((id: string) => {
+    router.push(`/people/${id}?from=tree`);
+  }, [router]);
+  const selectedLeafEdge = flowingLeafId
+    ? layout.parentEdges.find((edge) => edge.childId === flowingLeafId)
+    : undefined;
+  const flowingLeafParents = selectedLeafEdge?.parentIds ?? [];
+  const flowingLeafDuration = selectedLeafEdge
+    ? Math.min(
+        1200,
+        Math.max(
+          480,
+          420 +
+            (Math.abs(selectedLeafEdge.midY - selectedLeafEdge.parentBottomY) +
+              Math.abs(selectedLeafEdge.childX - selectedLeafEdge.parentMidX) +
+              Math.abs(selectedLeafEdge.childEndY - selectedLeafEdge.midY)) *
+              0.35,
+        ),
+      )
+    : 0;
 
   // The node/edge markup below never depends on `zoom` - only the outer
   // <svg>'s own scale transform does. Memoizing it (excluding zoom from the
@@ -549,12 +559,34 @@ export function FamilyTree({
           onClick={() => {
             setPinnedKey(null);
             setHighlightedId(null);
+            setFlowingParentId(null);
+            setFlowingLeafId(null);
           }}
         />
         {layout.parentEdges.map((edge, i) => {
           const key = `parent-${i}`;
-          const active = key === activeKey;
+          const parentFlowing =
+            flowingParentId !== null && edge.parentIds.includes(flowingParentId);
+          const selectedLeafEdge = edge.childId === flowingLeafId;
+          const siblingFlowing =
+            flowingLeafId !== null &&
+            edge.parentIds.some((parentId) => flowingLeafParents.includes(parentId));
+          const isFlowing = parentFlowing || siblingFlowing;
+          const active = key === activeKey || isFlowing;
           const d = `M ${edge.parentMidX} ${edge.parentBottomY} L ${edge.parentMidX} ${edge.midY} L ${edge.childX} ${edge.midY} L ${edge.childX} ${edge.childEndY}`;
+          const flowPath = selectedLeafEdge
+            ? `M ${edge.childX} ${edge.childEndY} L ${edge.childX} ${edge.midY} L ${edge.parentMidX} ${edge.midY} L ${edge.parentMidX} ${edge.parentBottomY}`
+            : d;
+          const siblingDelay =
+            siblingFlowing && !selectedLeafEdge ? flowingLeafDuration : 0;
+          const flowDistance =
+            Math.abs(edge.midY - edge.parentBottomY) +
+            Math.abs(edge.childX - edge.parentMidX) +
+            Math.abs(edge.childEndY - edge.midY);
+          const flowDuration = Math.min(
+            1200,
+            Math.max(480, 420 + flowDistance * 0.35),
+          );
           return (
             <g key={key}>
               <path
@@ -570,12 +602,29 @@ export function FamilyTree({
                 }
               />
               <path
-                d={d}
+                key={isFlowing ? `${key}-${flowAnimationId}` : key}
+                d={isFlowing ? flowPath : d}
                 fill="none"
                 stroke={active ? HIGHLIGHT_COLOR : "currentColor"}
                 strokeOpacity={active ? 1 : 0.3}
                 strokeWidth={active ? 3 : 1.5}
+                pathLength={isFlowing ? 1 : undefined}
+                strokeDasharray={isFlowing ? "1" : undefined}
+                strokeDashoffset={isFlowing ? 1 : undefined}
                 pointerEvents="none"
+                style={
+                  isFlowing
+                    ? {
+                        animationDuration: `${flowDuration}ms`,
+                        animationDelay: `${siblingDelay}ms`,
+                      }
+                    : undefined
+                }
+                className={
+                  isFlowing
+                    ? "tree-connector-visible tree-connector-flowing"
+                    : "tree-connector-visible"
+                }
               />
             </g>
           );
@@ -610,6 +659,7 @@ export function FamilyTree({
                 strokeWidth={active ? 3 : 1.5}
                 strokeDasharray={edge.status === "divorced" ? "5 4" : undefined}
                 pointerEvents="none"
+                className="tree-connector-visible"
               />
             </g>
           );
@@ -622,8 +672,6 @@ export function FamilyTree({
           const firstNameY = hasLastName ? -9 : 0;
           const lastNameY = 9;
 
-          const isEditing = editingId === node.person.id;
-
           const isHighlighted = highlightedId === node.person.id;
 
           return (
@@ -634,8 +682,9 @@ export function FamilyTree({
             >
               <g
                 className="tree-node-interactive cursor-pointer"
+                style={{ animationDelay: `${Math.min(node.gen, 7) * 35}ms` }}
                 onClick={() => handleNodeClick(node.person.id)}
-                onDoubleClick={() => startEditing(node.person)}
+                onDoubleClick={() => handleNodeDoubleClick(node.person.id)}
               >
                 {isHighlighted && (
                   <circle
@@ -645,6 +694,7 @@ export function FamilyTree({
                     fill="none"
                     stroke={HIGHLIGHT_COLOR}
                     strokeWidth={3}
+                    className="tree-node-highlight-ring"
                   />
                 )}
                 {/* Opaque backing so connector lines passing behind (e.g. a
@@ -664,11 +714,12 @@ export function FamilyTree({
                   fillOpacity={0.18}
                   stroke={treeNodeColor(node.person)}
                   strokeWidth={1.5}
+                  className="tree-node-disc"
                   strokeDasharray={
                     node.person.isDeceased ? "5 4" : undefined
                   }
                 />
-                {!isEditing && !isGesturing && (
+                {!isGesturing && (
                   <>
                     <text
                       x={NODE_WIDTH / 2}
@@ -695,28 +746,6 @@ export function FamilyTree({
                   </>
                 )}
               </g>
-              {isEditing && (
-                <foreignObject
-                  x={10}
-                  y={NODE_HEIGHT / 2 - 14}
-                  width={NODE_WIDTH - 20}
-                  height={28}
-                >
-                  <input
-                    autoFocus
-                    value={nameDraft}
-                    onChange={(e) => setNameDraft(e.target.value)}
-                    onClick={(e) => e.stopPropagation()}
-                    onDoubleClick={(e) => e.stopPropagation()}
-                    onBlur={() => saveEditing(node.person)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") e.currentTarget.blur();
-                      if (e.key === "Escape") setEditingId(null);
-                    }}
-                    className="w-full rounded border border-black/30 bg-white px-1 py-0.5 text-center text-[13px] font-semibold text-black outline-none dark:border-white/40 dark:bg-neutral-900 dark:text-white"
-                  />
-                </foreignObject>
-              )}
             </g>
           );
         })}
@@ -726,14 +755,16 @@ export function FamilyTree({
       layout,
       centerOffset,
       activeKey,
-      editingId,
-      nameDraft,
       highlightedId,
+      flowingParentId,
+      flowingLeafId,
+      flowingLeafParents,
+      flowingLeafDuration,
+      flowAnimationId,
       locale,
       isGesturing,
       handleNodeClick,
-      startEditing,
-      saveEditing,
+      handleNodeDoubleClick,
     ],
   );
 
@@ -868,6 +899,7 @@ export function FamilyTree({
           phones). This wrapper's own box is what the scaled size actually
           is, so the scrollable area still matches. */}
       <div
+        ref={treeScaleRef}
         style={{
           width: (layout.width + padding * 2) * zoom,
           height: (layout.height + padding * 2) * zoom,
@@ -919,6 +951,9 @@ export function FamilyTree({
               {t.tree.deceased}
             </span>
           </div>
+          <p className="mt-2 text-[11px] leading-relaxed text-black/50 dark:text-white/50">
+            {t.tree.clickParentHint}
+          </p>
         </div>
       )}
     </div>

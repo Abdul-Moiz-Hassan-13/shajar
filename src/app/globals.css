@@ -811,16 +811,70 @@ html.dark .person-form-save-new:disabled {
 }
 
 .tree-node-interactive {
-  transition: filter 110ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: filter;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: tree-node-arrive 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: filter 180ms cubic-bezier(0.22, 1, 0.36, 1), transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes tree-node-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.tree-connector-visible {
+  transition: stroke 220ms ease, stroke-opacity 220ms ease, stroke-width 220ms ease;
+}
+
+.tree-connector-flowing {
+  animation: tree-water-fill 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes tree-water-fill {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.tree-node-disc {
+  transition: stroke 180ms ease, stroke-width 180ms ease, fill-opacity 180ms ease;
+}
+
+.tree-node-highlight-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: tree-node-highlight 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes tree-node-highlight {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .tree-node-interactive:hover {
   filter: drop-shadow(0 0 10px color-mix(in srgb, currentColor 18%, transparent));
+  transform: scale(1.035);
+  will-change: filter, transform;
 }
 
-.tree-node-interactive:hover circle:not(:first-child) {
+.tree-node-interactive:hover .tree-node-disc {
   stroke-width: 2.5;
+  fill-opacity: 0.24;
 }
 
 .tree-node-interactive:focus-visible {
@@ -1506,14 +1560,28 @@ html[dir="rtl"] .relation-path-label {
   .family-card,
   .family-child-pill,
   .family-graph-button,
-  .relation-person-field {
+  .relation-person-field,
+  .tree-node-interactive,
+  .tree-node-disc,
+  .tree-connector-visible {
     transition: none;
+  }
+
+  .tree-node-interactive,
+  .tree-node-highlight-ring,
+  .tree-connector-flowing {
+    animation: none;
+  }
+
+  .tree-connector-flowing {
+    stroke-dashoffset: 0;
   }
 
   .family-card:hover,
   .family-child-pill:hover,
   .family-graph-button:hover,
-  .relation-person-field:focus-within {
+  .relation-person-field:focus-within,
+  .tree-node-interactive:hover {
     transform: none;
   }
 }

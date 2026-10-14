@@ -98,6 +98,7 @@ export interface TranslationDict {
     living: string;
     deceased: string;
     legend: string;
+    clickParentHint: string;
     nothingToShow: string;
     addSomeone: string;
     toGetStarted: string;
@@ -270,6 +271,7 @@ const en: TranslationDict = {
     living: "Living",
     deceased: "Deceased",
     legend: "Legend",
+    clickParentHint: "Click a parent to trace lines to children, or a person with no children to trace parents and siblings.",
     nothingToShow: "Nothing to show yet.",
     addSomeone: "Add someone",
     toGetStarted: "to get started.",
@@ -439,6 +441,7 @@ const ur: TranslationDict = {
     living: "حیات",
     deceased: "مرحوم",
     legend: "علامتیں",
+    clickParentHint: "والد یا والدہ پر کلک کریں تو بچوں تک رشتے نمایاں ہوں گے؛ جس فرد کے بچے درج نہ ہوں، اس پر کلک کرنے سے والدین اور بہن بھائی نمایاں ہوں گے۔",
     nothingToShow: "ابھی دکھانے کے لیے کچھ نہیں ہے۔",
     addSomeone: "کسی کو شامل کریں",
     toGetStarted: "شروع کرنے کے لیے۔",
