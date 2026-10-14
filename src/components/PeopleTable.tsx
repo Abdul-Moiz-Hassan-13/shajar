@@ -249,7 +249,7 @@ export function PeopleTable({ people }: { people: Person[] }) {
                     className="people-person-card flex cursor-pointer flex-col gap-3 rounded-2xl border p-4 text-sm transition"
               >
                 <div className="people-mobile-card-heading flex items-center justify-between gap-2">
-                  <span style={{ ...genderTagStyle(p.gender), ...(p.isDeceased ? { borderStyle: "dashed", borderWidth: "1.5px" } : {}) }} className={`urdu-content-pill rounded-full border px-3 py-1 font-semibold ${p.isDeceased ? "border-dashed" : ""}`}>
+                  <span style={{ ...genderTagStyle(p.gender), ...(p.isDeceased ? { borderStyle: "dashed", borderWidth: "1.5px" } : {}) }} className={`urdu-content-pill rounded-full border px-3 py-1 font-normal ${p.isDeceased ? "border-dashed" : ""}`}>
                     {displayFullName(p, locale)}
                   </span>
                 </div>
