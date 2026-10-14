@@ -55,7 +55,7 @@ export function HomeContent({
   ];
 
   return (
-    <div className="home-content -mt-2 flex flex-col gap-8">
+    <div className={`home-content -mt-2 flex flex-col gap-8 ${isAdmin ? "" : "home-nonadmin-home"}`}>
       <div className="home-welcome-panel relative flex items-center justify-center overflow-hidden rounded-3xl border border-black/10 bg-gradient-to-br from-emerald-500/10 via-transparent to-teal-400/10 px-6 py-4 dark:border-white/10">
         <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-emerald-400/20 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-teal-400/20 blur-3xl" />
@@ -87,7 +87,7 @@ export function HomeContent({
       <div className="home-actions-grid grid gap-3 sm:grid-cols-2">
         <Link
           href="/tree"
-          className="home-action-card home-admin-action-card group flex flex-col gap-2 rounded-xl border border-black/10 bg-gradient-to-br from-emerald-500/5 to-transparent p-3 transition hover:border-emerald-500/40 dark:border-white/10"
+          className={`home-action-card home-admin-action-card group flex flex-col gap-2 rounded-xl border border-black/10 bg-gradient-to-br from-emerald-500/5 to-transparent p-3 transition hover:border-emerald-500/40 dark:border-white/10 ${isAdmin ? "" : "home-nonadmin-action-card"}`}
         >
           <span className="home-map-icon flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/15 text-2xl" aria-hidden="true">
             <span className="home-map-label home-map-label-admin">🗺️</span>
@@ -102,7 +102,7 @@ export function HomeContent({
         {!isAdmin && (
           <Link
             href="/relations"
-            className="home-action-card home-admin-action-card group flex flex-col gap-2 rounded-xl border border-black/10 bg-gradient-to-br from-teal-400/5 to-transparent p-3 transition hover:border-teal-400/40 dark:border-white/10"
+            className="home-action-card home-admin-action-card home-nonadmin-action-card group flex flex-col gap-2 rounded-xl border border-black/10 bg-gradient-to-br from-teal-400/5 to-transparent p-3 transition hover:border-teal-400/40 dark:border-white/10"
           >
             <span className="home-add-icon flex h-12 w-12 items-center justify-center rounded-xl bg-teal-400/15 text-2xl" aria-hidden="true">
               <span className="home-add-label">🔗</span>

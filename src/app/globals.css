@@ -942,6 +942,95 @@ html.dark .person-form-save-new:disabled {
     transform: translateY(1px) scale(0.98);
     filter: brightness(0.94);
   }
+
+}
+
+/* Experimental non-admin home refresh */
+.home-nonadmin-home .home-welcome-panel {
+  border-color: color-mix(in srgb, #2563eb 30%, transparent);
+  background: linear-gradient(120deg, color-mix(in srgb, #2563eb 13%, transparent), transparent 55%, color-mix(in srgb, #6366f1 11%, transparent));
+  box-shadow: 0 14px 40px color-mix(in srgb, #2563eb 8%, transparent);
+}
+
+.home-nonadmin-home .home-stat-card {
+  border-radius: 1.25rem;
+  background: color-mix(in srgb, #2563eb 5%, transparent);
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.home-nonadmin-home .home-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, #2563eb 38%, transparent);
+  background: color-mix(in srgb, #2563eb 10%, transparent);
+}
+
+.home-nonadmin-home .home-actions-grid { gap: 1rem; }
+
+.home-nonadmin-home .home-nonadmin-action-card {
+  min-height: 13rem;
+  justify-content: center;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 12px 30px color-mix(in srgb, #2563eb 7%, transparent);
+}
+
+.home-nonadmin-home .home-nonadmin-action-card:first-child {
+  border-color: color-mix(in srgb, #2563eb 35%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, #2563eb 13%, transparent), transparent 70%);
+}
+
+.home-nonadmin-home .home-nonadmin-action-card:nth-child(2) {
+  border-color: color-mix(in srgb, #6366f1 35%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, #6366f1 13%, transparent), transparent 70%);
+}
+
+.home-nonadmin-home .home-nonadmin-action-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 36px color-mix(in srgb, #2563eb 13%, transparent);
+}
+
+@media (max-width: 767px) {
+  .home-nonadmin-home .home-nonadmin-action-card {
+    min-height: 10rem;
+    padding: 1.25rem;
+  }
+}
+
+html:not(.dark) .home-nonadmin-home .home-welcome-panel {
+  background: linear-gradient(120deg, #e0ecff, #dffaf5 52%, #f0edff);
+  border-color: #a5d8f5;
+  box-shadow: 0 14px 40px rgb(37 99 235 / 0.16);
+}
+
+html:not(.dark) .home-nonadmin-home .home-stat-card {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+html:not(.dark) .home-nonadmin-home .home-nonadmin-action-card:first-child {
+  background: linear-gradient(135deg, #d2edff, #dffaf5 72%);
+  border-color: #8bcbea;
+}
+
+html:not(.dark) .home-nonadmin-home .home-nonadmin-action-card:nth-child(2) {
+  background: linear-gradient(135deg, #e8e3ff, #fbeef5 72%);
+  border-color: #b9aef0;
+}
+
+html:not(.dark) .home-nonadmin-home .home-map-icon {
+  background: #cfe5fb;
+}
+
+html:not(.dark) .home-nonadmin-home .home-add-icon {
+  background: #d5cff5;
+}
+
+html:not(.dark) .home-nonadmin-home .home-nonadmin-action-card:nth-child(2) .home-add-icon {
+  background: #cfc7f2;
+}
+
+html:not(.dark) .home-nonadmin-home .home-nonadmin-action-card .font-semibold {
+  color: #1d4ed8;
 }
 
 .family-parent-pill,
