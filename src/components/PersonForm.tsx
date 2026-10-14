@@ -257,7 +257,7 @@ export function PersonForm({
             onChange={(e) =>
               setGender(e.target.value as Person["gender"])
             }
-            className="rounded-md border border-black/15 bg-white px-3 py-2 text-black dark:border-white/20 dark:bg-neutral-900 dark:text-white"
+            className="gender-select rounded-md border border-black/15 bg-white px-3 py-2 pe-4 text-black dark:border-white/20 dark:bg-neutral-900 dark:text-white"
           >
             <option value="male" className="bg-white text-black dark:bg-neutral-900 dark:text-white">
               {t.form.male}

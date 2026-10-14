@@ -50,6 +50,20 @@ html[dir="rtl"] .brand-logo {
   overflow: visible;
 }
 
+html[dir="rtl"] .login-form-panel {
+  padding-block: 1.5rem !important;
+  transform: translateY(1rem);
+  text-align: right;
+}
+
+html[dir="rtl"] .login-form-panel form > p:last-child {
+  padding-bottom: 1.75rem;
+}
+
+html[dir="rtl"] .login-form-panel button[type="submit"] {
+  text-align: center;
+}
+
 html[dir="rtl"] input,
 html[dir="rtl"] textarea,
 html[dir="rtl"] select,
@@ -420,6 +434,10 @@ button:disabled {
   .people-parent-comma {
     display: none;
   }
+
+  .people-mobile-cards .people-relation-pill {
+    font-weight: 400 !important;
+  }
 }
 
 @media (min-width: 725px) {
@@ -522,6 +540,21 @@ button:disabled {
   transform: translateY(-1px);
 }
 
+.person-details-back.person-details-arrow:hover {
+  background: transparent;
+  transform: none;
+}
+
+.person-details-back.person-details-arrow:focus,
+.person-details-back.person-details-arrow:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.person-details-back.person-details-arrow {
+  border-color: color-mix(in srgb, var(--foreground) 20%, transparent);
+}
+
 html[dir="rtl"] .person-details-page .person-details-tag-label {
   display: inline-block;
   transform: translateY(-2px);
@@ -533,6 +566,7 @@ html[dir="rtl"] .person-details-page .person-details-back {
   padding-block: 0.2rem 0.45rem !important;
 }
 
+
 html[dir="rtl"] .person-details-page .person-details-hero > span {
   align-items: center;
   line-height: 1.5 !important;
@@ -542,6 +576,32 @@ html[dir="rtl"] .person-details-page .person-details-hero > span {
 html[dir="rtl"] .person-details-back-label {
   display: inline-block;
   transform: translateY(-2px);
+}
+
+.person-details-page .person-details-arrow {
+  padding: 0.625rem !important;
+}
+
+html[dir="rtl"] .person-details-page .person-details-arrow {
+  padding: 0.5rem 0.625rem !important;
+}
+
+html[dir="rtl"] .person-details-page .person-details-arrow svg {
+  position: relative;
+  left: 1px;
+}
+
+html[dir="rtl"] .person-form-back svg {
+  position: relative;
+  left: 2px;
+}
+
+html:not([dir="rtl"]) .person-details-page .person-details-arrow {
+  margin-inline-start: -0.25rem;
+}
+
+html:not([dir="rtl"]) .person-details-page .person-details-arrow svg {
+  transform: translateX(-1px);
 }
 
 html[dir="rtl"] .people-add-first-link {
@@ -588,6 +648,19 @@ html[dir="rtl"] .urdu-add-person-label {
 .person-form textarea {
   border-radius: 0.75rem;
   transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.person-form .gender-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23171717' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1rem;
+  padding-right: 2.5rem !important;
+}
+
+:root.dark .person-form .gender-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ededed' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
 }
 
 .person-form input:not([type="checkbox"]):focus,
@@ -872,6 +945,12 @@ html.dark .person-form-save-new:disabled {
   line-height: 1.25;
 }
 
+.people-mobile-cards .people-relation-pill,
+.people-table .people-relation-pill,
+.family-parent-pill {
+  font-weight: 400 !important;
+}
+
 .family-parent-label,
 .family-child-label {
   display: inline-block;
@@ -1063,6 +1142,10 @@ html[dir="rtl"] .home-add-label {
 }
 
 @media (min-width: 641px) {
+  html[dir="rtl"] .home-welcome-panel > div.relative {
+    transform: translateY(-8px);
+  }
+
   html[dir="rtl"] .home-content {
     gap: 1rem;
   }
@@ -1104,7 +1187,36 @@ html[dir="rtl"] .home-add-label {
   }
 }
 
+@media (min-width: 1024px) {
+  .home-content {
+    width: calc(100% + 10rem);
+    margin-inline: -5rem;
+  }
+
+  .home-welcome-panel {
+    min-height: 14rem;
+    padding-block: 3.5rem;
+  }
+
+  .home-stat-card {
+    min-height: 7rem;
+    padding-block: 1.5rem !important;
+  }
+
+  .home-action-card {
+    min-height: 11rem;
+    padding-block: 2rem !important;
+  }
+}
+
 @media (min-width: 768px) {
+  html:not([dir="rtl"]) .home-map-icon,
+  html:not([dir="rtl"]) .home-add-icon,
+  html[dir="rtl"] .home-map-icon,
+  html[dir="rtl"] .home-add-icon {
+    transform: translateY(-18px);
+  }
+
   html[dir="rtl"] .home-explore-arrow-label,
   html[dir="rtl"] .home-explore-arrow-label {
     transform: translateY(-7px);
@@ -1120,6 +1232,39 @@ html[dir="rtl"] .home-add-label {
 }
 
 @media (max-width: 767px) {
+  html[dir="rtl"] .home-welcome-panel {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  html[dir="rtl"] .home-welcome-panel > div.relative {
+    width: 100%;
+    align-items: center;
+    text-align: center;
+    transform: translateY(-8px);
+  }
+
+  .home-welcome-panel {
+    min-height: 11rem;
+    padding-block: 2rem;
+  }
+
+  .home-stat-card {
+    min-height: 6rem;
+    padding-block: 1rem !important;
+  }
+
+  .home-action-card {
+    min-height: 9rem;
+    padding-block: 1.5rem !important;
+  }
+
+  .home-map-icon,
+  .home-add-icon {
+    transform: translateY(-12px);
+  }
+
   .home-map-label {
     display: inline-flex;
     line-height: 1 !important;

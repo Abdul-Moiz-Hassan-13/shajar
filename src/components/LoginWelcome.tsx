@@ -10,9 +10,6 @@ export function LoginWelcome() {
       <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10" />
       <div className="absolute -bottom-28 -left-20 h-72 w-72 rounded-full border-[24px] border-white/10" />
       <div className="relative">
-        <div className="mb-10 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 text-2xl font-bold ring-1 ring-white/25">
-          ش
-        </div>
         <p className="max-w-xs text-2xl font-semibold leading-tight lg:text-3xl">
           {t.auth.loginDescription}
         </p>

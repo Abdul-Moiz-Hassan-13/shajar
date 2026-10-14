@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/AuthProvider";
 import { useLanguage } from "@/components/LanguageProvider";
 import { displayFullName } from "@/lib/personName";
 import { genderTagStyle } from "@/lib/personColors";
@@ -9,6 +10,7 @@ import type { Person } from "@/lib/types";
 
 export function PersonDetails({ person, people }: { person: Person; people: Person[] }) {
   const { t, locale } = useLanguage();
+  const { isAdmin } = useAuth();
   const router = useRouter();
   const byId = new Map(people.map((entry) => [entry.id, entry]));
   const related = (ids: string[]) => ids.map((id) => byId.get(id)).filter(Boolean) as Person[];
@@ -23,9 +25,25 @@ export function PersonDetails({ person, people }: { person: Person; people: Pers
       <button
         type="button"
         onClick={() => router.back()}
-        className="person-details-back absolute start-0 top-0 hidden rounded-xl border px-4 py-2 text-sm font-medium transition md:inline-flex"
+        className={`person-details-back absolute start-0 top-0 hidden items-center justify-center rounded-xl border text-sm font-medium transition md:inline-flex ${isAdmin ? "px-4 py-2" : "person-details-arrow p-2.5"}`}
       >
-        <span className="person-details-back-label">{t.people.backToPeople}</span>
+        {isAdmin ? (
+          <span className="person-details-back-label">{t.people.backToPeople}</span>
+        ) : (
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            className={`h-5 w-5 ${locale === "ur" ? "rotate-180" : ""}`}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M5 12H22" />
+            <path d="m12 19-7-7 7-7" />
+          </svg>
+        )}
       </button>
       <div className="mx-auto flex w-full max-w-xl flex-col gap-5">
       <div>
@@ -81,9 +99,25 @@ export function PersonDetails({ person, people }: { person: Person; people: Pers
       <button
         type="button"
         onClick={() => router.back()}
-        className="person-details-back self-start rounded-xl border px-4 py-2 text-sm font-medium transition md:hidden"
+        className={`person-details-back self-start inline-flex items-center justify-center rounded-xl border text-sm font-medium transition md:hidden ${isAdmin ? "px-4 py-2" : "person-details-arrow p-2.5"}`}
       >
-        <span className="person-details-back-label">{t.people.backToPeople}</span>
+        {isAdmin ? (
+          <span className="person-details-back-label">{t.people.backToPeople}</span>
+        ) : (
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            className={`h-5 w-5 ${locale === "ur" ? "rotate-180" : ""}`}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M5 12H22" />
+            <path d="m12 19-7-7 7-7" />
+          </svg>
+        )}
       </button>
       </div>
     </div>
