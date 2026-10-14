@@ -1214,8 +1214,18 @@ html[dir="rtl"] .home-add-label {
   }
 
   .home-action-card {
-    min-height: 11rem;
+    min-height: 11rem !important;
     padding-block: 2rem !important;
+  }
+
+  .home-admin-action-card {
+    min-height: 11rem !important;
+    padding-block: 2rem !important;
+  }
+
+  .home-action-card:not(.home-admin-action-card) {
+    min-height: 0 !important;
+    padding-bottom: 1rem !important;
   }
 }
 
@@ -1418,3 +1428,4 @@ html[dir="rtl"] .relation-path-label {
     transform: none;
   }
 }
+

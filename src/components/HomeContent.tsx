@@ -87,48 +87,38 @@ export function HomeContent({
       <div className="home-actions-grid grid gap-3 sm:grid-cols-2">
         <Link
           href="/tree"
-          className={`home-action-card group rounded-xl border transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 ${isAdmin
-            ? "flex flex-col gap-2 border-black/10 bg-gradient-to-br from-emerald-500/5 to-transparent p-3 hover:border-emerald-500/40 dark:border-white/10"
-            : "flex flex-col items-start justify-between gap-4 border-emerald-500/25 bg-gradient-to-r from-emerald-500/10 via-teal-400/5 to-transparent p-3 text-start hover:border-emerald-500/60 hover:from-emerald-500/15 dark:border-emerald-400/25 sm:col-span-2 sm:flex-row sm:p-4"
-          }`}
+          className="home-action-card home-admin-action-card group flex flex-col gap-2 rounded-xl border border-black/10 bg-gradient-to-br from-emerald-500/5 to-transparent p-3 transition hover:border-emerald-500/40 dark:border-white/10"
         >
-          {isAdmin ? (
-            <>
-              <span className="home-map-icon flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/15 text-2xl" aria-hidden="true">
-                <span className="home-map-label home-map-label-admin">🗺️</span>
-              </span>
-              <span className="font-semibold group-hover:text-emerald-500">
-                {t.home.exploreTree}
-              </span>
-              <span className="text-sm text-black/60 dark:text-white/60">
-                {t.home.exploreTreeDesc}
-              </span>
-            </>
-          ) : (
-            <>
-              <span className="flex min-w-0 flex-col items-start gap-4 sm:flex-row">
-                <span className="home-map-icon flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-2xl sm:h-14 sm:w-14" aria-hidden="true">
-                  <span className="home-map-label home-map-label-non-admin">🗺️</span>
-                </span>
-                <span className="flex min-w-0 flex-col items-start gap-1">
-                  <span className="text-lg font-semibold group-hover:text-emerald-500">
-                    {t.home.exploreTree}
-                  </span>
-                  <span className="text-sm text-black/60 dark:text-white/60">
-                    {t.home.exploreTreeDesc}
-                  </span>
-                </span>
-              </span>
-              <span className={`hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-emerald-500/30 text-xl text-emerald-600 transition group-hover:bg-emerald-500 group-hover:text-white dark:text-emerald-400 dark:group-hover:text-black sm:flex ${locale === "ur" ? "group-hover:-translate-x-1" : "group-hover:translate-x-1"}`} aria-hidden="true">
-                <span className="home-explore-arrow-label">{locale === "ur" ? "←" : "→"}</span>
-              </span>
-            </>
-          )}
+          <span className="home-map-icon flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/15 text-2xl" aria-hidden="true">
+            <span className="home-map-label home-map-label-admin">🗺️</span>
+          </span>
+          <span className="font-semibold group-hover:text-emerald-500">
+            {t.home.exploreTree}
+          </span>
+          <span className="text-sm text-black/60 dark:text-white/60">
+            {t.home.exploreTreeDesc}
+          </span>
         </Link>
+        {!isAdmin && (
+          <Link
+            href="/relations"
+            className="home-action-card home-admin-action-card group flex flex-col gap-2 rounded-xl border border-black/10 bg-gradient-to-br from-teal-400/5 to-transparent p-3 transition hover:border-teal-400/40 dark:border-white/10"
+          >
+            <span className="home-add-icon flex h-12 w-12 items-center justify-center rounded-xl bg-teal-400/15 text-2xl" aria-hidden="true">
+              <span className="home-add-label">🔗</span>
+            </span>
+            <span className="font-semibold group-hover:text-teal-400">
+              {t.nav.relations}
+            </span>
+            <span className="text-sm text-black/60 dark:text-white/60">
+              {t.relations.subtitle}
+            </span>
+          </Link>
+        )}
         {isAdmin && (
           <Link
             href="/people/new"
-            className="home-action-card group flex flex-col gap-2 rounded-xl border border-black/10 bg-gradient-to-br from-teal-400/5 to-transparent p-3 transition hover:border-teal-400/40 dark:border-white/10"
+            className="home-action-card home-admin-action-card group flex flex-col gap-2 rounded-xl border border-black/10 bg-gradient-to-br from-teal-400/5 to-transparent p-3 transition hover:border-teal-400/40 dark:border-white/10"
           >
             <span className="home-add-icon flex h-12 w-12 items-center justify-center rounded-xl bg-teal-400/15 text-2xl" aria-hidden="true">
               <span className="home-add-label">➕</span>
