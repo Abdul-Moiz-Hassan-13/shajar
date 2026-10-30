@@ -365,7 +365,7 @@ export function FamilyTree({
       }, 200);
     }
 
-    function scheduleZoomUpdate() {
+    const scheduleZoomUpdate = () => {
       if (rafId !== null) return;
       rafId = requestAnimationFrame(() => {
         rafId = null;
@@ -395,7 +395,7 @@ export function FamilyTree({
         }
         zoomRef.current = gesture.newZoom;
       });
-    }
+    };
 
     function onTouchStart(e: TouchEvent) {
       if (e.touches.length !== 2) return;
